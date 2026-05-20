@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+env/
+venv/
+.venv/
+
+# Node
+node_modules/
+/npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Local project files
+.env
+architecture.md
+build_milestones.md
+diabetrack_ui.html
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# OS files
+Thumbs.db
+Desktop.ini
