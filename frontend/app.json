@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Tena AI",
+    "slug": "tena-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "tena-ai",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B4D3B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tenaai.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0B4D3B"
+      },
+      "package": "com.tenaai.app"
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-font"
+    ]
+  }
+}
