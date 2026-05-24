@@ -1,13 +1,54 @@
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
+import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const [profile, setProfile] = useState<PatientProfile | null>(null);
+  const [stats, setStats] = useState<GlucoseStats | null>(null);
+  const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [p, s, t] = await Promise.all([
+        patientService.getProfile(),
+        patientService.getStats(),
+        patientService.getTodayReadings(),
+      ]);
+      setProfile(p);
+      setStats(s);
+      setTodaySlots(t.slots);
+    } catch (err) {
+      console.log('Failed to load home data', err);
+    }
+  };
+
+  const maxBarHeight = (val: number | null) => {
+    if (val === null) return '10%';
+    const pct = (val / 300) * 100;
+    return `${Math.min(Math.max(pct, 10), 95)}%`;
+  };
+
+  const barColor = (val: number | null) => {
+    if (val === null) return colors.bg2;
+    if (val > 180) return colors.red;
+    if (val < 70) return '#D94F3D';
+    return colors.greenLight;
+  };
+
+  const today = new Date();
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dateStr = `${dayNames[today.getDay()]}, ${today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -15,46 +56,48 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-            <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>{t('home.greeting', 'ሰላም')}</Text>
-            <Feather name="smile" size={16} color="rgba(255,255,255,0.55)" />
-          </View>
-            <Text style={{ fontSize: 24, fontWeight: '800', color: colors.white }}>Abebe Bekele</Text>
-            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Day 23 of tracking · Monday, May 19</Text>
+              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>{t('home.greeting', 'ሰላም')}</Text>
+              <Feather name="smile" size={16} color="rgba(255,255,255,0.55)" />
+            </View>
+            <Text style={{ fontSize: 24, fontWeight: '800', color: colors.white }}>{profile?.full_name || '...'}</Text>
+            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Day {stats?.days_logged || 0} of tracking · {dateStr}</Text>
           </View>
           <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: colors.white }}>AB</Text>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: colors.white }}>{profile?.full_name?.split(' ').map(n => n[0]).join('') || 'AB'}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white, fontVariant: ['tabular-nums'] }}>198</Text>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white, fontVariant: ['tabular-nums'] }}>{stats?.last_glucose ?? '—'}</Text>
             <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Last glucose</Text>
           </View>
           <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-              <Text style={{ fontSize: 20, fontWeight: '800', color: colors.gold2, fontVariant: ['tabular-nums'] }}>12</Text>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: colors.gold2, fontVariant: ['tabular-nums'] }}>{stats?.days_logged ?? 0}</Text>
               <MaterialCommunityIcons name="fire" size={20} color={colors.gold2} />
             </View>
             <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Day streak</Text>
           </View>
-          <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>86%</Text>
-            <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Med adherence</Text>
+            <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>{stats ? Math.round((stats.days_logged / 30) * 100) : '—'}%</Text>
+              <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Med adherence</Text>
           </View>
         </View>
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 16, paddingBottom: 96 }}>
-        <TouchableOpacity style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.redLight, borderRadius: 20, padding: 14, paddingHorizontal: 16, flexDirection: 'row', gap: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(217,79,61,0.15)' }}>
-          <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.red, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Feather name="alert-triangle" size={20} color={colors.white} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.red }}>High glucose streak detected</Text>
-            <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2, lineHeight: 16 }}>Fasting above 230 mg/dL for 3 days</Text>
-          </View>
-          <Text style={{ color: colors.t3, fontSize: 16 }}>›</Text>
-        </TouchableOpacity>
+        {stats && stats.today_high_count >= 2 && (
+          <TouchableOpacity style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.redLight, borderRadius: 20, padding: 14, paddingHorizontal: 16, flexDirection: 'row', gap: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(217,79,61,0.15)' }}>
+            <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.red, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Feather name="alert-triangle" size={20} color={colors.white} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.red }}>High readings today</Text>
+              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2, lineHeight: 16 }}>{stats.today_high_count} readings above 180 mg/dL</Text>
+            </View>
+            <Text style={{ color: colors.t3, fontSize: 16 }}>›</Text>
+          </TouchableOpacity>
+        )}
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Today's glucose</Text>
@@ -68,17 +111,16 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1 }}>Today's readings</Text>
               <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>mg/dL</Text>
             </View>
-            <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.redLight }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.red }}>3 high</Text>
-            </View>
+            {stats && stats.today_high_count > 0 && (
+              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.redLight }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.red }}>{stats.today_high_count} high</Text>
+              </View>
+            )}
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 4, height: 72 }}>
-            <View style={{ flex: 1, backgroundColor: colors.red, borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: '80%' }} />
-            <View style={{ flex: 1, backgroundColor: colors.red, borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: '92%' }} />
-            <View style={{ flex: 1, backgroundColor: colors.greenLight, borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: '60%' }} />
-            <View style={{ flex: 1, backgroundColor: colors.greenLight, borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: '68%' }} />
-            <View style={{ flex: 1, backgroundColor: colors.bg2, borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: '20%' }} />
-            <View style={{ flex: 1, backgroundColor: colors.bg2, borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: '20%' }} />
+            {todaySlots.map((slot, i) => (
+              <View key={i} style={{ flex: 1, backgroundColor: barColor(slot.value), borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: maxBarHeight(slot.value) }} />
+            ))}
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
             <Text style={{ fontSize: 9, color: colors.t4 }}>Fasting</Text>
@@ -100,9 +142,9 @@ export default function HomeScreen() {
           <LinearGradient colors={['#0B4D3B', '#1A6B52']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ padding: 20, position: 'relative', overflow: 'hidden' }}>
             <View style={{ position: 'absolute', top: -24, right: -24, width: 96, height: 96, borderRadius: 48, backgroundColor: 'rgba(255,255,255,0.06)' }} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 10 }}>
-            <MaterialCommunityIcons name="pill" size={14} color="rgba(255,255,255,0.55)" />
-            <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)' }}>Medication · Streak boost</Text>
-          </View>
+              <MaterialCommunityIcons name="pill" size={14} color="rgba(255,255,255,0.55)" />
+              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)' }}>Medication · Streak boost</Text>
+            </View>
             <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', lineHeight: 22, marginBottom: 12 }}>Your 12-day streak is doing more than you think. Every consistent dose of Metformin quietly reduces how hard your liver works to release glucose at night.</Text>
             <View style={{ backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: 12 }}>
               <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 18 }}>Metformin reduces hepatic glucose production by up to 30% when taken consistently for 2+ weeks.</Text>

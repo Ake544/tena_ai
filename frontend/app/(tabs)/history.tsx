@@ -1,29 +1,44 @@
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
-import Button from '../../components/Button';
 import { colors, typography, shadows } from '../../constants/theme';
+import { patientService, GlucoseStats } from '../../services/patient';
 
-const barData = [65, 72, 58, 85, 78, 62, 90, 75, 68, 82, 55, 70, 88, 60];
 const barColors = ['#D94F3D', '#FDECEA', '#E3F0EB', '#0B4D3B'];
 
-function getBarColor(height: number) {
-  if (height >= 80) return barColors[0];
-  if (height >= 70) return barColors[1];
-  if (height >= 60) return barColors[2];
+function getBarColor(value: number) {
+  if (value > 180) return barColors[0];
+  if (value > 140) return barColors[1];
+  if (value > 100) return barColors[2];
   return barColors[3];
 }
 
-const medicationDays = Array.from({ length: 30 }, (_, i) => {
-  const day = i + 1;
-  if (day > 22) return { label: String(day), status: 'upcoming' };
-  if (day === 5 || day === 10 || day === 15) return { label: String(day), status: 'missed' };
-  return { label: String(day), status: 'taken' };
-});
-
 export default function HistoryScreen() {
   const router = useRouter();
+  const [stats, setStats] = useState<GlucoseStats | null>(null);
+  const [history, setHistory] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [s, h] = await Promise.all([
+        patientService.getStats(),
+        patientService.getHistory(30),
+      ]);
+      setStats(s);
+      setHistory(h || []);
+    } catch (err) {
+      console.log('Failed to load history', err);
+    }
+  };
+
+  const daysLogged = stats?.days_logged ?? 0;
+  const adherence = Math.round((daysLogged / 30) * 100);
 
   return (
     <View style={styles.container}>
@@ -48,33 +63,39 @@ export default function HistoryScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.statsGrid}>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={[styles.statValue, { color: colors.red }]}>198</Text>
+            <Text style={[styles.statValue, { color: colors.red }]}>{stats?.avg_fasting ?? '—'}</Text>
             <Text style={styles.statLabel}>Avg fasting</Text>
             <Text style={styles.statUnit}>mg/dL</Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={[styles.statValue, { color: colors.green }]}>86%</Text>
+            <Text style={[styles.statValue, { color: colors.green }]}>{adherence}%</Text>
             <Text style={styles.statLabel}>Med adherence</Text>
             <Text style={styles.statUnit}>this month</Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={[styles.statValue, { color: colors.green }]}>23</Text>
+            <Text style={[styles.statValue, { color: colors.green }]}>{daysLogged}</Text>
             <Text style={styles.statLabel}>Days logged</Text>
             <Text style={styles.statUnit}>of 30</Text>
           </Card>
         </View>
 
-        <Text style={styles.sectionTitle}>30-day fasting trend</Text>
+        <Text style={styles.sectionTitle}>30-day glucose trend</Text>
         <Card style={styles.chartCard}>
           <View style={styles.chartBars}>
-            {barData.map((h, i) => (
-              <View key={i} style={[styles.bar, { height: `${h}%` as any, backgroundColor: getBarColor(h) }]} />
-            ))}
+            {history.length > 0 ? (
+              history.slice(0, 30).map((entry: any, i: number) => (
+                <View key={i} style={[styles.bar, { height: `${Math.min((entry.value / 300) * 100, 95)}%` as any, backgroundColor: getBarColor(entry.value) }]} />
+              ))
+            ) : (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontSize: 12, color: colors.t4 }}>No data yet</Text>
+              </View>
+            )}
           </View>
           <View style={styles.chartLabels}>
-            <Text style={styles.chartLabel}>Apr 19</Text>
-            <Text style={[styles.chartLabel, { flex: 1, textAlign: 'center' }]}>May 4</Text>
-            <Text style={styles.chartLabel}>May 19</Text>
+            <Text style={styles.chartLabel}>{new Date(Date.now() - 30*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+            <Text style={[styles.chartLabel, { flex: 1, textAlign: 'center' }]}>{new Date(Date.now() - 15*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+            <Text style={styles.chartLabel}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
           </View>
           <View style={styles.legend}>
             <View style={styles.legendItem}>
@@ -96,32 +117,44 @@ export default function HistoryScreen() {
               <Text style={styles.medSchedule}>Twice daily</Text>
             </View>
             <View style={styles.medBadge}>
-              <Text style={styles.medBadgeText}>86%</Text>
+              <Text style={styles.medBadgeText}>{adherence}%</Text>
             </View>
           </View>
           <View style={styles.medCalendar}>
-            {medicationDays.map((day) => (
-              <View
-                key={day.label}
-                style={[
-                  styles.medDay,
-                  day.status === 'taken' && styles.medDayTaken,
-                  day.status === 'missed' && styles.medDayMissed,
-                  day.status === 'upcoming' && styles.medDayUpcoming,
-                ]}
-              >
-                <Text
+            {Array.from({ length: 30 }, (_, i) => {
+              const day = i + 1;
+              const hasLog = history.some((h: any) => {
+                const d = new Date(h.timestamp);
+                return d.getDate() === day && (d.getMonth() === new Date().getMonth() || d.getMonth() === new Date(Date.now() - 30*86400000).getMonth());
+              });
+              const isUpcoming = day > daysLogged;
+              const isMissed = !hasLog && !isUpcoming;
+              let status = 'taken';
+              if (isUpcoming) status = 'upcoming';
+              else if (isMissed) status = 'missed';
+              return (
+                <View
+                  key={day}
                   style={[
-                    styles.medDayText,
-                    day.status === 'taken' && styles.medDayTextTaken,
-                    day.status === 'missed' && styles.medDayTextMissed,
-                    day.status === 'upcoming' && styles.medDayTextUpcoming,
+                    styles.medDay,
+                    status === 'taken' && styles.medDayTaken,
+                    status === 'missed' && styles.medDayMissed,
+                    status === 'upcoming' && styles.medDayUpcoming,
                   ]}
                 >
-                  {day.label}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={[
+                      styles.medDayText,
+                      status === 'taken' && styles.medDayTextTaken,
+                      status === 'missed' && styles.medDayTextMissed,
+                      status === 'upcoming' && styles.medDayTextUpcoming,
+                    ]}
+                  >
+                    {day}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
           <View style={styles.medLegend}>
             <View style={styles.medLegendItem}>
@@ -139,41 +172,23 @@ export default function HistoryScreen() {
           </View>
         </Card>
 
-        <Text style={styles.sectionTitle}>Alerts & episodes</Text>
-        <Card>
-          <View style={styles.alertRow}>
-            <View style={styles.alertIcon}><Feather name="alert-triangle" size={20} color={colors.red} /></View>
-            <View style={styles.alertInfo}>
-              <Text style={styles.alertTitle}>High glucose streak</Text>
-              <Text style={styles.alertSub}>May 17-19 · Fasting &gt; 230 mg/dL</Text>
-            </View>
-            <View style={[styles.alertBadge, { backgroundColor: colors.redLight }]}>
-              <Text style={[styles.alertBadgeText, { color: colors.red }]}>Urgent</Text>
-            </View>
-          </View>
-          <View style={styles.alertDivider} />
-          <View style={styles.alertRow}>
-            <View style={styles.alertIcon}><MaterialCommunityIcons name="pill" size={20} color={colors.t3} /></View>
-            <View style={styles.alertInfo}>
-              <Text style={styles.alertTitle}>Missed medication</Text>
-              <Text style={styles.alertSub}>May 14 · Evening dose</Text>
-            </View>
-            <View style={[styles.alertBadge, { backgroundColor: colors.amberLight }]}>
-              <Text style={[styles.alertBadgeText, { color: colors.amber }]}>Warning</Text>
-            </View>
-          </View>
-          <View style={styles.alertDivider} />
-          <View style={styles.alertRow}>
-            <View style={styles.alertIcon}><Feather name="info" size={20} color={colors.blue} /></View>
-            <View style={styles.alertInfo}>
-              <Text style={styles.alertTitle}>3 days without logging</Text>
-              <Text style={styles.alertSub}>May 9-11</Text>
-            </View>
-            <View style={[styles.alertBadge, { backgroundColor: colors.blueLight }]}>
-              <Text style={[styles.alertBadgeText, { color: colors.blue }]}>Info</Text>
-            </View>
-          </View>
-        </Card>
+        {stats && stats.today_high_count > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Alerts & episodes</Text>
+            <Card>
+              <View style={styles.alertRow}>
+                <View style={styles.alertIcon}><Feather name="alert-triangle" size={20} color={colors.red} /></View>
+                <View style={styles.alertInfo}>
+                  <Text style={styles.alertTitle}>High glucose today</Text>
+                  <Text style={styles.alertSub}>{stats.today_high_count} readings above 180 mg/dL</Text>
+                </View>
+                <View style={[styles.alertBadge, { backgroundColor: colors.redLight }]}>
+                  <Text style={[styles.alertBadgeText, { color: colors.red }]}>Urgent</Text>
+                </View>
+              </View>
+            </Card>
+          </>
+        )}
       </ScrollView>
     </View>
   );

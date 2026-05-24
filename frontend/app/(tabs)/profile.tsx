@@ -1,12 +1,34 @@
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
 import { colors, typography, shadows } from '../../constants/theme';
 import { authService } from '../../services/auth';
+import { patientService, PatientProfile } from '../../services/patient';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const [profile, setProfile] = useState<PatientProfile | null>(null);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const p = await patientService.getProfile();
+      setProfile(p);
+    } catch (err) {
+      console.log('Failed to load profile', err);
+    }
+  };
+
+  const initials = profile?.full_name
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase() || 'AB';
 
   const handleLogout = async () => {
     await authService.logout();
@@ -17,21 +39,21 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <View style={styles.greenHeader}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>AB</Text>
+          <Text style={styles.avatarText}>{initials}</Text>
         </View>
-        <Text style={styles.name}>Abebe Bekele</Text>
+        <Text style={styles.name}>{profile?.full_name || 'Loading...'}</Text>
         <Text style={styles.subtitle}>Type 2 DM · Since 2021</Text>
         <View style={styles.badgeRow}>
           <View style={styles.badgePill}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <MaterialCommunityIcons name="leaf" size={14} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.badgePillText}>Low awareness</Text>
+              <Text style={styles.badgePillText}>{profile?.education_level || 'Low awareness'}</Text>
             </View>
           </View>
           <View style={styles.badgePill}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <Feather name="flag" size={14} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.badgePillText}>Amharic</Text>
+              <Text style={styles.badgePillText}>{profile?.language === 'am' ? 'Amharic' : 'English'}</Text>
             </View>
           </View>
         </View>
@@ -41,19 +63,19 @@ export default function ProfileScreen() {
         <View style={styles.statsGrid}>
           <Card variant="sm" style={styles.statCard}>
             <Text style={styles.statLabel}>Age</Text>
-            <Text style={styles.statValue}>47 <Text style={styles.statUnit}>yrs</Text></Text>
+            <Text style={styles.statValue}>{profile?.age || '—'} <Text style={styles.statUnit}>yrs</Text></Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
             <Text style={styles.statLabel}>BMI</Text>
-            <Text style={styles.statValue}>27.4</Text>
+            <Text style={styles.statValue}>{profile?.bmi || '—'}</Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={styles.statLabel}>Weight</Text>
-            <Text style={styles.statValue}>78 <Text style={styles.statUnit}>kg</Text></Text>
+            <Text style={styles.statLabel}>Sex</Text>
+            <Text style={styles.statValue}>{profile?.sex || '—'}</Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={styles.statLabel}>Height</Text>
-            <Text style={styles.statValue}>169 <Text style={styles.statUnit}>cm</Text></Text>
+            <Text style={styles.statLabel}>Language</Text>
+            <Text style={styles.statValue}>{profile?.language === 'am' ? 'አማርኛ' : 'English'}</Text>
           </Card>
         </View>
 
@@ -74,7 +96,7 @@ export default function ProfileScreen() {
             <View style={styles.infoIcon}><MaterialCommunityIcons name="dna" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Family history</Text>
-              <Text style={styles.infoSub}>Father · Type 2 diabetes</Text>
+              <Text style={styles.infoSub}>{profile?.family_history ? 'Yes · Type 2 diabetes' : 'None reported'}</Text>
             </View>
           </View>
           <View style={styles.infoDivider} />
@@ -96,7 +118,7 @@ export default function ProfileScreen() {
             <View style={styles.infoIcon}><MaterialCommunityIcons name="walk" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Exercise</Text>
-              <Text style={styles.infoSub}>Walking · 3×/week · 30 min</Text>
+              <Text style={styles.infoSub}>{profile?.exercise_habit || 'Not specified'}</Text>
             </View>
           </View>
           <View style={styles.infoDivider} />
@@ -104,7 +126,7 @@ export default function ProfileScreen() {
             <View style={styles.infoIcon}><MaterialCommunityIcons name="food" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Staple diet</Text>
-              <Text style={styles.infoSub}>Injera · Light snacking</Text>
+              <Text style={styles.infoSub}>{profile?.staple_diet || 'Not specified'}</Text>
             </View>
           </View>
           <View style={styles.infoDivider} />
@@ -134,7 +156,7 @@ export default function ProfileScreen() {
             <View style={styles.settingIcon}><Feather name="globe" size={20} color={colors.t1} /></View>
             <View style={styles.settingContent}>
               <Text style={styles.settingLabel}>Language</Text>
-              <Text style={styles.settingSub}>አማርኛ (Amharic)</Text>
+              <Text style={styles.settingSub}>{profile?.language === 'am' ? 'አማርኛ (Amharic)' : 'English'}</Text>
             </View>
             <Text style={styles.changeBtn}>Change</Text>
           </View>
