@@ -6,6 +6,8 @@ import { useRouter } from 'expo-router';
 import Button from '../../components/Button';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import { patientService, GlucoseTodaySlot } from '../../services/patient';
+import { dbService } from '../../services/db';
+import { syncService } from '../../services/sync';
 
 const symptomList = [
   { iconSet: 'feather' as const, icon: 'activity', label: 'Headache' },
@@ -17,12 +19,7 @@ const symptomList = [
   { iconSet: 'feather' as const, icon: 'plus', label: 'More' },
 ];
 
-const readingTypes = [
-  { iconSet: 'feather' as const, icon: 'moon', label: 'Pre-dinner' },
-  { iconSet: 'material' as const, icon: 'sleep', label: 'Bedtime' },
-];
-
-function IconRender({ item, size, color }: { item: typeof symptomList[0] | typeof readingTypes[0]; size: number; color: string }) {
+function IconRender({ item, size, color }: { item: typeof symptomList[0]; size: number; color: string }) {
   if (item.iconSet === 'feather') return <Feather name={item.icon as any} size={size} color={color} />;
   return <MaterialCommunityIcons name={item.icon as any} size={size} color={color} />;
 }
@@ -38,6 +35,10 @@ export default function LogScreen() {
 
   useEffect(() => {
     loadToday();
+  }, []);
+
+  useEffect(() => {
+    syncService.syncPending();
   }, []);
 
   const loadToday = async () => {
@@ -57,23 +58,36 @@ export default function LogScreen() {
 
   const handleSave = async () => {
     setSubmitting(true);
+    const logData = {
+      value,
+      reading_type: selectedType,
+      timestamp: new Date().toISOString(),
+      symptoms: selectedSymptoms.join(', ') || undefined,
+    };
+
     try {
-      await patientService.logReading({
-        value,
-        reading_type: selectedType,
-        timestamp: new Date().toISOString(),
-        symptoms: selectedSymptoms.join(', ') || undefined,
-      });
-      router.push('/(tabs)/home');
-    } catch (err: any) {
-      Alert.alert('Error', err.response?.data?.detail || 'Failed to save reading');
-    } finally {
-      setSubmitting(false);
+      await dbService.saveLog(logData);
+    } catch (err) {
+      console.log('Failed to save locally', err);
     }
+
+    const online = await syncService.isOnline();
+    if (online) {
+      try {
+        await patientService.logReading(logData);
+      } catch {
+        console.log('Online save failed, will sync later');
+      }
+    }
+
+    setSubmitting(false);
+    router.push(`/log-success?value=${value}&reading_type=${encodeURIComponent(selectedType)}`);
   };
 
-  const allReadingTypes = [...readingTypes];
-  const fastingTypes = ['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch'];
+  const allReadingTypes = [
+    { iconSet: 'feather' as const, icon: 'moon', label: 'Pre-dinner' },
+    { iconSet: 'material' as const, icon: 'sleep', label: 'Bedtime' },
+  ];
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

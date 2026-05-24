@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
+import { syncService } from '../../services/sync';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -20,6 +21,7 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
+      syncService.syncPending();
       const [p, s, t] = await Promise.all([
         patientService.getProfile(),
         patientService.getStats(),
