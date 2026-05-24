@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
-import BottomNav from '../../components/BottomNav';
 import { colors, typography, shadows } from '../../constants/theme';
 import { authService } from '../../services/auth';
 
@@ -23,10 +23,16 @@ export default function ProfileScreen() {
         <Text style={styles.subtitle}>Type 2 DM · Since 2021</Text>
         <View style={styles.badgeRow}>
           <View style={styles.badgePill}>
-            <Text style={styles.badgePillText}>🌱 Low awareness</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <MaterialCommunityIcons name="leaf" size={14} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.badgePillText}>Low awareness</Text>
+            </View>
           </View>
           <View style={styles.badgePill}>
-            <Text style={styles.badgePillText}>🇪🇹 Amharic</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Feather name="flag" size={14} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.badgePillText}>Amharic</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -57,7 +63,7 @@ export default function ProfileScreen() {
         </View>
         <Card style={styles.sectionCard}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoEmoji}>💊</Text>
+            <View style={styles.infoIcon}><MaterialCommunityIcons name="pill" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Metformin 500mg</Text>
               <Text style={styles.infoSub}>Twice daily · No side effects</Text>
@@ -65,7 +71,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.infoRow}>
-            <Text style={styles.infoEmoji}>🧬</Text>
+            <View style={styles.infoIcon}><MaterialCommunityIcons name="dna" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Family history</Text>
               <Text style={styles.infoSub}>Father · Type 2 diabetes</Text>
@@ -73,7 +79,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.infoRow}>
-            <Text style={styles.infoEmoji}>🚫</Text>
+            <View style={styles.infoIcon}><Feather name="x-circle" size={20} color={colors.t3} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Allergies</Text>
               <Text style={styles.infoSub}>None reported</Text>
@@ -87,7 +93,7 @@ export default function ProfileScreen() {
         </View>
         <Card style={styles.sectionCard}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoEmoji}>🚶</Text>
+            <View style={styles.infoIcon}><MaterialCommunityIcons name="walk" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Exercise</Text>
               <Text style={styles.infoSub}>Walking · 3×/week · 30 min</Text>
@@ -95,7 +101,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.infoRow}>
-            <Text style={styles.infoEmoji}>🫓</Text>
+            <View style={styles.infoIcon}><MaterialCommunityIcons name="food" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Staple diet</Text>
               <Text style={styles.infoSub}>Injera · Light snacking</Text>
@@ -103,7 +109,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.infoRow}>
-            <Text style={styles.infoEmoji}>🚭</Text>
+            <View style={styles.infoIcon}><MaterialCommunityIcons name="smoking-off" size={20} color={colors.t3} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Substances</Text>
               <Text style={styles.infoSub}>No alcohol · Non-smoker</Text>
@@ -116,7 +122,7 @@ export default function ProfileScreen() {
         </View>
         <Card style={styles.sectionCard}>
           <View style={styles.settingRow}>
-            <Text style={styles.settingEmoji}>🔔</Text>
+            <View style={styles.settingIcon}><Feather name="bell" size={20} color={colors.t1} /></View>
             <View style={styles.settingContent}>
               <Text style={styles.settingLabel}>Medication reminder</Text>
               <Text style={styles.settingSub}>8:00 AM & 8:00 PM · 2 active</Text>
@@ -125,7 +131,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.settingRow}>
-            <Text style={styles.settingEmoji}>🌐</Text>
+            <View style={styles.settingIcon}><Feather name="globe" size={20} color={colors.t1} /></View>
             <View style={styles.settingContent}>
               <Text style={styles.settingLabel}>Language</Text>
               <Text style={styles.settingSub}>አማርኛ (Amharic)</Text>
@@ -134,7 +140,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.settingRow}>
-            <Text style={styles.settingEmoji}>📅</Text>
+            <View style={styles.settingIcon}><Feather name="calendar" size={20} color={colors.t1} /></View>
             <View style={styles.settingContent}>
               <Text style={styles.settingLabel}>Appointments</Text>
               <Text style={styles.settingSub}>2 upcoming · Next in 6 days</Text>
@@ -143,7 +149,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.infoDivider} />
           <View style={styles.settingRow} onTouchEnd={handleLogout}>
-            <Text style={styles.settingEmoji}>🚪</Text>
+            <View style={styles.settingIcon}><Feather name="log-out" size={20} color={colors.red} /></View>
             <View style={styles.settingContent}>
               <Text style={[styles.settingLabel, { color: colors.red }]}>Sign out</Text>
               <Text style={styles.settingSub}>You'll need to sign back in</Text>
@@ -152,11 +158,6 @@ export default function ProfileScreen() {
           </View>
         </Card>
       </ScrollView>
-
-      <BottomNav
-        activeTab="profile"
-        onTabPress={(tab) => router.push(`/(tabs)/${tab}`)}
-      />
     </View>
   );
 }
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 96,
+    paddingBottom: 24,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -276,10 +277,10 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 12,
   },
-  infoEmoji: {
-    fontSize: 18,
+  infoIcon: {
     width: 28,
-    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   infoContent: {
     flex: 1,
@@ -304,10 +305,10 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 12,
   },
-  settingEmoji: {
-    fontSize: 18,
+  settingIcon: {
     width: 28,
-    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   settingContent: {
     flex: 1,

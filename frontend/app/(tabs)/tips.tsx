@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
-import BottomNav from '../../components/BottomNav';
 import { colors, typography } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
@@ -34,28 +34,37 @@ export default function TipsScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <LinearGradient colors={['#0B4D3B', '#1A6B52']} style={styles.tipCard}>
           <View style={[styles.decorCircle, { bottom: -20, right: -20 }]} />
-          <Text style={styles.tipLabel}>💊 Medication · Streak reinforcement</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+            <MaterialCommunityIcons name="pill" size={14} color="rgba(255,255,255,0.5)" />
+            <Text style={styles.tipLabel}>Medication · Streak reinforcement</Text>
+          </View>
           <Text style={styles.tipBody}>Taking your medication consistently is the single most important habit for managing diabetes. Every dose you take on time builds a streak that keeps your blood sugar stable and reduces long-term complications.</Text>
           <View style={styles.factBox}>
-            <Text style={styles.factText}>📌 Fact: Patients who maintain a 7-day medication streak are 3× more likely to reach their target HbA1c within 3 months.</Text>
+            <Text style={styles.factText}>Fact: Patients who maintain a 7-day medication streak are 3× more likely to reach their target HbA1c within 3 months.</Text>
           </View>
         </LinearGradient>
 
         <LinearGradient colors={['#8B5A00', '#C47A20']} style={styles.tipCard}>
           <View style={[styles.decorCircle, { top: -20, left: -20 }]} />
-          <Text style={styles.tipLabel}>📈 Glucose · Consequence story</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+            <Feather name="bar-chart-2" size={14} color="rgba(255,255,255,0.5)" />
+            <Text style={styles.tipLabel}>Glucose · Consequence story</Text>
+          </View>
           <Text style={styles.tipBody}>When blood sugar stays high for extended periods, it damages blood vessels and nerves. Over time, this can lead to serious complications affecting your eyes, kidneys, and feet.</Text>
           <View style={styles.factBox}>
-            <Text style={styles.factText}>📌 Fact: Uncontrolled glucose above 240 mg/dL for 3+ days increases infection risk by 40%. Consistent tracking helps you spot trends early.</Text>
+            <Text style={styles.factText}>Fact: Uncontrolled glucose above 240 mg/dL for 3+ days increases infection risk by 40%. Consistent tracking helps you spot trends early.</Text>
           </View>
         </LinearGradient>
 
         <LinearGradient colors={['#1A3D6B', '#2A6DB5']} style={styles.tipCard}>
           <View style={[styles.decorCircle, { bottom: -20, right: -20 }]} />
-          <Text style={styles.tipLabel}>🫓 Diet · Ethiopian context</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+            <MaterialCommunityIcons name="food" size={14} color="rgba(255,255,255,0.5)" />
+            <Text style={styles.tipLabel}>Diet · Ethiopian context</Text>
+          </View>
           <Text style={styles.tipBody}>Injera is a staple in Ethiopian cuisine, but its high carbohydrate content can spike blood sugar. Pairing it with protein-rich stews and fibrous vegetables helps slow glucose absorption.</Text>
           <View style={styles.factBox}>
-            <Text style={styles.factText}>📌 Fact: A single piece of injera (100g) contains ~48g of carbs. Balancing your plate with shiro, gomen, or lean meat can reduce the glycemic impact by up to 30%.</Text>
+            <Text style={styles.factText}>Fact: A single piece of injera (100g) contains ~48g of carbs. Balancing your plate with shiro, gomen, or lean meat can reduce the glycemic impact by up to 30%.</Text>
           </View>
         </LinearGradient>
 
@@ -64,7 +73,7 @@ export default function TipsScreen() {
         <Card>
           <View style={styles.prevTipRow}>
             <View style={[styles.prevTipIcon, { backgroundColor: colors.greenLight }]}>
-              <Text style={styles.prevTipEmoji}>🏃</Text>
+              <MaterialCommunityIcons name="walk" size={20} color={colors.green} />
             </View>
             <View style={styles.prevTipInfo}>
               <Text style={styles.prevTipName}>Walking lowers blood sugar</Text>
@@ -74,7 +83,7 @@ export default function TipsScreen() {
           <View style={styles.prevTipDivider} />
           <View style={styles.prevTipRow}>
             <View style={[styles.prevTipIcon, { backgroundColor: colors.amberLight }]}>
-              <Text style={styles.prevTipEmoji}>⚡</Text>
+              <Feather name="zap" size={20} color={'#9A6200'} />
             </View>
             <View style={styles.prevTipInfo}>
               <Text style={styles.prevTipName}>Missing one dose — what really happens</Text>
@@ -84,7 +93,7 @@ export default function TipsScreen() {
           <View style={styles.prevTipDivider} />
           <View style={styles.prevTipRow}>
             <View style={[styles.prevTipIcon, { backgroundColor: colors.blueLight }]}>
-              <Text style={styles.prevTipEmoji}>💧</Text>
+              <MaterialCommunityIcons name="water" size={20} color="#3B82F6" />
             </View>
             <View style={styles.prevTipInfo}>
               <Text style={styles.prevTipName}>Why thirst is your body's signal</Text>
@@ -93,11 +102,6 @@ export default function TipsScreen() {
           </View>
         </Card>
       </ScrollView>
-
-      <BottomNav
-        activeTab="tips"
-        onTabPress={(tab) => router.push(`/(tabs)/${tab}`)}
-      />
     </View>
   );
 }
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 96,
+    paddingBottom: 24,
   },
   tipCard: {
     borderRadius: 24,
@@ -221,9 +225,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  prevTipEmoji: {
-    fontSize: 18,
   },
   prevTipInfo: {
     flex: 1,

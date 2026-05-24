@@ -2,24 +2,29 @@ import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
-import BottomNav from '../../components/BottomNav';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Button from '../../components/Button';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 
 const symptomList = [
-  { emoji: '😵', label: 'Headache' },
-  { emoji: '💧', label: 'Thirst' },
-  { emoji: '👁️', label: 'Blurred vision' },
-  { emoji: '😴', label: 'Fatigue' },
-  { emoji: '🦶', label: 'Foot pain' },
-  { emoji: '⚡', label: 'Weakness' },
-  { emoji: '+', label: 'More' },
+  { iconSet: 'feather' as const, icon: 'activity', label: 'Headache' },
+  { iconSet: 'material' as const, icon: 'water', label: 'Thirst' },
+  { iconSet: 'feather' as const, icon: 'eye', label: 'Blurred vision' },
+  { iconSet: 'material' as const, icon: 'sleep', label: 'Fatigue' },
+  { iconSet: 'material' as const, icon: 'foot-print', label: 'Foot pain' },
+  { iconSet: 'feather' as const, icon: 'zap', label: 'Weakness' },
+  { iconSet: 'feather' as const, icon: 'plus', label: 'More' },
 ];
 
 const readingTypes = [
-  { emoji: '🌙', label: 'Pre-dinner' },
-  { emoji: '😴', label: 'Bedtime' },
+  { iconSet: 'feather' as const, icon: 'moon', label: 'Pre-dinner' },
+  { iconSet: 'material' as const, icon: 'sleep', label: 'Bedtime' },
 ];
+
+function IconRender({ item, size, color }: { item: typeof symptomList[0] | typeof readingTypes[0]; size: number; color: string }) {
+  if (item.iconSet === 'feather') return <Feather name={item.icon as any} size={size} color={color} />;
+  return <MaterialCommunityIcons name={item.icon as any} size={size} color={color} />;
+}
 
 export default function LogScreen() {
   const { t } = useTranslation();
@@ -74,7 +79,7 @@ export default function LogScreen() {
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: 96 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: 24 }}>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1, marginBottom: 14 }}>Add a reading</Text>
 
@@ -88,7 +93,10 @@ export default function LogScreen() {
                   onPress={() => setSelectedType(type.label)}
                   style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 50, backgroundColor: active ? colors.green : colors.bg2 }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? colors.white : colors.t3 }}>{type.emoji} {type.label}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <IconRender item={type} size={16} color={active ? colors.white : colors.t3} />
+                    <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? colors.white : colors.t3 }}>{type.label}</Text>
+                  </View>
                 </TouchableOpacity>
               );
             })}
@@ -126,7 +134,10 @@ export default function LogScreen() {
                   onPress={() => toggleSymptom(symptom.label)}
                   style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 50, backgroundColor: active ? colors.goldLight : colors.bg2 }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? '#9A6200' : colors.t2 }}>{symptom.emoji} {symptom.label}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <IconRender item={symptom} size={16} color={active ? '#9A6200' : colors.t2} />
+                    <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? '#9A6200' : colors.t2 }}>{symptom.label}</Text>
+                  </View>
                 </TouchableOpacity>
               );
             })}
@@ -139,15 +150,16 @@ export default function LogScreen() {
         <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Text style={{ fontSize: 18 }}>💊</Text>
+              <MaterialCommunityIcons name="pill" size={20} color={colors.green} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Metformin 500mg</Text>
               <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Twice daily · 8AM & 8PM</Text>
             </View>
             <View style={{ gap: 6, alignItems: 'flex-end' }}>
-              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.green }}>AM ✓</Text>
+              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight, flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                <Feather name="check" size={12} color={colors.green} />
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.green }}>AM</Text>
               </View>
               <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.goldLight }}>
                 <Text style={{ fontSize: 11, fontWeight: '700', color: '#9A6200' }}>PM ?</Text>
@@ -156,8 +168,6 @@ export default function LogScreen() {
           </View>
         </View>
       </ScrollView>
-
-      <BottomNav activeTab="log" onTabPress={(tab) => router.push(`/(tabs)/${tab}`)} />
     </View>
   );
 }

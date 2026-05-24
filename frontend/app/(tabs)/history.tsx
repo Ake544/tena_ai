@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
-import BottomNav from '../../components/BottomNav';
 import { colors, typography, shadows } from '../../constants/theme';
 
 const barData = [65, 72, 58, 85, 78, 62, 90, 75, 68, 82, 55, 70, 88, 60];
@@ -39,7 +39,10 @@ export default function HistoryScreen() {
           <Text style={styles.title}>History</Text>
           <Text style={styles.titleSub}>Last 30 days</Text>
         </View>
-        <Button title="📄 Export PDF" onPress={() => {}} variant="ghost" size="sm" style={styles.exportBtn} />
+        <TouchableOpacity onPress={() => {}} style={styles.exportBtn}>
+            <Feather name="download" size={16} color={colors.green} />
+            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.green, marginLeft: 6 }}>Export PDF</Text>
+          </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -139,7 +142,7 @@ export default function HistoryScreen() {
         <Text style={styles.sectionTitle}>Alerts & episodes</Text>
         <Card>
           <View style={styles.alertRow}>
-            <Text style={styles.alertEmoji}>⚠️</Text>
+            <View style={styles.alertIcon}><Feather name="alert-triangle" size={20} color={colors.red} /></View>
             <View style={styles.alertInfo}>
               <Text style={styles.alertTitle}>High glucose streak</Text>
               <Text style={styles.alertSub}>May 17-19 · Fasting &gt; 230 mg/dL</Text>
@@ -150,7 +153,7 @@ export default function HistoryScreen() {
           </View>
           <View style={styles.alertDivider} />
           <View style={styles.alertRow}>
-            <Text style={styles.alertEmoji}>💊</Text>
+            <View style={styles.alertIcon}><MaterialCommunityIcons name="pill" size={20} color={colors.t3} /></View>
             <View style={styles.alertInfo}>
               <Text style={styles.alertTitle}>Missed medication</Text>
               <Text style={styles.alertSub}>May 14 · Evening dose</Text>
@@ -161,7 +164,7 @@ export default function HistoryScreen() {
           </View>
           <View style={styles.alertDivider} />
           <View style={styles.alertRow}>
-            <Text style={styles.alertEmoji}>ℹ️</Text>
+            <View style={styles.alertIcon}><Feather name="info" size={20} color={colors.blue} /></View>
             <View style={styles.alertInfo}>
               <Text style={styles.alertTitle}>3 days without logging</Text>
               <Text style={styles.alertSub}>May 9-11</Text>
@@ -172,11 +175,6 @@ export default function HistoryScreen() {
           </View>
         </Card>
       </ScrollView>
-
-      <BottomNav
-        activeTab="history"
-        onTabPress={(tab) => router.push(`/(tabs)/${tab}`)}
-      />
     </View>
   );
 }
@@ -226,15 +224,18 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   exportBtn: {
-    width: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.greenLight,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    borderRadius: 9999,
   },
   scroll: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 96,
+    paddingBottom: 24,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -402,10 +403,10 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 12,
   },
-  alertEmoji: {
-    fontSize: 18,
+  alertIcon: {
     width: 32,
-    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   alertInfo: {
     flex: 1,

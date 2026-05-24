@@ -1,16 +1,17 @@
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import Svg, { Path, Circle, Line, Polyline, Rect } from 'react-native-svg';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { colors } from '../constants/theme';
 
 type Tab = 'home' | 'log' | 'tips' | 'history' | 'profile';
 
-interface BottomNavProps {
-  activeTab: Tab;
-  onTabPress: (tab: Tab) => void;
+interface TabConfig {
+  key: Tab;
+  label: string;
 }
 
-const tabs: { key: Tab; label: string }[] = [
-  { key: 'home', label: '' },
+const tabs: TabConfig[] = [
+  { key: 'home', label: 'Home' },
   { key: 'log', label: 'Log' },
   { key: 'tips', label: 'Tips' },
   { key: 'history', label: 'History' },
@@ -78,14 +79,30 @@ const iconComponents: Record<Tab, typeof HomeIcon> = {
   profile: ProfileIcon,
 };
 
-export default function BottomNav({ activeTab, onTabPress }: BottomNavProps) {
+export default function BottomNav({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
     <View style={styles.container}>
-      {tabs.map(({ key, label }) => {
-        const isActive = key === activeTab;
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const key = route.name as Tab;
+        const isActive = state.index === index;
         const Icon = iconComponents[key];
+        const tabConfig = tabs.find((t) => t.key === key);
+        const label = tabConfig?.label ?? '';
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+          if (!isActive && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
         return (
-          <TouchableOpacity key={key} style={[styles.item, !isActive && styles.itemInactive]} onPress={() => onTabPress(key)} activeOpacity={0.7}>
+          <TouchableOpacity key={route.key} style={[styles.item, !isActive && styles.itemInactive]} onPress={onPress} activeOpacity={0.7} accessibilityRole="button" accessibilityState={isActive ? { selected: true } : {}}>
             <Icon active={isActive} />
             {isActive ? (
               <View style={styles.dot} />
