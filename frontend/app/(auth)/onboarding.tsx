@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { colors, borderRadius } from '../../constants/theme';
@@ -23,9 +24,9 @@ const exercises = ['Walking', 'Running', 'Gym', 'None'];
 const diets = ['Injera', 'Rice', 'Bread', 'Mix'];
 
 const knowledgeLevels = [
-  { emoji: '🌱', title: 'Just getting started', desc: 'I want to learn the basics' },
-  { emoji: '📚', title: 'I know the basics', desc: 'Managing for 1\u20133 years' },
-  { emoji: '🎓', title: 'I know it well', desc: 'Managing for many years' },
+  { iconSet: 'material' as const, icon: 'leaf', title: 'Just getting started', desc: 'I want to learn the basics' },
+  { iconSet: 'feather' as const, icon: 'book', title: 'I know the basics', desc: 'Managing for 1\u20133 years' },
+  { iconSet: 'feather' as const, icon: 'award', title: 'I know it well', desc: 'Managing for many years' },
 ];
 
 export default function OnboardingScreen() {
@@ -123,7 +124,7 @@ export default function OnboardingScreen() {
       <Input label="Confirm password" placeholder="Repeat password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
       <View style={styles.termsRow}>
         <TouchableOpacity style={styles.checkbox} onPress={() => setTermsAccepted(!termsAccepted)}>
-          {termsAccepted && <Text style={styles.checkboxMark}>✓</Text>}
+          {termsAccepted && <Feather name="check" size={14} color={colors.green} />}
         </TouchableOpacity>
         <Text style={styles.termsText}>
           I agree to the{' '}
@@ -132,7 +133,7 @@ export default function OnboardingScreen() {
           <Text style={styles.termsLink} onPress={() => setShowPrivacy(true)}>Privacy Policy</Text>
         </Text>
       </View>
-      <Button title="Continue →" variant="primary" size="lg" onPress={handleStep0Next} disabled={!termsAccepted} />
+      <Button title="Continue" variant="primary" size="lg" onPress={handleStep0Next} disabled={!termsAccepted} />
       <Text style={styles.footerText}>
         Already have an account?{' '}
         <Text style={styles.linkText} onPress={() => router.push('/(auth)/login')}>Sign in</Text>
@@ -164,7 +165,7 @@ export default function OnboardingScreen() {
           style={[styles.familyCard, familyHistory === 'yes' && styles.familyCardSelected]}
           onPress={() => setFamilyHistory('yes')}
         >
-          <Text style={styles.familyEmoji}>🧬</Text>
+          <View style={styles.familyIcon}><MaterialCommunityIcons name="dna" size={22} color={colors.green} /></View>
           <Text style={[styles.familyTitle, familyHistory === 'yes' && styles.familyTitleSelected]}>Yes</Text>
           <Text style={styles.familySub}>Parent or sibling</Text>
         </TouchableOpacity>
@@ -172,14 +173,14 @@ export default function OnboardingScreen() {
           style={[styles.familyCard, familyHistory === 'no' && styles.familyCardSelected]}
           onPress={() => setFamilyHistory('no')}
         >
-          <Text style={styles.familyEmoji}>✅</Text>
+          <View style={styles.familyIcon}><Feather name="check-circle" size={22} color={colors.green} /></View>
           <Text style={[styles.familyTitle, familyHistory === 'no' && styles.familyTitleSelected]}>No</Text>
           <Text style={styles.familySub}>Not that I know</Text>
         </TouchableOpacity>
       </View>
       <Input label="Current medication" placeholder="e.g. Metformin 500mg" value={medication} onChangeText={setMedication} />
       <Input label="Other conditions or allergies" placeholder="e.g. Hypertension, none" value={conditions} onChangeText={setConditions} />
-      <Button title="Continue →" variant="primary" size="lg" onPress={() => setStep(2)} />
+      <Button title="Continue" variant="primary" size="lg" onPress={() => setStep(2)} />
       <TouchableOpacity onPress={() => setStep(2)}>
         <Text style={styles.skipText}>Skip for now</Text>
       </TouchableOpacity>
@@ -219,19 +220,21 @@ export default function OnboardingScreen() {
           style={[styles.knowCard, selectedKnowledge === i && styles.knowCardOn]}
           onPress={() => setSelectedKnowledge(i)}
         >
-          <Text style={styles.knowEmoji}>{k.emoji}</Text>
+          <View style={styles.knowIcon}>
+              {k.iconSet === 'feather' ? <Feather name={k.icon as any} size={22} color={colors.green} /> : <MaterialCommunityIcons name={k.icon as any} size={22} color={colors.green} />}
+            </View>
           <View style={styles.knowInfo}>
             <Text style={[styles.knowTitle, selectedKnowledge === i && styles.knowTitleOn]}>{k.title}</Text>
             <Text style={styles.knowDesc}>{k.desc}</Text>
           </View>
           {selectedKnowledge === i && (
             <View style={styles.checkCircle}>
-              <Text style={styles.checkMark}>✓</Text>
+              <Feather name="check" size={12} color={colors.white} />
             </View>
           )}
         </TouchableOpacity>
       ))}
-      <Button title="Start tracking ✦" variant="primary" size="lg" onPress={handleSubmit} loading={submitting} />
+      <Button title="Start tracking" variant="primary" size="lg" onPress={handleSubmit} loading={submitting} />
     </>
   );
 
@@ -259,7 +262,7 @@ export default function OnboardingScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{showTerms ? 'Terms of Service' : 'Privacy Policy'}</Text>
               <TouchableOpacity style={styles.modalClose} onPress={() => { setShowTerms(false); setShowPrivacy(false); }}>
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Feather name="x" size={14} color={colors.t2} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalBody}>
@@ -459,12 +462,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  checkboxMark: {
-    color: colors.green,
-    fontSize: 14,
-    fontWeight: '800',
-    lineHeight: 16,
-  },
   termsText: {
     fontSize: 12,
     color: colors.t2,
@@ -508,10 +505,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: colors.t2,
   },
   modalBody: {
     marginBottom: 20,
@@ -574,8 +567,11 @@ const styles = StyleSheet.create({
     borderColor: colors.green,
     backgroundColor: colors.greenXlight,
   },
-  familyEmoji: {
-    fontSize: 22,
+  familyIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 4,
   },
   familyTitle: {
@@ -638,8 +634,11 @@ const styles = StyleSheet.create({
     borderColor: colors.green,
     backgroundColor: colors.greenXlight,
   },
-  knowEmoji: {
-    fontSize: 24,
+  knowIcon: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   knowInfo: {
     flex: 1,
@@ -665,10 +664,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.green,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  checkMark: {
-    color: colors.white,
-    fontSize: 10,
-    fontWeight: '700',
   },
 });
