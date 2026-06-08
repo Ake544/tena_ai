@@ -5,7 +5,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
 from app.core.config import get_settings
-from app.routers import auth, patient, glucose
+from app.routers import auth, patient, glucose, medications, appointments
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +28,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(patient.router)
 app.include_router(glucose.router)
+app.include_router(medications.router)
+app.include_router(appointments.router)
 
 
 @app.get("/health")

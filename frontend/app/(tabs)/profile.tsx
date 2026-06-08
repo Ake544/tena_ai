@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
@@ -84,27 +84,33 @@ export default function ProfileScreen() {
           <Text style={styles.editLink}>Edit</Text>
         </View>
         <Card style={styles.sectionCard}>
-          <View style={styles.infoRow}>
-            <View style={styles.infoIcon}><MaterialCommunityIcons name="pill" size={20} color={colors.green} /></View>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Metformin 500mg</Text>
-              <Text style={styles.infoSub}>Twice daily · No side effects</Text>
+          <TouchableOpacity onPress={() => router.push('/medications')}>
+            <View style={styles.infoRow}>
+              <View style={styles.infoIcon}><MaterialCommunityIcons name="pill" size={20} color={colors.green} /></View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Medications</Text>
+                <Text style={styles.infoSub}>Manage prescriptions and track adherence</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
             </View>
-          </View>
+          </TouchableOpacity>
+          <View style={styles.infoDivider} />
+          <TouchableOpacity onPress={() => router.push('/appointments')}>
+            <View style={styles.infoRow}>
+              <View style={styles.infoIcon}><MaterialCommunityIcons name="hospital-building" size={20} color={colors.green} /></View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Appointments</Text>
+                <Text style={styles.infoSub}>Upcoming visits and past records</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </View>
+          </TouchableOpacity>
           <View style={styles.infoDivider} />
           <View style={styles.infoRow}>
             <View style={styles.infoIcon}><MaterialCommunityIcons name="dna" size={20} color={colors.green} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Family history</Text>
               <Text style={styles.infoSub}>{profile?.family_history ? 'Yes · Type 2 diabetes' : 'None reported'}</Text>
-            </View>
-          </View>
-          <View style={styles.infoDivider} />
-          <View style={styles.infoRow}>
-            <View style={styles.infoIcon}><Feather name="x-circle" size={20} color={colors.t3} /></View>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Allergies</Text>
-              <Text style={styles.infoSub}>None reported</Text>
             </View>
           </View>
         </Card>
@@ -143,14 +149,16 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Settings</Text>
         </View>
         <Card style={styles.sectionCard}>
-          <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Feather name="bell" size={20} color={colors.t1} /></View>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingLabel}>Medication reminder</Text>
-              <Text style={styles.settingSub}>8:00 AM & 8:00 PM · 2 active</Text>
+          <TouchableOpacity onPress={() => router.push('/medications')}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingIcon}><Feather name="bell" size={20} color={colors.t1} /></View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingLabel}>Medication reminder</Text>
+                <Text style={styles.settingSub}>Manage your medications</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
             </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.infoDivider} />
           <View style={styles.settingRow}>
             <View style={styles.settingIcon}><Feather name="globe" size={20} color={colors.t1} /></View>
@@ -161,14 +169,16 @@ export default function ProfileScreen() {
             <Text style={styles.changeBtn}>Change</Text>
           </View>
           <View style={styles.infoDivider} />
-          <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Feather name="calendar" size={20} color={colors.t1} /></View>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingLabel}>Appointments</Text>
-              <Text style={styles.settingSub}>2 upcoming · Next in 6 days</Text>
+          <TouchableOpacity onPress={() => router.push('/appointments')}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingIcon}><Feather name="calendar" size={20} color={colors.t1} /></View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingLabel}>Appointments</Text>
+                <Text style={styles.settingSub}>Upcoming visits and past records</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
             </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.infoDivider} />
           <View style={styles.settingRow} onTouchEnd={handleLogout}>
             <View style={styles.settingIcon}><Feather name="log-out" size={20} color={colors.red} /></View>
@@ -243,7 +253,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 24,
+    paddingBottom: 96,
   },
   statsGrid: {
     flexDirection: 'row',

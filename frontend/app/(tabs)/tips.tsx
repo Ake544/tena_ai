@@ -14,13 +14,6 @@ export default function TipsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.statusBar}>
-        <Text style={styles.statusTime}>9:41</Text>
-        <View style={styles.statusIcons}>
-          <Text style={styles.statusIcon}>●●●●○</Text>
-        </View>
-      </View>
-
       <View style={styles.titleRow}>
         <View>
           <Text style={styles.title}>Daily tips</Text>
@@ -111,31 +104,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
-  statusBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
-  statusTime: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.t1,
-  },
-  statusIcons: {
-    flexDirection: 'row',
-    gap: 2,
-  },
-  statusIcon: {
-    fontSize: 10,
-    color: colors.t1,
-    letterSpacing: 1,
-  },
   titleRow: {
     paddingHorizontal: 24,
-    paddingTop: 8,
+    paddingTop: 52,
     paddingBottom: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -165,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 24,
+    paddingBottom: 96,
   },
   tipCard: {
     borderRadius: 24,

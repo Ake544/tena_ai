@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
 import { syncService } from '../../services/sync';
+import { medicationService, Medication, Appointment } from '../../services/medication';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -14,6 +15,8 @@ export default function HomeScreen() {
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [stats, setStats] = useState<GlucoseStats | null>(null);
   const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   useEffect(() => {
     loadData();
@@ -22,18 +25,86 @@ export default function HomeScreen() {
   const loadData = async () => {
     try {
       syncService.syncPending();
-      const [p, s, t] = await Promise.all([
+      const [p, s, t, m, a] = await Promise.all([
         patientService.getProfile(),
         patientService.getStats(),
         patientService.getTodayReadings(),
+        medicationService.list(),
+        medicationService.listAppointments(),
       ]);
       setProfile(p);
       setStats(s);
       setTodaySlots(t.slots);
+      setMedications(m);
+      setAppointments(a);
     } catch (err) {
       console.log('Failed to load home data', err);
     }
   };
+
+  const splitList = (s: string | null) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  const parseTime = (t: string) => {
+    t = t.trim();
+    const isPM = t.toUpperCase().includes('PM');
+    const isAM = t.toUpperCase().includes('AM');
+    const clean = t.replace(/\s*[APap][Mm]\s*/g, '').trim();
+    const [hStr, mStr] = clean.split(':');
+    let h = parseInt(hStr, 10) || 0;
+    const m = parseInt(mStr, 10) || 0;
+    if (isPM && h !== 12) h += 12;
+    if (isAM && h === 12) h = 0;
+    return { h, m };
+  };
+
+  const formatTime = (t: string) => {
+    const { h, m } = parseTime(t);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+  };
+
+  const getNearestPending = (med: Medication): { time: string; status: 'pending' | 'overdue' } | null => {
+    const times = splitList(med.times);
+    if (times.length === 0) return null;
+    const taken = splitList(med.taken_times);
+    const skipped = splitList(med.skipped_times);
+    const done = new Set([...taken, ...skipped]);
+    const pending = times.filter(t => !done.has(t));
+    if (pending.length === 0) return null;
+    const now = new Date();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    pending.sort((a, b) => {
+      const { h: ah, m: am } = parseTime(a);
+      const { h: bh, m: bm } = parseTime(b);
+      return (ah * 60 + am) - (bh * 60 + bm);
+    });
+    const nearest = pending[0];
+    const { h: nh, m: nm } = parseTime(nearest);
+    return { time: nearest, status: (nh * 60 + nm) <= currentMin ? 'overdue' : 'pending' };
+  };
+
+  const medAdherence = medications.length > 0
+    ? Math.round((medications.filter(m => m.taken_today).length / medications.length) * 100)
+    : null;
+
+  const pendingMeds = medications
+    .map(m => ({ med: m, nearest: getNearestPending(m) }))
+    .filter(x => x.nearest)
+    .sort((a, b) => {
+      const { h: ah, m: am } = parseTime(a.nearest!.time);
+      const { h: bh, m: bm } = parseTime(b.nearest!.time);
+      return (ah * 60 + am) - (bh * 60 + bm);
+    });
+
+  const nextAppt = appointments.length > 0
+    ? appointments
+        .filter(a => new Date(a.date) > new Date())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
+    : null;
+
+  const bedtimeSlot = todaySlots.find(s => s.reading_type === 'Bedtime');
+  const bedtimeLogged = bedtimeSlot?.value != null;
 
   const maxBarHeight = (val: number | null) => {
     if (val === null) return '10%';
@@ -45,7 +116,7 @@ export default function HomeScreen() {
     if (val === null) return colors.bg2;
     if (val > 180) return colors.red;
     if (val < 70) return '#D94F3D';
-    return colors.greenLight;
+    return colors.green;
   };
 
   const today = new Date();
@@ -81,7 +152,7 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Day streak</Text>
           </View>
             <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
-              <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>{stats ? Math.round((stats.days_logged / 30) * 100) : '—'}%</Text>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>{medAdherence != null ? `${medAdherence}%` : '—'}</Text>
               <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Med adherence</Text>
           </View>
         </View>
@@ -119,9 +190,12 @@ export default function HomeScreen() {
               </View>
             )}
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 4, height: 72 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 100 }}>
             {todaySlots.map((slot, i) => (
-              <View key={i} style={{ flex: 1, backgroundColor: barColor(slot.value), borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: maxBarHeight(slot.value) }} />
+              <View key={i} style={{ flex: 1, alignItems: 'center' }}>
+                <Text style={{ fontSize: 9, fontWeight: '600', color: 'rgba(0,0,0,0.35)', marginBottom: 3, fontVariant: ['tabular-nums'] }}>{slot.value ?? ''}</Text>
+                <View style={{ width: '100%', backgroundColor: barColor(slot.value), borderRadius: 4, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, height: maxBarHeight(slot.value) }} />
+              </View>
             ))}
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
@@ -162,42 +236,58 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Reminders</Text>
         </View>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.bg2 }}>
-            <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <MaterialCommunityIcons name="pill" size={20} color={colors.green} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Evening Metformin</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Due at 8:00 PM · Not yet taken</Text>
-            </View>
-            <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.goldLight }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#9A6200' }}>Pending</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.bg2 }}>
-            <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.blueLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <MaterialCommunityIcons name="hospital-building" size={20} color="#3B82F6" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Follow-up appointment</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>In 6 days · Black Lion Hospital</Text>
-            </View>
-            <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.green }}>6 days</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 }}>
-            <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.bg2, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <MaterialCommunityIcons name="water" size={20} color={colors.t3} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Bedtime glucose log</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Not yet logged today</Text>
-            </View>
-            <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.amberLight }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.amber }}>Tonight</Text>
-            </View>
-          </View>
+          {pendingMeds.length > 0 ? pendingMeds.map(({ med, nearest }, idx) => (
+            <TouchableOpacity key={med.id} onPress={() => router.push('/medications')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: (idx < pendingMeds.length - 1 || nextAppt || !bedtimeLogged) ? 1 : 0, borderBottomColor: colors.bg2 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <MaterialCommunityIcons name="pill" size={20} color={colors.green} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{med.name} {med.dose}</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Due at {formatTime(nearest!.time)} · {nearest!.status === 'overdue' ? 'Overdue' : 'Not yet taken'}</Text>
+              </View>
+              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: nearest!.status === 'overdue' ? '#FEE2E2' : colors.goldLight }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: nearest!.status === 'overdue' ? '#DC2626' : '#9A6200' }}>{nearest!.status === 'overdue' ? 'Overdue' : 'Pending'}</Text>
+              </View>
+            </TouchableOpacity>
+          )) : medications.length > 0 ? null : (
+            <TouchableOpacity onPress={() => router.push('/medications')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.bg2 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.bg2, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <MaterialCommunityIcons name="pill" size={20} color={colors.t3} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>No medications yet</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Add medications in Profile to track adherence</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {nextAppt ? (
+            <TouchableOpacity onPress={() => router.push('/appointments')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: nextAppt && !bedtimeLogged ? 1 : 0, borderBottomColor: colors.bg2 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.blueLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <MaterialCommunityIcons name="hospital-building" size={20} color="#3B82F6" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{nextAppt.title}</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>{nextAppt.hospital}</Text>
+              </View>
+              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.green }}>{nextAppt.date.split('T')[0]}</Text>
+              </View>
+            </TouchableOpacity>
+          ) : null}
+          {!bedtimeLogged && (
+            <TouchableOpacity onPress={() => router.push('/(tabs)/log')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.bg2, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <MaterialCommunityIcons name="water" size={20} color={colors.t3} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Bedtime glucose log</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Not yet logged today</Text>
+              </View>
+              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.amberLight }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.amber }}>Tonight</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
 

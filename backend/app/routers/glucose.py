@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, cast, Date
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from app.core.database import get_db
 from app.models.patient import Patient
 from app.models.glucose import GlucoseLog
@@ -21,11 +21,19 @@ def create_glucose_log(payload: GlucoseLogCreate, current_patient: Patient = Dep
     if payload.reading_type not in READING_TYPES:
         raise HTTPException(status_code=400, detail=f"Invalid reading type. Must be one of: {', '.join(READING_TYPES)}")
 
+    ts = payload.timestamp
+    if ts.tzinfo is None:
+        now = datetime.utcnow()
+    else:
+        now = datetime.now(timezone.utc)
+    if ts > now:
+        ts = now
+
     log = GlucoseLog(
         patient_id=current_patient.id,
         value=payload.value,
         reading_type=payload.reading_type,
-        timestamp=payload.timestamp,
+        timestamp=ts,
         symptoms=payload.symptoms,
         synced=payload.synced,
     )
@@ -81,11 +89,19 @@ def sync_logs(payload: GlucoseSyncRequest, current_patient: Patient = Depends(ge
             continue
         if item.reading_type not in READING_TYPES:
             continue
+        ts = item.timestamp
+        if ts.tzinfo is None:
+            now = datetime.utcnow()
+        else:
+            now = datetime.now(timezone.utc)
+        if ts > now:
+            ts = now
+
         log = GlucoseLog(
             patient_id=current_patient.id,
             value=item.value,
             reading_type=item.reading_type,
-            timestamp=item.timestamp,
+            timestamp=ts,
             symptoms=item.symptoms,
             synced=True,
         )

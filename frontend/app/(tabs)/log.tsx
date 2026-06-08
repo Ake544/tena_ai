@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
@@ -8,6 +8,7 @@ import { colors, spacing, borderRadius, typography, shadows } from '../../consta
 import { patientService, GlucoseTodaySlot } from '../../services/patient';
 import { dbService } from '../../services/db';
 import { syncService } from '../../services/sync';
+import { medicationService, Medication } from '../../services/medication';
 
 const symptomList = [
   { iconSet: 'feather' as const, icon: 'activity', label: 'Headache' },
@@ -16,7 +17,6 @@ const symptomList = [
   { iconSet: 'material' as const, icon: 'sleep', label: 'Fatigue' },
   { iconSet: 'material' as const, icon: 'foot-print', label: 'Foot pain' },
   { iconSet: 'feather' as const, icon: 'zap', label: 'Weakness' },
-  { iconSet: 'feather' as const, icon: 'plus', label: 'More' },
 ];
 
 function IconRender({ item, size, color }: { item: typeof symptomList[0]; size: number; color: string }) {
@@ -32,9 +32,17 @@ export default function LogScreen() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>(['Headache']);
   const [submitting, setSubmitting] = useState(false);
   const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
+  const [customSymptoms, setCustomSymptoms] = useState<string[]>([]);
+  const [showSymptomInput, setShowSymptomInput] = useState(false);
+  const [symptomInput, setSymptomInput] = useState('');
+
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
+  const [showMedModal, setShowMedModal] = useState(false);
 
   useEffect(() => {
     loadToday();
+    loadMedications();
   }, []);
 
   useEffect(() => {
@@ -45,9 +53,75 @@ export default function LogScreen() {
     try {
       const res = await patientService.getTodayReadings();
       setTodaySlots(res.slots);
+      const firstUnlogged = res.slots.find(s => s.value == null);
+      if (firstUnlogged) setSelectedType(firstUnlogged.reading_type);
     } catch (err) {
       console.log('Failed to load today readings', err);
     }
+  };
+
+  const loadMedications = async () => {
+    try {
+      const data = await medicationService.list();
+      setMedications(data);
+    } catch (err) {
+      console.log('Failed to load medications', err);
+    }
+  };
+
+  const splitList = (s: string | null) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  const parseTime = (t: string) => {
+    t = t.trim();
+    const isPM = t.toUpperCase().includes('PM');
+    const isAM = t.toUpperCase().includes('AM');
+    const clean = t.replace(/\s*[APap][Mm]\s*/g, '').trim();
+    const [hStr, mStr] = clean.split(':');
+    let h = parseInt(hStr, 10) || 0;
+    const m = parseInt(mStr, 10) || 0;
+    if (isPM && h !== 12) h += 12;
+    if (isAM && h === 12) h = 0;
+    return { h, m };
+  };
+
+  const formatTime = (t: string) => {
+    const { h, m } = parseTime(t);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+  };
+
+  const getNearestPending = useCallback((med: Medication): { time: string; status: 'pending' | 'overdue' } | null => {
+    const times = splitList(med.times);
+    if (times.length === 0) return null;
+    const taken = splitList(med.taken_times);
+    const skipped = splitList(med.skipped_times);
+    const done = new Set([...taken, ...skipped]);
+    const pending = times.filter(t => !done.has(t));
+    if (pending.length === 0) return null;
+    const now = new Date();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    pending.sort((a, b) => {
+      const { h: ah, m: am } = parseTime(a);
+      const { h: bh, m: bm } = parseTime(b);
+      return (ah * 60 + am) - (bh * 60 + bm);
+    });
+    const nearest = pending[0];
+    const { h: nh, m: nm } = parseTime(nearest);
+    return { time: nearest, status: (nh * 60 + nm) <= currentMin ? 'overdue' : 'pending' };
+  }, []);
+
+  const handleMedAction = async (med: Medication, time: string, action: 'taken' | 'skip') => {
+    try {
+      const updated = action === 'taken'
+        ? await medicationService.markTaken(med.id, time)
+        : await medicationService.markSkip(med.id, time);
+      setMedications(prev => prev.map(m => m.id === updated.id ? updated : m));
+    } catch (err) {
+      console.log(`Failed to mark ${action}`, err);
+    }
+    setShowMedModal(false);
+    setSelectedMed(null);
   };
 
   const toggleSymptom = (label: string) => {
@@ -62,7 +136,7 @@ export default function LogScreen() {
       value,
       reading_type: selectedType,
       timestamp: new Date().toISOString(),
-      symptoms: selectedSymptoms.join(', ') || undefined,
+      symptoms: [...selectedSymptoms, ...customSymptoms].join(', ') || undefined,
     };
 
     try {
@@ -84,39 +158,31 @@ export default function LogScreen() {
     router.push(`/log-success?value=${value}&reading_type=${encodeURIComponent(selectedType)}`);
   };
 
-  const allReadingTypes = [
-    { iconSet: 'feather' as const, icon: 'moon', label: 'Pre-dinner' },
-    { iconSet: 'material' as const, icon: 'sleep', label: 'Bedtime' },
-  ];
+  const allReadingTypes = ['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Bedtime'];
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ backgroundColor: colors.green, paddingTop: 52, paddingHorizontal: 24, paddingBottom: 24, flexShrink: 0 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/home')} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 18, fontWeight: '700', color: colors.white }}>{'<'}</Text>
-          </TouchableOpacity>
-          <View>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>Log glucose</Text>
-            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} · All in mg/dL</Text>
-          </View>
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>Log glucose</Text>
+          <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} · All in mg/dL</Text>
         </View>
         <View style={{ flexDirection: 'row', gap: 6 }}>
           {allReadingTypes.map((type, i) => {
-            const slot = todaySlots.find(s => s.reading_type === type.label);
+            const slot = todaySlots.find(s => s.reading_type === type);
             const val = slot?.value;
             const color = val ? (val > 180 ? '#f87171' : '#6ee7b7') : 'rgba(255,255,255,0.25)';
             return (
               <View key={i} style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 8, alignItems: 'center' }}>
                 <Text style={{ fontSize: 14, fontWeight: '800', color, fontVariant: ['tabular-nums'] }}>{val ?? '—'}</Text>
-                <Text style={{ fontSize: 9, color: val ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.3)', marginTop: 2 }}>{type.label}</Text>
+                <Text style={{ fontSize: 9, color: val ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.3)', marginTop: 2 }}>{type}</Text>
               </View>
             );
           })}
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: 24 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: 96 }}>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1, marginBottom: 14 }}>Add a reading</Text>
 
@@ -124,13 +190,15 @@ export default function LogScreen() {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
             {['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Bedtime'].map((type) => {
               const active = selectedType === type;
+              const logged = todaySlots.find(s => s.reading_type === type)?.value != null;
               return (
                 <TouchableOpacity
                   key={type}
+                  disabled={logged}
                   onPress={() => setSelectedType(type)}
-                  style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 50, backgroundColor: active ? colors.green : colors.bg2 }}
+                  style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 50, backgroundColor: logged ? colors.bg2 : (active ? colors.green : colors.bg2), opacity: logged ? 0.4 : 1 }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? colors.white : colors.t3 }}>{type}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: logged ? colors.t4 : (active ? colors.white : colors.t3) }}>{logged ? `${type} ✓` : type}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -152,7 +220,13 @@ export default function LogScreen() {
             </View>
           </View>
 
-          <Button title="Save reading" onPress={handleSave} loading={submitting} variant="primary" />
+          {todaySlots.every(s => s.value != null) ? (
+            <View style={{ paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.t3 }}>All readings logged today ✓</Text>
+            </View>
+          ) : (
+            <Button title="Save reading" onPress={handleSave} loading={submitting} variant="primary" />
+          )}
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
@@ -175,32 +249,156 @@ export default function LogScreen() {
                 </TouchableOpacity>
               );
             })}
+            <TouchableOpacity onPress={() => setShowSymptomInput(true)} style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Feather name="plus" size={16} color={colors.t2} />
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.t2 }}>More</Text>
+              </View>
+            </TouchableOpacity>
           </View>
+          {customSymptoms.length > 0 && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.bg2 }}>
+              {customSymptoms.map((s, i) => (
+                <TouchableOpacity key={i} onPress={() => setCustomSymptoms(prev => prev.filter((_, idx) => idx !== i))} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 50, backgroundColor: colors.blueLight, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#3B82F6' }}>{s}</Text>
+                  <Feather name="x" size={14} color="#3B82F6" />
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
+
+        <Modal visible={showSymptomInput} animationType="slide" transparent>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+              <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40 }}>
+                <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
+                <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 16 }}>Add custom symptom</Text>
+                <TextInput
+                  value={symptomInput}
+                  onChangeText={setSymptomInput}
+                  placeholder="Type a symptom..."
+                  placeholderTextColor={colors.t4}
+                  style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1, marginBottom: 16 }}
+                  autoFocus
+                />
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <TouchableOpacity onPress={() => { setShowSymptomInput(false); setSymptomInput(''); }} style={{ flex: 1, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { if (symptomInput.trim()) { setCustomSymptoms(prev => [...prev, symptomInput.trim()]); setSymptomInput(''); setShowSymptomInput(false); } }} style={{ flex: 2, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.green, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>Add</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Medication today</Text>
         </View>
-        <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <MaterialCommunityIcons name="pill" size={20} color={colors.green} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Metformin 500mg</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Twice daily · 8AM & 8PM</Text>
-            </View>
-            <View style={{ gap: 6, alignItems: 'flex-end' }}>
-              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight, flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-                <Feather name="check" size={12} color={colors.green} />
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.green }}>AM</Text>
-              </View>
-              <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.goldLight }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: '#9A6200' }}>PM ?</Text>
-              </View>
+        {medications.length === 0 ? (
+          <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 24, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)', alignItems: 'center' }}>
+            <Text style={{ fontSize: 12, color: colors.t4 }}>No medications added yet</Text>
+          </View>
+        ) : (
+          medications
+            .map(med => {
+              const nearest = getNearestPending(med);
+              const count = splitList(med.times).length;
+              return { med, nearest, count };
+            })
+            .sort((a, b) => {
+              if (a.nearest && !b.nearest) return -1;
+              if (!a.nearest && b.nearest) return 1;
+              if (!a.nearest && !b.nearest) return 0;
+              const { h: ah, m: am } = parseTime(a.nearest!.time);
+              const { h: bh, m: bm } = parseTime(b.nearest!.time);
+              return (ah * 60 + am) - (bh * 60 + bm);
+            })
+            .map(({ med, nearest, count }) => (
+              <TouchableOpacity
+                key={med.id}
+                onPress={() => { setSelectedMed(med); setShowMedModal(true); }}
+                style={{ marginHorizontal: 16, marginBottom: 8, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <MaterialCommunityIcons name="pill" size={20} color={colors.green} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{med.name} {med.dose}</Text>
+                    <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>{med.frequency} · {splitList(med.times).map(formatTime).join(' & ')}</Text>
+                  </View>
+                  {nearest ? (
+                    <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: nearest.status === 'overdue' ? '#FEE2E2' : colors.goldLight }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: nearest.status === 'overdue' ? '#DC2626' : '#9A6200' }}>{formatTime(nearest.time)}</Text>
+                    </View>
+                  ) : (
+                    <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>All done ✓</Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))
+        )}
+
+        <Modal visible={showMedModal} animationType="slide" transparent>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40 }}>
+              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
+              {selectedMed && (
+                <>
+                  <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 4 }}>{selectedMed.name} {selectedMed.dose}</Text>
+                  <Text style={{ fontSize: 13, color: colors.t3, marginBottom: 20 }}>{selectedMed.frequency} · {splitList(selectedMed.times).map(formatTime).join(' & ')}</Text>
+                  <View style={{ gap: 12 }}>
+                    {splitList(selectedMed.times).map(time => {
+                      const taken = splitList(selectedMed.taken_times).includes(time);
+                      const skipped = splitList(selectedMed.skipped_times).includes(time);
+                      const { h: th, m: tm } = parseTime(time);
+                      const now = new Date();
+                      const timePassed = (th * 60 + tm) <= (now.getHours() * 60 + now.getMinutes());
+                      return (
+                        <View key={time} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 16, backgroundColor: colors.bg2, borderRadius: 16 }}>
+                          <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1 }}>{formatTime(time)}</Text>
+                          <View style={{ flexDirection: 'row', gap: 8 }}>
+                            {taken ? (
+                              <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.greenLight }}>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>Taken ✓</Text>
+                              </View>
+                            ) : skipped ? (
+                              <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.t4 }}>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t4 }}>Skipped</Text>
+                              </View>
+                            ) : !timePassed ? (
+                              <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.amberLight }}>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: '#9A6200' }}>Upcoming</Text>
+                              </View>
+                            ) : (
+                              <>
+                                <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'taken')} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.green }}>
+                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.white }}>Taken</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'skip')} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.t4 }}>
+                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t2 }}>Skip</Text>
+                                </TouchableOpacity>
+                              </>
+                            )}
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </View>
+                  <TouchableOpacity onPress={() => setShowMedModal(false)} style={{ marginTop: 20, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>Close</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
-        </View>
+        </Modal>
       </ScrollView>
     </View>
   );

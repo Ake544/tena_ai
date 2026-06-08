@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from app.core.database import Base
 from app.models.patient import Patient
 from app.models.glucose import GlucoseLog
+from app.models.medication import Medication, Appointment
 
 config = context.config
 
