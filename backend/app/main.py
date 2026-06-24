@@ -1,10 +1,12 @@
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
 from app.core.config import get_settings
+from app.core.scheduler import start as start_scheduler, shutdown as stop_scheduler
 from app.routers import auth, patient, glucose, medications, appointments
 
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +14,15 @@ logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
-app = FastAPI(title="Tena AI API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+app = FastAPI(title="Tena AI API", version="1.0.0", lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
