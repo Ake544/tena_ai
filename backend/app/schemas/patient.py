@@ -76,3 +76,4 @@ class ResetPasswordOTP(BaseModel):
 
 class PushTokenUpdate(BaseModel):
     push_token: str
+    device_id: Optional[str] = None

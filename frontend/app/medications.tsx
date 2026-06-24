@@ -79,9 +79,52 @@ export default function MedicationsScreen() {
     ]);
   };
 
+  const splitList = (s: string | null) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  const parseTime = (t: string) => {
+    t = t.trim();
+    const isPM = t.toUpperCase().includes('PM');
+    const isAM = t.toUpperCase().includes('AM');
+    const clean = t.replace(/\s*[APap][Mm]\s*/g, '').trim();
+    const [hStr, mStr] = clean.split(':');
+    let h = parseInt(hStr, 10) || 0;
+    const m = parseInt(mStr, 10) || 0;
+    if (isPM && h !== 12) h += 12;
+    if (isAM && h === 12) h = 0;
+    return { h, m };
+  };
+
+  const findNearestPendingTime = (med: Medication): string | null => {
+    const times = splitList(med.times);
+    if (times.length === 0) return null;
+    const taken = splitList(med.taken_times);
+    const skipped = splitList(med.skipped_times);
+    const done = new Set([...taken, ...skipped]);
+    const pending = times.filter(t => !done.has(t));
+    if (pending.length === 0) return null;
+    const now = new Date();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    const upcoming = pending.filter(t => {
+      const { h, m } = parseTime(t);
+      return (h * 60 + m) <= currentMin;
+    });
+    if (upcoming.length === 0) return pending[0];
+    upcoming.sort((a, b) => {
+      const { h: ah, m: am } = parseTime(a);
+      const { h: bh, m: bm } = parseTime(b);
+      return (bh * 60 + bm) - (ah * 60 + am);
+    });
+    return upcoming[0];
+  };
+
   const handleTaken = async (med: Medication) => {
+    const time = findNearestPendingTime(med);
+    if (!time) {
+      Alert.alert('All taken', `All doses of ${med.name} are already marked for today`);
+      return;
+    }
     try {
-      await medicationService.markTaken(med.id);
+      await medicationService.markTaken(med.id, time);
       loadMeds();
     } catch (err: any) {
       Alert.alert('Error', err.response?.data?.detail || 'Failed to update');

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from app.core.database import get_db
+from app.core.scheduler import schedule_medication, unschedule_medication
 from app.models.patient import Patient
 from app.models.medication import Medication
 from app.schemas.medication import MedicationCreate, MedicationUpdate, MedicationResponse
@@ -45,6 +46,7 @@ def create_medication(payload: MedicationCreate, current_patient: Patient = Depe
     db.add(med)
     db.commit()
     db.refresh(med)
+    schedule_medication(med)
     return med
 
 
@@ -63,6 +65,7 @@ def update_medication(med_id: str, payload: MedicationUpdate, current_patient: P
         setattr(med, field, value)
     db.commit()
     db.refresh(med)
+    schedule_medication(med)
     return med
 
 
@@ -71,6 +74,7 @@ def delete_medication(med_id: str, current_patient: Patient = Depends(get_curren
     med = db.query(Medication).filter(Medication.id == med_id, Medication.patient_id == current_patient.id).first()
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
+    unschedule_medication(med_id)
     db.delete(med)
     db.commit()
 

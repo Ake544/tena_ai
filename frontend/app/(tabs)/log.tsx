@@ -9,6 +9,7 @@ import { patientService, GlucoseTodaySlot } from '../../services/patient';
 import { dbService } from '../../services/db';
 import { syncService } from '../../services/sync';
 import { medicationService, Medication } from '../../services/medication';
+import { symptomService } from '../../services/symptom';
 
 const symptomList = [
   { iconSet: 'feather' as const, icon: 'activity', label: 'Headache' },
@@ -132,11 +133,12 @@ export default function LogScreen() {
 
   const handleSave = async () => {
     setSubmitting(true);
+    const symptomNames = [...selectedSymptoms, ...customSymptoms];
     const logData = {
       value,
       reading_type: selectedType,
       timestamp: new Date().toISOString(),
-      symptoms: [...selectedSymptoms, ...customSymptoms].join(', ') || undefined,
+      symptoms: symptomNames.join(', ') || undefined,
     };
 
     try {
@@ -151,6 +153,13 @@ export default function LogScreen() {
         await patientService.logReading(logData);
       } catch {
         console.log('Online save failed, will sync later');
+      }
+      try {
+        for (const name of symptomNames) {
+          await symptomService.log({ name, timestamp: new Date().toISOString() });
+        }
+      } catch {
+        console.log('Failed to log symptoms, will retry');
       }
     }
 

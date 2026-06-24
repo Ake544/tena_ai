@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Button from '../../components/Button';
 import { colors } from '../../constants/theme';
 import { authService } from '../../services/auth';
+import { pushService } from '../../services/push';
 
 export default function VerifyEmailScreen() {
   const { t } = useTranslation();
@@ -49,6 +50,9 @@ export default function VerifyEmailScreen() {
       if (paramPassword) {
         await authService.login({ email, password: paramPassword });
       }
+      pushService.register().then(r => {
+        if (r) pushService.sendTokenToBackend(r.token, r.deviceId);
+      });
       router.replace('/(tabs)/home');
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('common.error'));
