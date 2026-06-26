@@ -169,6 +169,14 @@ export default function ProfileScreen() {
             <Text style={styles.changeBtn}>Change</Text>
           </View>
           <View style={styles.infoDivider} />
+          <View style={styles.settingRow}>
+            <View style={styles.settingIcon}><Feather name="clock" size={20} color={colors.t1} /></View>
+            <View style={styles.settingContent}>
+              <Text style={styles.settingLabel}>Timezone</Text>
+              <Text style={styles.settingSub}>{profile?.timezone || 'Africa/Addis_Ababa'}</Text>
+            </View>
+          </View>
+          <View style={styles.infoDivider} />
           <TouchableOpacity onPress={() => router.push('/appointments')}>
             <View style={styles.settingRow}>
               <View style={styles.settingIcon}><Feather name="calendar" size={20} color={colors.t1} /></View>

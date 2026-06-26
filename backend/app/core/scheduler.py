@@ -1,5 +1,6 @@
 import re
 import logging
+from zoneinfo import ZoneInfo
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
@@ -13,10 +14,13 @@ from app.services.notification import send_to_patient, retry_pending
 logger = logging.getLogger(__name__)
 scheduler = BackgroundScheduler()
 
-ETHIOPIA_UTC_OFFSET = 3
+
+def _get_offset(tz_name: str) -> int:
+    now = datetime.now(ZoneInfo(tz_name))
+    return int(now.utcoffset().total_seconds() / 3600)
 
 
-def _parse_time_to_utc(time_str: str) -> tuple[int, int]:
+def _parse_time_to_utc(time_str: str, tz_name: str = "Africa/Addis_Ababa") -> tuple[int, int]:
     parts = time_str.replace("\u202f", " ").split()
     h_str, m_str = parts[0].split(":")
     h, m = int(h_str), int(m_str)
@@ -26,7 +30,8 @@ def _parse_time_to_utc(time_str: str) -> tuple[int, int]:
         h += 12
     if is_am and h == 12:
         h = 0
-    utc_h = (h - ETHIOPIA_UTC_OFFSET) % 24
+    offset = _get_offset(tz_name)
+    utc_h = (h - offset) % 24
     return (utc_h, m)
 
 
@@ -45,12 +50,22 @@ def send_medication_reminder(patient_id: str, med_name: str, med_dose: str, time
     )
 
 
+def _get_patient_tz(patient_id) -> str:
+    db = SessionLocal()
+    try:
+        patient = db.query(Patient).filter(Patient.id == patient_id).first()
+        return patient.timezone if patient else "Africa/Addis_Ababa"
+    finally:
+        db.close()
+
+
 def schedule_medication(med):
     med_id = str(med.id)
     unschedule_medication(med_id)
+    tz_name = _get_patient_tz(med.patient_id)
     times = _split_times(med.times)
     for t in times:
-        h, m = _parse_time_to_utc(t)
+        h, m = _parse_time_to_utc(t, tz_name)
         job_id = f"med_{med_id}_{h:02d}{m:02d}"
         scheduler.add_job(
             send_medication_reminder,
@@ -152,32 +167,40 @@ def evening_checkin():
 def appointment_reminders():
     db = SessionLocal()
     try:
-        now = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-        for apt in db.query(Appointment).all():
-            diff_days = (apt.date.replace(tzinfo=timezone.utc) - now).days if apt.date.tzinfo else (apt.date - now).days
-            if diff_days == 7:
+        utc_now = datetime.now(timezone.utc)
+        for apt, tz_name in db.query(Appointment, Patient.timezone).join(Patient, Appointment.patient_id == Patient.id).filter(Appointment.date >= utc_now - timedelta(days=14)).all():
+            offset = _get_offset(tz_name)
+            local_today = (utc_now + timedelta(hours=offset)).date()
+            apt_local = (apt.date.astimezone(timezone.utc) + timedelta(hours=offset)).date()
+            diff_days = (apt_local - local_today).days
+            if diff_days == 7 and not apt.reminder_7d_sent:
                 send_to_patient(
                     str(apt.patient_id),
                     f"Appointment in 7 days: {apt.title}",
                     f"At {apt.hospital} — {apt.date.strftime('%b %d at %I:%M %p')}",
                     {"screen": "appointments"},
                 )
-            elif diff_days == 1:
+                apt.reminder_7d_sent = True
+            elif diff_days == 1 and not apt.reminder_1d_sent:
                 send_to_patient(
                     str(apt.patient_id),
                     f"Appointment tomorrow: {apt.title}",
                     f"At {apt.hospital} — {apt.date.strftime('%b %d at %I:%M %p')}",
                     {"screen": "appointments"},
                 )
-            elif diff_days == 0:
+                apt.reminder_1d_sent = True
+            elif diff_days == 0 and not apt.reminder_0d_sent:
                 send_to_patient(
                     str(apt.patient_id),
-                    f"Today: {apt.title}",
-                    f"At {apt.hospital} — {apt.date.strftime('%I:%M %p')}",
+                    f"Today's the day: {apt.title}",
+                    f"Your appointment at {apt.hospital} is today at {apt.date.strftime('%I:%M %p')}. Please don't miss it!",
                     {"screen": "appointments"},
                 )
+                apt.reminder_0d_sent = True
+        db.commit()
         logger.info("Appointment reminders checked")
     except Exception as e:
+        db.rollback()
         logger.error(f"Appointment reminders failed: {e}")
     finally:
         db.close()
@@ -187,11 +210,11 @@ def start():
     scheduler.add_job(reset_taken_today, CronTrigger(hour=0, minute=0, timezone="UTC"), id="reset_taken_today", replace_existing=True)
     scheduler.add_job(glucose_nudge, CronTrigger(hour=6, minute=0, timezone="UTC"), id="glucose_nudge", replace_existing=True)
     scheduler.add_job(evening_checkin, CronTrigger(hour=18, minute=0, timezone="UTC"), id="evening_checkin", replace_existing=True)
-    scheduler.add_job(appointment_reminders, CronTrigger(hour=5, minute=0, timezone="UTC"), id="appointment_reminders", replace_existing=True)
+    scheduler.add_job(appointment_reminders, CronTrigger(hour=5, minute=0, timezone="UTC"), id="appointment_reminders", replace_existing=True, misfire_grace_time=300)
     scheduler.add_job(retry_pending, IntervalTrigger(minutes=5), id="retry_pending", replace_existing=True)
     scheduler.start()
     reschedule_all_medications()
-    logger.info("Scheduler started — event-based med reminders, no polling")
+    logger.info("Scheduler started — event-based med reminders")
 
 
 def shutdown():

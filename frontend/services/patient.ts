@@ -13,6 +13,7 @@ export interface PatientProfile {
   family_history: boolean;
   exercise_habit: string | null;
   staple_diet: string | null;
+  timezone: string;
   created_at: string;
 }
 

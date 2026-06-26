@@ -21,6 +21,7 @@ class Patient(Base):
     family_history = Column(Boolean, default=False)
     exercise_habit = Column(String, nullable=True)
     staple_diet = Column(Text, nullable=True)
+    timezone = Column(String, default="Africa/Addis_Ababa")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     push_token = Column(String, nullable=True)
     verification_token = Column(String, nullable=True)

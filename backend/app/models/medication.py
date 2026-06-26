@@ -31,4 +31,7 @@ class Appointment(Base):
     appointment_type = Column(String, nullable=True)
     date = Column(DateTime(timezone=True), nullable=False)
     notes = Column(String, nullable=True)
+    reminder_7d_sent = Column(Boolean, default=False)
+    reminder_1d_sent = Column(Boolean, default=False)
+    reminder_0d_sent = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

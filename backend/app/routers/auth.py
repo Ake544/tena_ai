@@ -45,6 +45,7 @@ def signup(request: Request, payload: PatientCreate, db: Session = Depends(get_d
         email=payload.email,
         password_hash=hash_password(payload.password),
         language=payload.language,
+        timezone=payload.timezone,
         age=payload.age,
         sex=payload.sex,
         education_level=payload.education_level,

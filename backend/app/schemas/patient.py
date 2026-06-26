@@ -9,6 +9,7 @@ class PatientCreate(BaseModel):
     email: EmailStr
     password: str
     language: str = "en"
+    timezone: str = "Africa/Addis_Ababa"
     age: Optional[int] = None
     sex: Optional[str] = None
     education_level: Optional[str] = None
@@ -27,6 +28,7 @@ class PatientUpdate(BaseModel):
     exercise_habit: Optional[str] = None
     staple_diet: Optional[str] = None
     language: Optional[str] = None
+    timezone: Optional[str] = None
 
 
 class PatientResponse(BaseModel):
@@ -42,6 +44,7 @@ class PatientResponse(BaseModel):
     family_history: bool
     exercise_habit: Optional[str]
     staple_diet: Optional[str]
+    timezone: str
     created_at: datetime
 
     class Config:

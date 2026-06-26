@@ -59,6 +59,9 @@ class AppointmentResponse(BaseModel):
     appointment_type: Optional[str]
     date: datetime
     notes: Optional[str]
+    reminder_7d_sent: bool = False
+    reminder_1d_sent: bool = False
+    reminder_0d_sent: bool = False
     created_at: datetime
 
     class Config:

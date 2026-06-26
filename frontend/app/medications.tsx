@@ -131,6 +131,20 @@ export default function MedicationsScreen() {
     }
   };
 
+  const handleSkip = async (med: Medication) => {
+    const time = findNearestPendingTime(med);
+    if (!time) {
+      Alert.alert('All done', `All doses of ${med.name} are already marked for today`);
+      return;
+    }
+    try {
+      await medicationService.markSkip(med.id, time);
+      loadMeds();
+    } catch (err: any) {
+      Alert.alert('Error', err.response?.data?.detail || 'Failed to update');
+    }
+  };
+
   const takenCount = medications.filter(m => m.taken_today).length;
   const adherence = medications.length > 0 ? Math.round((takenCount / medications.length) * 100) : 0;
 
@@ -176,9 +190,16 @@ export default function MedicationsScreen() {
                   <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1 }}>{med.name} {med.dose}</Text>
                   <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>{med.frequency} · {med.times}</Text>
                 </View>
-                <TouchableOpacity onPress={() => handleTaken(med)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, backgroundColor: med.taken_today ? colors.greenLight : colors.bg2 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: med.taken_today ? colors.green : colors.t3 }}>{med.taken_today ? 'Taken' : 'Mark'}</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  <TouchableOpacity onPress={() => handleTaken(med)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, backgroundColor: med.taken_today ? colors.greenLight : colors.bg2 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: med.taken_today ? colors.green : colors.t3 }}>{med.taken_today ? 'Taken' : 'Take'}</Text>
+                  </TouchableOpacity>
+                  {!med.taken_today && (
+                    <TouchableOpacity onPress={() => handleSkip(med)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, backgroundColor: colors.bg2 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3 }}>Skip</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
               {med.notes && (
                 <Text style={{ fontSize: 12, color: colors.t4, marginTop: 8, marginLeft: 56 }}>{med.notes}</Text>

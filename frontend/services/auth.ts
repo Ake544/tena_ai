@@ -6,6 +6,7 @@ interface SignupData {
   email: string;
   password: string;
   language?: string;
+  timezone?: string;
   age?: number;
   sex?: string;
   education_level?: string;

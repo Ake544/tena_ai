@@ -77,6 +77,7 @@ export default function OnboardingScreen() {
         email,
         password,
         language: lang,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Addis_Ababa',
         age: age ? parseInt(age, 10) : undefined,
         sex: sex || undefined,
         family_history: familyHistory === 'yes',
