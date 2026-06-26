@@ -25,17 +25,21 @@ function IconRender({ item, size, color }: { item: typeof symptomList[0]; size: 
   return <MaterialCommunityIcons name={item.icon as any} size={size} color={color} />;
 }
 
+type SymptomEntry = { name: string; severity: number };
+
 export default function LogScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [value, setValue] = useState(118);
   const [selectedType, setSelectedType] = useState('Pre-dinner');
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>(['Headache']);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<SymptomEntry[]>([{ name: 'Headache', severity: 5 }]);
   const [submitting, setSubmitting] = useState(false);
   const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
-  const [customSymptoms, setCustomSymptoms] = useState<string[]>([]);
+  const [customSymptoms, setCustomSymptoms] = useState<SymptomEntry[]>([]);
   const [showSymptomInput, setShowSymptomInput] = useState(false);
   const [symptomInput, setSymptomInput] = useState('');
+  const [severityTarget, setSeverityTarget] = useState<string | null>(null);
+  const [severityTempValue, setSeverityTempValue] = useState(5);
 
   const [medications, setMedications] = useState<Medication[]>([]);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
@@ -126,19 +130,44 @@ export default function LogScreen() {
   };
 
   const toggleSymptom = (label: string) => {
-    setSelectedSymptoms((prev) =>
-      prev.includes(label) ? prev.filter((s) => s !== label) : [...prev, label]
-    );
+    setSelectedSymptoms((prev) => {
+      const exists = prev.find(s => s.name === label);
+      if (exists) return prev.filter(s => s.name !== label);
+      return [...prev, { name: label, severity: 5 }];
+    });
+  };
+
+  const openSeverityModal = (name: string) => {
+    const entry = [...selectedSymptoms, ...customSymptoms].find(s => s.name === name);
+    setSeverityTempValue(entry?.severity ?? 5);
+    setSeverityTarget(name);
+  };
+
+  const saveSeverity = () => {
+    if (!severityTarget) return;
+    setSelectedSymptoms(prev => prev.map(s => s.name === severityTarget ? { ...s, severity: severityTempValue } : s));
+    setCustomSymptoms(prev => prev.map(s => s.name === severityTarget ? { ...s, severity: severityTempValue } : s));
+    setSeverityTarget(null);
+  };
+
+  const toggleCustomSymptom = (name: string) => {
+    setCustomSymptoms(prev => {
+      const exists = prev.find(s => s.name === name);
+      if (exists) return prev.filter(s => s.name !== name);
+      return [...prev, { name, severity: 5 }];
+    });
   };
 
   const handleSave = async () => {
     setSubmitting(true);
-    const symptomNames = [...selectedSymptoms, ...customSymptoms];
+    const allSymptoms = [...selectedSymptoms, ...customSymptoms];
+    const symptomNames = allSymptoms.map(s => s.name);
+    const symptomsStr = symptomNames.length > 0 ? symptomNames.join(', ') : undefined;
     const logData = {
       value,
       reading_type: selectedType,
       timestamp: new Date().toISOString(),
-      symptoms: symptomNames.join(', ') || undefined,
+      symptoms: symptomsStr ?? null,
     };
 
     try {
@@ -150,13 +179,13 @@ export default function LogScreen() {
     const online = await syncService.isOnline();
     if (online) {
       try {
-        await patientService.logReading(logData);
+        await patientService.logReading({ value, reading_type: selectedType, timestamp: logData.timestamp, symptoms: symptomsStr });
       } catch {
         console.log('Online save failed, will sync later');
       }
       try {
-        for (const name of symptomNames) {
-          await symptomService.log({ name, timestamp: new Date().toISOString() });
+        for (const s of allSymptoms) {
+          await symptomService.log({ name: s.name, severity: s.severity, timestamp: new Date().toISOString() });
         }
       } catch {
         console.log('Failed to log symptoms, will retry');
@@ -188,8 +217,8 @@ export default function LogScreen() {
               </View>
             );
           })}
+          </View>
         </View>
-      </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: 96 }}>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
@@ -244,16 +273,23 @@ export default function LogScreen() {
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {symptomList.map((symptom) => {
-              const active = selectedSymptoms.includes(symptom.label);
+              const entry = selectedSymptoms.find(s => s.name === symptom.label);
+              const active = !!entry;
               return (
                 <TouchableOpacity
                   key={symptom.label}
                   onPress={() => toggleSymptom(symptom.label)}
+                  onLongPress={() => active && openSeverityModal(symptom.label)}
                   style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 50, backgroundColor: active ? colors.goldLight : colors.bg2 }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     <IconRender item={symptom} size={16} color={active ? '#9A6200' : colors.t2} />
                     <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? '#9A6200' : colors.t2 }}>{symptom.label}</Text>
+                    {active && (
+                      <View style={{ backgroundColor: '#9A6200', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.white }}>{entry!.severity}</Text>
+                      </View>
+                    )}
                   </View>
                 </TouchableOpacity>
               );
@@ -268,8 +304,11 @@ export default function LogScreen() {
           {customSymptoms.length > 0 && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.bg2 }}>
               {customSymptoms.map((s, i) => (
-                <TouchableOpacity key={i} onPress={() => setCustomSymptoms(prev => prev.filter((_, idx) => idx !== i))} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 50, backgroundColor: colors.blueLight, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#3B82F6' }}>{s}</Text>
+                <TouchableOpacity key={i} onPress={() => setCustomSymptoms(prev => prev.filter((_, idx) => idx !== i))} onLongPress={() => openSeverityModal(s.name)} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 50, backgroundColor: colors.blueLight, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#3B82F6' }}>{s.name}</Text>
+                  <View style={{ backgroundColor: '#3B82F6', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: colors.white }}>{s.severity}</Text>
+                  </View>
                   <Feather name="x" size={14} color="#3B82F6" />
                 </TouchableOpacity>
               ))}
@@ -291,17 +330,45 @@ export default function LogScreen() {
                   style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1, marginBottom: 16 }}
                   autoFocus
                 />
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 8 }}>Severity</Text>
+                <View style={{ flexDirection: 'row', gap: 4, marginBottom: 20 }}>
+                  {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                    <TouchableOpacity key={n} onPress={() => setSeverityTempValue(n)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: severityTempValue === n ? colors.gold : colors.bg2, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 12, fontWeight: severityTempValue === n ? '800' : '600', color: severityTempValue === n ? colors.t1 : colors.t3 }}>{n}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                   <TouchableOpacity onPress={() => { setShowSymptomInput(false); setSymptomInput(''); }} style={{ flex: 1, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>Cancel</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { if (symptomInput.trim()) { setCustomSymptoms(prev => [...prev, symptomInput.trim()]); setSymptomInput(''); setShowSymptomInput(false); } }} style={{ flex: 2, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.green, alignItems: 'center' }}>
+                  <TouchableOpacity onPress={() => { if (symptomInput.trim()) { setCustomSymptoms(prev => [...prev, { name: symptomInput.trim(), severity: severityTempValue }]); setSymptomInput(''); setSeverityTempValue(5); setShowSymptomInput(false); } }} style={{ flex: 2, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.green, alignItems: 'center' }}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>Add</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
           </KeyboardAvoidingView>
+        </Modal>
+
+        <Modal visible={severityTarget !== null} animationType="slide" transparent>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40 }}>
+              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
+              <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 4 }}>{severityTarget}</Text>
+              <Text style={{ fontSize: 13, color: colors.t3, marginBottom: 16 }}>Severity: {severityTempValue}/10</Text>
+              <View style={{ flexDirection: 'row', gap: 4, marginBottom: 20 }}>
+                {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                  <TouchableOpacity key={n} onPress={() => setSeverityTempValue(n)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: severityTempValue === n ? colors.gold : colors.bg2, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 12, fontWeight: severityTempValue === n ? '800' : '600', color: severityTempValue === n ? colors.t1 : colors.t3 }}>{n}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity onPress={saveSeverity} style={{ paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.green, alignItems: 'center' }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </Modal>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
