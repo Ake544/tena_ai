@@ -1,99 +1,123 @@
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
 import { colors, typography } from '../../constants/theme';
+import { tipService, Tip } from '../../services/tips';
 
 const { width } = Dimensions.get('window');
 
-const barData = [65, 72, 58, 85, 78, 62, 90, 75, 68, 82, 55, 70, 88, 60];
+const CATEGORY_COLORS: Record<string, [string, string]> = {
+  medication: ['#0B4D3B', '#1A6B52'],
+  glucose: ['#8B5A00', '#C47A20'],
+  diet: ['#1A3D6B', '#2A6DB5'],
+  exercise: ['#4A1A6B', '#7A2DB5'],
+  adherence: ['#0B4D3B', '#1A6B52'],
+  monitoring: ['#8B5A00', '#C47A20'],
+  lifestyle: ['#1A3D6B', '#2A6DB5'],
+  education: ['#4A1A6B', '#7A2DB5'],
+};
+
+const CATEGORY_ICONS: Record<string, string> = {
+  medication: 'pill',
+  glucose: 'bar-chart-2',
+  diet: 'food',
+  exercise: 'walk',
+  adherence: 'shield-check',
+  monitoring: 'activity',
+  lifestyle: 'heart',
+  education: 'book-open',
+};
+
+function getCategoryGradient(category: string): [string, string] {
+  return CATEGORY_COLORS[category] || ['#0B4D3B', '#1A6B52'];
+}
+
+function getCategoryIcon(category: string): string {
+  return CATEGORY_ICONS[category] || 'lightbulb';
+}
 
 export default function TipsScreen() {
   const router = useRouter();
+  const [tips, setTips] = useState<Tip[]>([]);
+  const [history, setHistory] = useState<Tip[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTips();
+  }, []);
+
+  const loadTips = async () => {
+    try {
+      const data = await tipService.getToday();
+      setTips(data.today);
+      setHistory(data.history);
+    } catch (err) {
+      console.log('Failed to load tips', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <View>
           <Text style={styles.title}>Daily tips</Text>
-          <Text style={styles.titleSub}>3 tips today · Low awareness</Text>
+          <Text style={styles.titleSub}>{tips.length > 0 ? `${tips.length} tip${tips.length > 1 ? 's' : ''} today` : 'Loading...'}</Text>
         </View>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>3 new</Text>
-        </View>
+        {tips.length > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{tips.length} new</Text>
+          </View>
+        )}
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <LinearGradient colors={['#0B4D3B', '#1A6B52']} style={styles.tipCard}>
-          <View style={[styles.decorCircle, { bottom: -20, right: -20 }]} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-            <MaterialCommunityIcons name="pill" size={14} color="rgba(255,255,255,0.5)" />
-            <Text style={styles.tipLabel}>Medication · Streak reinforcement</Text>
+        {loading ? (
+          <Text style={{ textAlign: 'center', color: colors.t3, marginTop: 40 }}>Loading tips...</Text>
+        ) : tips.length === 0 ? (
+          <View style={{ alignItems: 'center', marginTop: 40 }}>
+            <Feather name="info" size={40} color={colors.t4} />
+            <Text style={{ fontSize: 14, color: colors.t3, marginTop: 12 }}>No tips yet today. Log a glucose reading to get started.</Text>
           </View>
-          <Text style={styles.tipBody}>Taking your medication consistently is the single most important habit for managing diabetes. Every dose you take on time builds a streak that keeps your blood sugar stable and reduces long-term complications.</Text>
-          <View style={styles.factBox}>
-            <Text style={styles.factText}>Fact: Patients who maintain a 7-day medication streak are 3× more likely to reach their target HbA1c within 3 months.</Text>
-          </View>
-        </LinearGradient>
+        ) : (
+          tips.map((tip) => {
+            const [c1, c2] = getCategoryGradient(tip.category);
+            const icon = getCategoryIcon(tip.category);
+            return (
+              <LinearGradient key={tip.id} colors={[c1, c2]} style={styles.tipCard}>
+                <View style={[styles.decorCircle, { bottom: -20, right: -20 }]} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                  <MaterialCommunityIcons name={icon as any} size={14} color="rgba(255,255,255,0.5)" />
+                  <Text style={styles.tipLabel}>{tip.category.charAt(0).toUpperCase() + tip.category.slice(1)}</Text>
+                </View>
+                <Text style={styles.tipTitle}>{tip.title}</Text>
+                <Text style={styles.tipBody}>{tip.body}</Text>
+                {tip.fact && (
+                  <View style={styles.factBox}>
+                    <Text style={styles.factText}>{tip.fact}</Text>
+                  </View>
+                )}
+              </LinearGradient>
+            );
+          })
+        )}
 
-        <LinearGradient colors={['#8B5A00', '#C47A20']} style={styles.tipCard}>
-          <View style={[styles.decorCircle, { top: -20, left: -20 }]} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-            <Feather name="bar-chart-2" size={14} color="rgba(255,255,255,0.5)" />
-            <Text style={styles.tipLabel}>Glucose · Consequence story</Text>
-          </View>
-          <Text style={styles.tipBody}>When blood sugar stays high for extended periods, it damages blood vessels and nerves. Over time, this can lead to serious complications affecting your eyes, kidneys, and feet.</Text>
-          <View style={styles.factBox}>
-            <Text style={styles.factText}>Fact: Uncontrolled glucose above 240 mg/dL for 3+ days increases infection risk by 40%. Consistent tracking helps you spot trends early.</Text>
-          </View>
-        </LinearGradient>
-
-        <LinearGradient colors={['#1A3D6B', '#2A6DB5']} style={styles.tipCard}>
-          <View style={[styles.decorCircle, { bottom: -20, right: -20 }]} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-            <MaterialCommunityIcons name="food" size={14} color="rgba(255,255,255,0.5)" />
-            <Text style={styles.tipLabel}>Diet · Ethiopian context</Text>
-          </View>
-          <Text style={styles.tipBody}>Injera is a staple in Ethiopian cuisine, but its high carbohydrate content can spike blood sugar. Pairing it with protein-rich stews and fibrous vegetables helps slow glucose absorption.</Text>
-          <View style={styles.factBox}>
-            <Text style={styles.factText}>Fact: A single piece of injera (100g) contains ~48g of carbs. Balancing your plate with shiro, gomen, or lean meat can reduce the glycemic impact by up to 30%.</Text>
-          </View>
-        </LinearGradient>
-
-        <Text style={styles.sectionTitle}>Previous tips</Text>
-
-        <Card>
-          <View style={styles.prevTipRow}>
-            <View style={[styles.prevTipIcon, { backgroundColor: colors.greenLight }]}>
-              <MaterialCommunityIcons name="walk" size={20} color={colors.green} />
-            </View>
-            <View style={styles.prevTipInfo}>
-              <Text style={styles.prevTipName}>Walking lowers blood sugar</Text>
-              <Text style={styles.prevTipSub}>Yesterday · Reinforcement</Text>
-            </View>
-          </View>
-          <View style={styles.prevTipDivider} />
-          <View style={styles.prevTipRow}>
-            <View style={[styles.prevTipIcon, { backgroundColor: colors.amberLight }]}>
-              <Feather name="zap" size={20} color={'#9A6200'} />
-            </View>
-            <View style={styles.prevTipInfo}>
-              <Text style={styles.prevTipName}>Missing one dose — what really happens</Text>
-              <Text style={styles.prevTipSub}>2 days ago · Consequence</Text>
-            </View>
-          </View>
-          <View style={styles.prevTipDivider} />
-          <View style={styles.prevTipRow}>
-            <View style={[styles.prevTipIcon, { backgroundColor: colors.blueLight }]}>
-              <MaterialCommunityIcons name="water" size={20} color="#3B82F6" />
-            </View>
-            <View style={styles.prevTipInfo}>
-              <Text style={styles.prevTipName}>Why thirst is your body's signal</Text>
-              <Text style={styles.prevTipSub}>3 days ago · Educational</Text>
-            </View>
-          </View>
-        </Card>
+        {history.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Previous tips</Text>
+            {history.slice(0, 5).map((tip) => (
+              <Card key={tip.id} style={styles.historyCard}>
+                <Text style={styles.historyCategory}>{tip.category}</Text>
+                <Text style={styles.historyTitle}>{tip.title}</Text>
+                <Text style={styles.historyBody} numberOfLines={2}>{tip.body}</Text>
+              </Card>
+            ))}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -103,115 +127,113 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
+    paddingTop: 56,
   },
   titleRow: {
-    paddingHorizontal: 24,
-    paddingTop: 52,
-    paddingBottom: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
   title: {
-    ...typography.title,
+    fontSize: 26,
+    fontWeight: '800',
     color: colors.t1,
   },
   titleSub: {
-    ...typography.small,
+    fontSize: 12,
     color: colors.t3,
     marginTop: 2,
   },
   badge: {
-    backgroundColor: colors.goldLight,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    backgroundColor: colors.greenLight,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderRadius: 50,
   },
   badgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#9A6200',
+    color: colors.green,
   },
   scroll: {
     flex: 1,
   },
   scrollContent: {
+    paddingHorizontal: 16,
     paddingBottom: 96,
   },
   tipCard: {
     borderRadius: 24,
-    overflow: 'hidden',
-    marginHorizontal: 16,
-    marginBottom: 12,
     padding: 20,
+    marginBottom: 16,
     position: 'relative',
+    overflow: 'hidden',
   },
   decorCircle: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   tipLabel: {
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.5)',
-    marginBottom: 8,
+    color: 'rgba(255,255,255,0.55)',
+  },
+  tipTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.white,
+    marginBottom: 6,
   },
   tipBody: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.92)',
-    lineHeight: 23,
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 20,
     marginBottom: 12,
   },
   factBox: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 12,
     padding: 12,
   },
   factText: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.78)',
-    lineHeight: 18,
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: 16,
   },
   sectionTitle: {
-    ...typography.subtitle,
-    color: colors.t1,
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 12,
-  },
-  prevTipRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-  },
-  prevTipIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  prevTipInfo: {
-    flex: 1,
-  },
-  prevTipName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.t1,
+    marginBottom: 12,
+    marginTop: 8,
   },
-  prevTipSub: {
+  historyCard: {
+    marginBottom: 10,
+  },
+  historyCategory: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    color: colors.green,
+    marginBottom: 4,
+  },
+  historyTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.t1,
+    marginBottom: 4,
+  },
+  historyBody: {
     fontSize: 12,
     color: colors.t3,
-    marginTop: 2,
-  },
-  prevTipDivider: {
-    height: 1,
-    backgroundColor: colors.bg2,
+    lineHeight: 18,
   },
 });

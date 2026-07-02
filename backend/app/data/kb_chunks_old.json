@@ -1,0 +1,102 @@
+[
+  {
+    "id": "who_dm_001",
+    "category": "medication",
+    "text": "Metformin is the first-line medication for type 2 diabetes. It reduces hepatic glucose production and improves insulin sensitivity. Typical starting dose is 500mg once daily, titrating to 2000mg daily."
+  },
+  {
+    "id": "who_dm_002",
+    "category": "medication",
+    "text": "Sulfonylureas stimulate insulin secretion from pancreatic beta cells. They are second-line when metformin alone is insufficient. Risk of hypoglycemia is higher compared to metformin."
+  },
+  {
+    "id": "who_dm_003",
+    "category": "medication",
+    "text": "Insulin therapy is indicated when oral medications fail to achieve glycemic control. Basal insulin (e.g., glargine) is typically started at 10 units or 0.1-0.2 units/kg daily."
+  },
+  {
+    "id": "idf_glucose_001",
+    "category": "glucose",
+    "text": "Fasting plasma glucose target: 80-130 mg/dL. Postprandial glucose target: <180 mg/dL. HbA1c target: <7.0% for most adults with type 2 diabetes."
+  },
+  {
+    "id": "idf_glucose_002",
+    "category": "glucose",
+    "text": "Hypoglycemia is defined as glucose <70 mg/dL. Symptoms include sweating, palpitations, confusion, and hunger. Severe hypoglycemia (<54 mg/dL) requires immediate medical attention."
+  },
+  {
+    "id": "eth_moh_001",
+    "category": "diet",
+    "text": "Ethiopian staple diet includes injera made from teff. Teff has a lower glycemic index than wheat or maize. Pairing injera with shiro, gomen, or lean meat helps reduce post-meal glucose spikes."
+  },
+  {
+    "id": "eth_moh_002",
+    "category": "diet",
+    "text": "The Ethiopian Ministry of Health recommends: reduce sugar-sweetened beverages, choose whole grains, eat at least 5 portions of fruits and vegetables daily, and limit salt intake."
+  },
+  {
+    "id": "idf_diet_001",
+    "category": "diet",
+    "text": "A diabetes-friendly plate should be: 50% non-starchy vegetables, 25% lean protein, and 25% complex carbohydrates. This helps maintain stable blood glucose levels throughout the day."
+  },
+  {
+    "id": "who_ex_001",
+    "category": "exercise",
+    "text": "Adults with type 2 diabetes should engage in at least 150 minutes of moderate-intensity aerobic activity per week, spread over at least 3 days, with no more than 2 consecutive days without activity."
+  },
+  {
+    "id": "who_ex_002",
+    "category": "exercise",
+    "text": "Resistance training twice a week improves insulin sensitivity and glycemic control. Exercises like bodyweight squats, wall push-ups, and resistance band work are effective."
+  },
+  {
+    "id": "idf_complication_001",
+    "category": "complication",
+    "text": "Diabetic retinopathy is a leading cause of preventable blindness. Annual eye examinations are essential for all patients with type 2 diabetes."
+  },
+  {
+    "id": "idf_complication_002",
+    "category": "complication",
+    "text": "Diabetic foot complications can be prevented through daily foot checks, proper footwear, and annual podiatry assessment. Any foot ulcer requires immediate medical evaluation."
+  },
+  {
+    "id": "who_adherence_001",
+    "category": "adherence",
+    "text": "Medication adherence is the single most important self-care behavior in diabetes management. Consistent adherence reduces HbA1c by an average of 0.5-1.0% compared to inconsistent use."
+  },
+  {
+    "id": "who_adherence_002",
+    "category": "adherence",
+    "text": "Patients who maintain a 7-day medication streak are 3 times more likely to reach their target HbA1c within 3 months. Each dose taken on time builds sustainable glucose control."
+  },
+  {
+    "id": "idf_monitoring_001",
+    "category": "monitoring",
+    "text": "Self-monitoring of blood glucose is recommended for all patients on insulin or sulfonylureas. For others, structured monitoring helps identify glucose patterns and guides treatment adjustments."
+  },
+  {
+    "id": "idf_monitoring_002",
+    "category": "monitoring",
+    "text": "Consistent glucose tracking helps identify patterns. High fasting readings may indicate insufficient basal insulin or dawn phenomenon. High post-meal readings suggest meal composition adjustments."
+  },
+  {
+    "id": "eth_moh_lifestyle_001",
+    "category": "lifestyle",
+    "text": "Ethiopian traditional medicine should be disclosed to healthcare providers. Some herbal remedies can interact with diabetes medications and affect blood glucose levels."
+  },
+  {
+    "id": "eth_moh_lifestyle_002",
+    "category": "lifestyle",
+    "text": "Stress management is important for glycemic control. Cortisol and other stress hormones can raise blood glucose. Regular prayer, meditation, or community gatherings can help manage stress."
+  },
+  {
+    "id": "who_lifestyle_001",
+    "category": "lifestyle",
+    "text": "Adequate sleep (7-8 hours per night) is associated with better glycemic control. Poor sleep increases insulin resistance and appetite-regulating hormone disruption."
+  },
+  {
+    "id": "idf_education_001",
+    "category": "education",
+    "text": "Diabetes self-management education is a right of every person with diabetes. Understanding the condition leads to better outcomes. Patients should know their target glucose ranges and what to do when levels are out of range."
+  }
+]

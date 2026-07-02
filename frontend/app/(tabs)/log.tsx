@@ -31,7 +31,7 @@ export default function LogScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [value, setValue] = useState(118);
-  const [selectedType, setSelectedType] = useState('Pre-dinner');
+  const [selectedType, setSelectedType] = useState('Pre-Dinner');
   const [selectedSymptoms, setSelectedSymptoms] = useState<SymptomEntry[]>([{ name: 'Headache', severity: 5 }]);
   const [submitting, setSubmitting] = useState(false);
   const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);

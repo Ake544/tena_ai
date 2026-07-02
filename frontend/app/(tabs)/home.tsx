@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,9 @@ import { colors, spacing, borderRadius, typography, shadows } from '../../consta
 import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
 import { syncService } from '../../services/sync';
 import { medicationService, Medication, Appointment } from '../../services/medication';
+import { tipService, Tip } from '../../services/tips';
+import { alertService, Alert } from '../../services/alerts';
+import { chatService } from '../../services/chat';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -17,6 +20,13 @@ export default function HomeScreen() {
   const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [tips, setTips] = useState<Tip[]>([]);
+  const [unreadAlerts, setUnreadAlerts] = useState<Alert[]>([]);
+  const [chatVisible, setChatVisible] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     loadData();
@@ -37,6 +47,8 @@ export default function HomeScreen() {
       setTodaySlots(t.slots);
       setMedications(m);
       setAppointments(a);
+      tipService.getToday().then(d => setTips(d.today)).catch(() => {});
+      alertService.getActive().then(d => setUnreadAlerts(d)).catch(() => {});
     } catch (err) {
       console.log('Failed to load home data', err);
     }
@@ -105,6 +117,22 @@ export default function HomeScreen() {
 
   const bedtimeSlot = todaySlots.find(s => s.reading_type === 'Bedtime');
   const bedtimeLogged = bedtimeSlot?.value != null;
+
+  const handleSend = async () => {
+    const text = chatInput.trim();
+    if (!text || chatLoading) return;
+    setChatInput('');
+    setChatMessages(prev => [...prev, { role: 'user', content: text }]);
+    setChatLoading(true);
+    try {
+      const resp = await chatService.sendMessage(text);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: resp }]);
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please try again." }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   const maxBarHeight = (val: number | null) => {
     if (val === null) return '10%';
@@ -208,29 +236,54 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {unreadAlerts.length > 0 && (
+          <TouchableOpacity onPress={() => router.push('/alert-detail')} style={{ marginHorizontal: 16, marginBottom: 12 }}>
+            <View style={{ backgroundColor: unreadAlerts.some(a => a.severity === 'urgent') ? '#FEE2E2' : '#FEF3C7', borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: unreadAlerts.some(a => a.severity === 'urgent') ? '#FECACA' : '#FDE68A' }}>
+              <Feather name={unreadAlerts.some(a => a.severity === 'urgent') ? 'alert-triangle' : 'alert-circle'} size={20} color={unreadAlerts.some(a => a.severity === 'urgent') ? '#DC2626' : '#D97706'} />
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E' }}>{unreadAlerts.length} unread alert{unreadAlerts.length > 1 ? 's' : ''}</Text>
+                <Text style={{ fontSize: 11, color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E', marginTop: 1 }}>{unreadAlerts[0].title}</Text>
+              </View>
+              <Text style={{ fontSize: 18, color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E' }}>›</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Today's tip</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/tips')}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>See all 3</Text>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>See all {tips.length}</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/tips')} style={{ marginHorizontal: 16, marginBottom: 16, borderRadius: 24, overflow: 'hidden' }}>
-          <LinearGradient colors={['#0B4D3B', '#1A6B52']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ padding: 20, position: 'relative', overflow: 'hidden' }}>
-            <View style={{ position: 'absolute', top: -24, right: -24, width: 96, height: 96, borderRadius: 48, backgroundColor: 'rgba(255,255,255,0.06)' }} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 10 }}>
-              <MaterialCommunityIcons name="pill" size={14} color="rgba(255,255,255,0.55)" />
-              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)' }}>Medication · Streak boost</Text>
+        {tips.length > 0 ? (
+          <TouchableOpacity onPress={() => router.push('/(tabs)/tips')} style={{ marginHorizontal: 16, marginBottom: 16, borderRadius: 24, overflow: 'hidden' }}>
+            <LinearGradient colors={['#0B4D3B', '#1A6B52']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ padding: 20, position: 'relative', overflow: 'hidden' }}>
+              <View style={{ position: 'absolute', top: -24, right: -24, width: 96, height: 96, borderRadius: 48, backgroundColor: 'rgba(255,255,255,0.06)' }} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+                <MaterialCommunityIcons name="pill" size={14} color="rgba(255,255,255,0.55)" />
+                <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)' }}>{tips[0].category}</Text>
+              </View>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white, marginBottom: 8 }}>{tips[0].title}</Text>
+              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 20, marginBottom: 12 }}>{tips[0].body}</Text>
+              {tips[0].fact && (
+                <View style={{ backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: 12 }}>
+                  <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', lineHeight: 16 }}>{tips[0].fact}</Text>
+                </View>
+              )}
+              <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{tips.length - 1} more tip{tips.length > 2 ? 's' : ''} today</Text>
+                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>›</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => router.push('/(tabs)/tips')} style={{ marginHorizontal: 16, marginBottom: 16, borderRadius: 24, backgroundColor: colors.surface, padding: 20, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)', ...shadows.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Feather name="info" size={16} color={colors.t3} />
+              <Text style={{ fontSize: 13, color: colors.t3 }}>Log a glucose reading to get your personalized tip</Text>
             </View>
-            <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', lineHeight: 22, marginBottom: 12 }}>Your 12-day streak is doing more than you think. Every consistent dose of Metformin quietly reduces how hard your liver works to release glucose at night.</Text>
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: 12 }}>
-              <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 18 }}>Metformin reduces hepatic glucose production by up to 30% when taken consistently for 2+ weeks.</Text>
-            </View>
-            <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>2 more tips today</Text>
-              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>›</Text>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        )}
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Reminders</Text>
@@ -291,9 +344,77 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
+      <TouchableOpacity onPress={() => { setChatVisible(true); }} style={{ position: 'absolute', right: 24, bottom: 88, width: 48, height: 48, borderRadius: 24, backgroundColor: colors.green, alignItems: 'center', justifyContent: 'center', ...shadows.gold }}>
+        <Feather name="message-circle" size={22} color={colors.white} />
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push('/(tabs)/log')} style={{ position: 'absolute', right: 24, bottom: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center', ...shadows.gold }}>
         <Text style={{ fontSize: 28, color: colors.t1, fontWeight: '200', lineHeight: 30 }}>+</Text>
       </TouchableOpacity>
+
+      <Modal visible={chatVisible} animationType="slide">
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.bg }}>
+          <View style={{ backgroundColor: colors.green, paddingTop: 52, paddingHorizontal: 24, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+                <Feather name="message-circle" size={18} color={colors.white} />
+              </View>
+              <View>
+                <Text style={{ fontSize: 17, fontWeight: '800', color: colors.white }}>Tena AI Chat</Text>
+                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Diabetes assistant</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={() => setChatVisible(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+              <Feather name="x" size={18} color={colors.white} />
+            </TouchableOpacity>
+          </View>
+          <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} onContentSizeChange={() => scrollViewRef.current?.scrollToEnd()}>
+            {chatMessages.length === 0 ? (
+              <View style={{ alignItems: 'center', marginTop: 60 }}>
+                <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  <Feather name="message-square" size={28} color={colors.green} />
+                </View>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: colors.t1 }}>Ask me anything</Text>
+                <Text style={{ fontSize: 13, color: colors.t3, marginTop: 8, textAlign: 'center', lineHeight: 20 }}>I can help with your diabetes care — from meal ideas to understanding your glucose readings.</Text>
+              </View>
+            ) : (
+              chatMessages.map((msg, i) => (
+                <View key={i} style={{ flexDirection: msg.role === 'user' ? 'row-reverse' : 'row', marginBottom: 12, alignItems: 'flex-end', gap: 8 }}>
+                  <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: msg.role === 'user' ? colors.goldLight : colors.greenLight, alignItems: 'center', justifyContent: 'center' }}>
+                    <Feather name={msg.role === 'user' ? 'user' : 'message-circle'} size={14} color={msg.role === 'user' ? '#9A6200' : colors.green} />
+                  </View>
+                  <View style={{ maxWidth: '75%', backgroundColor: msg.role === 'user' ? colors.green : colors.surface, borderRadius: 16, borderBottomRightRadius: msg.role === 'user' ? 4 : 16, borderBottomLeftRadius: msg.role === 'user' ? 16 : 4, padding: 12, ...(msg.role === 'assistant' ? shadows.xs : {}) }}>
+                    <Text style={{ fontSize: 14, color: msg.role === 'user' ? colors.white : colors.t1, lineHeight: 22 }}>{msg.content}</Text>
+                  </View>
+                </View>
+              ))
+            )}
+            {chatLoading && (
+              <View style={{ flexDirection: 'row', marginBottom: 12, alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center' }}>
+                  <Feather name="message-circle" size={14} color={colors.green} />
+                </View>
+                <View style={{ backgroundColor: colors.surface, borderRadius: 16, borderBottomLeftRadius: 4, padding: 14, ...shadows.xs }}>
+                  <ActivityIndicator size="small" color={colors.green} />
+                </View>
+              </View>
+            )}
+          </ScrollView>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, paddingBottom: 20, borderTopWidth: 1, borderTopColor: colors.bg2, backgroundColor: colors.bg }}>
+            <TextInput
+              value={chatInput}
+              onChangeText={setChatInput}
+              placeholder="Ask Tena AI..."
+              placeholderTextColor={colors.t4}
+              style={{ flex: 1, backgroundColor: colors.surface, borderRadius: 50, paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: colors.t1, borderWidth: 1, borderColor: 'rgba(11,77,59,0.1)' }}
+              onSubmitEditing={handleSend}
+              returnKeyType="send"
+            />
+            <TouchableOpacity onPress={handleSend} disabled={chatLoading} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: chatLoading ? colors.t4 : colors.green, alignItems: 'center', justifyContent: 'center' }}>
+              <Feather name="send" size={16} color={colors.white} />
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }

@@ -1,6 +1,6 @@
 # DiabeTrack — full architecture
 
-> Ethiopian Type 2 diabetes assistant app — 100% free stack  
+> Ethiopian Type 2 diabetes assistant app  
 > Mobile: Expo + React Native | Backend: FastAPI | AI: Groq (Llama 3.3 70B) | DB: PostgreSQL
 
 ---
@@ -498,16 +498,3 @@ def generate_report(patient_id: str, db: Session) -> str:
 - No billing or insurance features
 - No doctor-facing interface (v1) — the PDF is patient-generated and patient-carried
 
----
-
-## Free tier limits (at scale)
-
-| Service | Free limit | Hits limit at |
-|---|---|---|
-| Groq API | 14,400 req/day (Llama 3.3 70B) | ~4,800 DAU (3 tips each) |
-| Resend | 3,000 emails/month | ~3,000 new signups/month |
-| Cloudflare R2 | 10GB storage | ~10,000 PDF reports |
-| Expo push | Unlimited | Never |
-| Railway/Render | 500hrs/month free | Upgrade at first users |
-
-At Ethiopian pilot scale (target: 50–500 DAU), all free tiers are comfortably sufficient.

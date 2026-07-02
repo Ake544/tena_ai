@@ -1,0 +1,1654 @@
+[
+    {
+        "id": "med_int_001",
+        "category": "medication",
+        "subcategory": "metformin",
+        "source": "WHO/ADA",
+        "text": "Metformin is the cornerstone first-line medication for type 2 diabetes. It works primarily by suppressing hepatic glucose production and secondarily by improving peripheral insulin sensitivity. It does not cause weight gain and has a very low risk of hypoglycemia when used alone."
+    },
+    {
+        "id": "med_int_002",
+        "category": "medication",
+        "subcategory": "metformin",
+        "source": "ADA",
+        "text": "Metformin should be taken with meals to reduce gastrointestinal side effects including nausea, diarrhea, and abdominal discomfort. Starting at 500mg once daily and increasing slowly over 4–8 weeks significantly reduces these side effects in most patients."
+    },
+    {
+        "id": "med_int_003",
+        "category": "medication",
+        "subcategory": "metformin",
+        "source": "ADA",
+        "text": "The maximum effective dose of metformin is 2000mg per day, typically given as 1000mg twice daily. Doses above 2000mg per day provide little additional glucose-lowering benefit but increase gastrointestinal side effects significantly."
+    },
+    {
+        "id": "med_int_004",
+        "category": "medication",
+        "subcategory": "metformin",
+        "source": "WHO",
+        "text": "Metformin reduces HbA1c by approximately 1.0–1.5% when used as monotherapy. This reduction is equivalent to removing roughly 3 months of sustained high blood glucose from the body's organs and their ongoing damage."
+    },
+    {
+        "id": "med_int_005",
+        "category": "medication",
+        "subcategory": "metformin",
+        "source": "ADA",
+        "text": "Long-term metformin use can reduce vitamin B12 absorption. Patients on metformin for more than 3 years should have B12 levels checked annually. B12 deficiency can cause peripheral neuropathy that mimics diabetic neuropathy and is often missed."
+    },
+    {
+        "id": "med_int_006",
+        "category": "medication",
+        "subcategory": "metformin",
+        "source": "WHO",
+        "text": "Metformin should be temporarily discontinued before iodinated contrast procedures and in situations of acute illness, dehydration, or surgery. It can be restarted 48 hours after the procedure if kidney function is confirmed as normal."
+    },
+    {
+        "id": "med_int_007",
+        "category": "medication",
+        "subcategory": "sulfonylureas",
+        "source": "IDF",
+        "text": "Sulfonylureas including glibenclamide, glipizide, and gliclazide stimulate insulin secretion from pancreatic beta cells regardless of blood glucose level. This mechanism makes them effective but carries a significant risk of hypoglycemia, especially when meals are delayed or skipped."
+    },
+    {
+        "id": "med_int_008",
+        "category": "medication",
+        "subcategory": "sulfonylureas",
+        "source": "ADA",
+        "text": "Gliclazide modified release (MR) is preferred over older sulfonylureas like glibenclamide because it has a lower risk of hypoglycemia and a more favorable cardiovascular profile. It is on the WHO Essential Medicines List and widely available."
+    },
+    {
+        "id": "med_int_009",
+        "category": "medication",
+        "subcategory": "sulfonylureas",
+        "source": "ADA",
+        "text": "Patients taking sulfonylureas must never skip meals without first reducing or omitting the dose. Missing a meal while on a sulfonylurea can cause dangerous hypoglycemia because the drug continues stimulating insulin release even without glucose input from food."
+    },
+    {
+        "id": "med_int_010",
+        "category": "medication",
+        "subcategory": "sulfonylureas",
+        "source": "WHO",
+        "text": "Sulfonylureas reduce HbA1c by approximately 1.0–2.0% but lose effectiveness over time as pancreatic beta cell function declines. About 5–10% of patients per year experience secondary failure requiring additional medication or insulin initiation."
+    },
+    {
+        "id": "med_int_011",
+        "category": "medication",
+        "subcategory": "insulin",
+        "source": "WHO",
+        "text": "Insulin therapy should be initiated in type 2 diabetes when oral medications fail to maintain HbA1c below 7–8%, or in situations of acute illness, surgery, pregnancy, or very high initial glucose levels above 300 mg/dL at diagnosis."
+    },
+    {
+        "id": "med_int_012",
+        "category": "medication",
+        "subcategory": "insulin",
+        "source": "ADA",
+        "text": "Basal insulin (long-acting insulin such as glargine or NPH) is the preferred starting insulin for type 2 diabetes. Starting at 10 units at bedtime and adjusting by 2 units every 3 days based on fasting glucose is the most widely recommended titration approach."
+    },
+    {
+        "id": "med_int_013",
+        "category": "medication",
+        "subcategory": "insulin",
+        "source": "IDF",
+        "text": "Insulin does not mean treatment has failed — it means the body needs additional support. Approximately 50% of pancreatic beta cell function is already lost by the time type 2 diabetes is diagnosed, and this decline continues regardless of treatment type."
+    },
+    {
+        "id": "med_int_014",
+        "category": "medication",
+        "subcategory": "insulin",
+        "source": "ADA",
+        "text": "Insulin storage is critical for maintaining potency. Unopened vials should be refrigerated at 2–8°C. Once opened, insulin can be kept at room temperature below 30°C for up to 28 days. Insulin exposed to direct sunlight or temperatures above 37°C loses potency rapidly."
+    },
+    {
+        "id": "med_int_015",
+        "category": "medication",
+        "subcategory": "insulin",
+        "source": "WHO",
+        "text": "NPH insulin (isophane insulin) is the most widely available basal insulin on the WHO Essential Medicines List. It is affordable and effective but has a peak action at 4–8 hours, increasing the risk of nocturnal hypoglycemia compared to modern long-acting analogs."
+    },
+    {
+        "id": "med_int_016",
+        "category": "medication",
+        "subcategory": "mechanism",
+        "source": "ADA",
+        "text": "Consistent metformin use reduces the liver's nighttime glucose production, which is why fasting glucose readings improve first when adherence improves. Most patients see measurable fasting glucose changes within 2–4 weeks of consistent twice-daily dosing."
+    },
+    {
+        "id": "med_int_017",
+        "category": "medication",
+        "subcategory": "adherence_impact",
+        "source": "WHO",
+        "text": "Medication adherence is defined as taking at least 80% of prescribed doses on schedule. Below 80% adherence, most glucose-lowering medications lose their clinical effectiveness and HbA1c increases by an average of 0.8–1.2% within 3 months."
+    },
+    {
+        "id": "med_int_018",
+        "category": "medication",
+        "subcategory": "side_effects",
+        "source": "ADA",
+        "text": "Lactic acidosis is a rare but serious complication of metformin, occurring mainly in patients with impaired kidney function, liver disease, or severe dehydration. Signs include muscle pain, breathing difficulty, stomach pain, and dizziness. Seek immediate care if these symptoms occur."
+    },
+    {
+        "id": "med_int_019",
+        "category": "medication",
+        "subcategory": "interaction",
+        "source": "WHO",
+        "text": "Alcohol and diabetes medications can interact dangerously. Alcohol increases the hypoglycemic effect of sulfonylureas and can cause lactic acidosis with metformin. Patients should limit alcohol to a maximum of 1 unit per day and never drink on an empty stomach."
+    },
+    {
+        "id": "med_int_020",
+        "category": "medication",
+        "subcategory": "interaction",
+        "source": "ADA",
+        "text": "Several common medications raise blood glucose in patients with type 2 diabetes: corticosteroids (like prednisolone), thiazide diuretics, antipsychotics, and some antibiotics. Patients should inform their diabetes care provider before starting any new medication or supplement."
+    },
+    {
+        "id": "med_int_021",
+        "category": "medication",
+        "subcategory": "newer_agents",
+        "source": "ADA 2024",
+        "text": "SGLT2 inhibitors (empagliflozin, dapagliflozin) lower blood glucose by causing the kidneys to excrete glucose in urine. They also reduce cardiovascular risk and protect kidney function, making them preferred add-on therapy for patients with established heart disease or chronic kidney disease."
+    },
+    {
+        "id": "med_int_022",
+        "category": "medication",
+        "subcategory": "newer_agents",
+        "source": "ADA 2024",
+        "text": "GLP-1 receptor agonists (semaglutide, liraglutide) lower blood glucose, cause significant weight loss, and reduce cardiovascular events. They work by stimulating insulin release only when glucose is high, making hypoglycemia rare. They are increasingly used as second-line therapy globally."
+    },
+    {
+        "id": "med_int_023",
+        "category": "medication",
+        "subcategory": "newer_agents",
+        "source": "IDF",
+        "text": "DPP-4 inhibitors (sitagliptin, linagliptin) are weight-neutral glucose-lowering agents with a good safety profile and low hypoglycemia risk. They are useful add-on therapy for patients who cannot tolerate other medications and reduce HbA1c by approximately 0.5–0.8%."
+    },
+    {
+        "id": "med_int_024",
+        "category": "medication",
+        "subcategory": "timing",
+        "source": "ADA",
+        "text": "Medication timing is as important as the dose itself. Taking metformin at a consistent time with meals each day maintains stable drug levels in the bloodstream. Irregular timing reduces effectiveness even when total doses are not missed during the week."
+    },
+    {
+        "id": "med_int_025",
+        "category": "medication",
+        "subcategory": "timing",
+        "source": "WHO",
+        "text": "For patients on twice-daily metformin, the recommended schedule is with the first and last meal of the day — typically morning and evening. This optimizes drug absorption throughout the day and minimizes gastrointestinal side effects by ensuring the stomach is not empty."
+    },
+    {
+        "id": "med_int_026",
+        "category": "medication",
+        "subcategory": "combination",
+        "source": "ADA",
+        "text": "Combination therapy with metformin plus a second agent is indicated when HbA1c remains above target after 3 months of metformin monotherapy. The choice of second agent depends on individual factors including cardiovascular risk, kidney function, body weight, and medication cost."
+    },
+    {
+        "id": "med_int_027",
+        "category": "medication",
+        "subcategory": "combination",
+        "source": "IDF",
+        "text": "Triple oral therapy combining metformin, a sulfonylurea, and a third agent is a reasonable option before initiating insulin. However, adding insulin should not be delayed when oral therapy is clearly insufficient, as prolonged poor control causes irreversible organ damage."
+    },
+    {
+        "id": "med_int_028",
+        "category": "medication",
+        "subcategory": "monitoring",
+        "source": "ADA",
+        "text": "Patients starting or changing diabetes medications should check fasting glucose daily for at least 2 weeks to assess the medication's effect. This data helps both the patient and healthcare provider make timely, evidence-based dosing adjustments."
+    },
+    {
+        "id": "med_int_029",
+        "category": "medication",
+        "subcategory": "missed_dose",
+        "source": "ADA",
+        "text": "If a dose of metformin is missed, it should be taken as soon as remembered unless it is almost time for the next dose. Never double a dose to make up for a missed one — doubling causes excessive gastrointestinal side effects without providing additional glucose-lowering benefit."
+    },
+    {
+        "id": "med_int_030",
+        "category": "medication",
+        "subcategory": "missed_dose",
+        "source": "IDF",
+        "text": "Missing 3 or more consecutive doses of diabetes medication allows blood glucose to rise toward pre-treatment levels within 48–72 hours. For patients on metformin, consistent missing of doses over weeks can completely eliminate the medication's glucose-lowering effect."
+    },
+    {
+        "id": "med_int_031",
+        "category": "medication",
+        "subcategory": "access",
+        "source": "WHO",
+        "text": "The WHO Essential Medicines List includes metformin, glibenclamide, gliclazide, and NPH insulin as core diabetes medications. These should be available at all levels of the healthcare system. Patients unable to access these medications should report to their district health office."
+    },
+    {
+        "id": "med_int_032",
+        "category": "medication",
+        "subcategory": "monitoring",
+        "source": "ADA",
+        "text": "Patients on metformin should have kidney function (creatinine and eGFR) tested at least annually. Metformin dose should be reduced for eGFR 30–45 mL/min and stopped for eGFR below 30 mL/min to prevent lactic acidosis risk in impaired kidneys."
+    },
+    {
+        "id": "gluc_int_001",
+        "category": "glucose",
+        "subcategory": "targets",
+        "source": "ADA 2024",
+        "text": "Target fasting plasma glucose for most adults with type 2 diabetes: 80–130 mg/dL. Target 2-hour postprandial glucose: less than 180 mg/dL. HbA1c below 7.0%. These targets should be individualized based on age, duration of diabetes, and presence of complications."
+    },
+    {
+        "id": "gluc_int_002",
+        "category": "glucose",
+        "subcategory": "targets",
+        "source": "IDF",
+        "text": "HbA1c below 7.0% (53 mmol/mol) is the standard target for most adults with type 2 diabetes. Each 1% reduction in HbA1c reduces the risk of microvascular complications — eye, kidney, and nerve damage — by approximately 37% sustained over years."
+    },
+    {
+        "id": "gluc_int_003",
+        "category": "glucose",
+        "subcategory": "hypoglycemia",
+        "source": "ADA",
+        "text": "Hypoglycemia is defined as blood glucose below 70 mg/dL. Level 1 (54–70 mg/dL) requires immediate carbohydrate intake. Level 2 (below 54 mg/dL) is clinically significant and requires immediate action. Level 3 is severe hypoglycemia requiring assistance from another person due to altered consciousness."
+    },
+    {
+        "id": "gluc_int_004",
+        "category": "glucose",
+        "subcategory": "hypoglycemia_treatment",
+        "source": "ADA",
+        "text": "The 15-15 rule for treating mild to moderate hypoglycemia: consume 15 grams of fast-acting carbohydrates (4 glucose tablets, 150ml fruit juice, or 3 teaspoons of sugar dissolved in water), wait 15 minutes, then recheck glucose. Repeat if still below 70 mg/dL. Eat a snack if the next meal is more than 1 hour away."
+    },
+    {
+        "id": "gluc_int_005",
+        "category": "glucose",
+        "subcategory": "hypoglycemia_unawareness",
+        "source": "WHO",
+        "text": "Hypoglycemia unawareness is a dangerous condition where the body loses its adrenergic warning symptoms after repeated episodes. Patients with hypoglycemia unawareness must check glucose more frequently and maintain targets slightly higher (above 100 mg/dL fasting) to prevent dangerous undetected episodes."
+    },
+    {
+        "id": "gluc_int_006",
+        "category": "glucose",
+        "subcategory": "hyperglycemia",
+        "source": "ADA",
+        "text": "Persistent fasting glucose above 250 mg/dL for 3 or more consecutive days indicates poor glycemic control requiring prompt medical review. At this level, the risk of hyperosmolar hyperglycemic state (HHS) in type 2 diabetes increases and urgent dose adjustment is needed."
+    },
+    {
+        "id": "gluc_int_007",
+        "category": "glucose",
+        "subcategory": "postprandial",
+        "source": "IDF",
+        "text": "Postprandial glucose spikes above 180 mg/dL are strongly associated with cardiovascular disease risk in type 2 diabetes. The height and duration of postprandial spikes, not just fasting glucose, independently predicts long-term complication development."
+    },
+    {
+        "id": "gluc_int_008",
+        "category": "glucose",
+        "subcategory": "dawn_phenomenon",
+        "source": "ADA",
+        "text": "The dawn phenomenon is a natural early morning rise in blood glucose caused by hormones released between 4–8 AM (cortisol, growth hormone, glucagon). It commonly causes elevated fasting readings despite good overnight control and is not a sign of medication failure or dietary indiscretion."
+    },
+    {
+        "id": "gluc_int_009",
+        "category": "glucose",
+        "subcategory": "patterns",
+        "source": "ADA",
+        "text": "High pre-dinner glucose despite good morning readings often indicates inadequate glucose control after lunch. Checking 2-hour post-lunch glucose helps identify whether the lunch meal composition or afternoon snacking is the primary driver of pre-dinner elevation."
+    },
+    {
+        "id": "gluc_int_010",
+        "category": "glucose",
+        "subcategory": "monitoring_strategy",
+        "source": "ADA",
+        "text": "For type 2 diabetes patients on non-insulin therapy, structured glucose monitoring — checking at specific times for 3–7 days monthly — is more clinically useful than random daily checks. Paired measurements (before and 2 hours after the same meal) reveal the specific impact of individual meals."
+    },
+    {
+        "id": "gluc_int_011",
+        "category": "glucose",
+        "subcategory": "illness",
+        "source": "ADA",
+        "text": "During illness, blood glucose can rise significantly even without eating, due to stress hormones released in response to infection. Patients should check glucose every 2–4 hours when sick, stay hydrated with sugar-free fluids, and contact their healthcare provider if glucose exceeds 250 mg/dL."
+    },
+    {
+        "id": "gluc_int_012",
+        "category": "glucose",
+        "subcategory": "accuracy",
+        "source": "ADA",
+        "text": "Home glucometers have an acceptable error margin of ±15% compared to laboratory values. A home reading of 200 mg/dL may actually represent anywhere between 170 and 230 mg/dL. This is clinically acceptable for daily management but insufficient for diagnosing diabetes — laboratory tests are required for diagnosis."
+    },
+    {
+        "id": "gluc_int_013",
+        "category": "glucose",
+        "subcategory": "accuracy",
+        "source": "WHO",
+        "text": "Factors that falsely lower glucometer readings include cold fingers, inadequate blood sample size, outdated test strips, high altitude, and anemia. Factors that falsely raise readings include contamination of the fingertip with glucose-containing foods or drinks before testing."
+    },
+    {
+        "id": "gluc_int_014",
+        "category": "glucose",
+        "subcategory": "hba1c",
+        "source": "ADA 2024",
+        "text": "HbA1c reflects average blood glucose over the past 2–3 months. An HbA1c of 7.0% corresponds to an average glucose of approximately 154 mg/dL. Each 1% increase in HbA1c above 7% represents approximately 29 mg/dL higher average glucose and significantly greater organ damage risk."
+    },
+    {
+        "id": "gluc_int_015",
+        "category": "glucose",
+        "subcategory": "exercise_glucose",
+        "source": "ADA",
+        "text": "Aerobic exercise typically lowers blood glucose during and for up to 24 hours after activity. Patients should check glucose before exercise and avoid exercise if fasting glucose is above 250 mg/dL — exercise can further raise glucose at this level due to counterregulatory hormone release."
+    },
+    {
+        "id": "gluc_int_016",
+        "category": "glucose",
+        "subcategory": "stress_glucose",
+        "source": "ADA",
+        "text": "Psychological stress raises blood glucose through cortisol and adrenaline release, increasing hepatic glucose production and reducing insulin sensitivity. Patients often notice unexplained glucose elevation during periods of emotional stress, work pressure, family difficulties, or major life changes."
+    },
+    {
+        "id": "gluc_int_017",
+        "category": "glucose",
+        "subcategory": "sleep_glucose",
+        "source": "WHO",
+        "text": "Poor sleep quality raises fasting glucose and worsens insulin resistance. Even one night of insufficient sleep (less than 5 hours) increases insulin resistance by up to 20% the next morning. Chronic poor sleep worsens long-term glycemic control independently of diet and exercise habits."
+    },
+    {
+        "id": "gluc_int_018",
+        "category": "glucose",
+        "subcategory": "fasting_reading",
+        "source": "ADA",
+        "text": "The fasting glucose reading taken immediately upon waking (before any food, water, or medication) is the most diagnostically useful daily reading. It reflects overnight hepatic glucose output and basal insulin sensitivity, providing the clearest picture of background metabolic control."
+    },
+    {
+        "id": "gluc_int_019",
+        "category": "glucose",
+        "subcategory": "variability",
+        "source": "ADA 2024",
+        "text": "Glucose variability — frequent swings between high and low readings — is independently associated with cardiovascular risk and cognitive impairment, even when average glucose appears acceptable. Reducing variability through consistent meal timing, medication adherence, and regular physical activity is an important treatment goal."
+    },
+    {
+        "id": "gluc_int_020",
+        "category": "glucose",
+        "subcategory": "very_high",
+        "source": "WHO",
+        "text": "A single blood glucose reading above 400 mg/dL requires immediate medical assessment regardless of symptoms. This level causes severe dehydration, electrolyte imbalances, and can progress to hyperosmolar hyperglycemic state (HHS) — a life-threatening diabetes emergency unique to type 2 diabetes."
+    },
+    {
+        "id": "gluc_int_021",
+        "category": "glucose",
+        "subcategory": "sitting",
+        "source": "ADA 2024",
+        "text": "Prolonged sitting (more than 90 consecutive minutes without movement) raises blood glucose and increases insulin resistance even in otherwise active individuals. Breaking up sitting with 3–5 minutes of walking or standing every 30 minutes significantly improves postprandial glucose control throughout the workday."
+    },
+    {
+        "id": "gluc_int_022",
+        "category": "glucose",
+        "subcategory": "postprandial_timing",
+        "source": "IDF",
+        "text": "Post-meal glucose peaks at approximately 60–90 minutes after eating and returns toward fasting levels by 2 hours in well-controlled type 2 diabetes. The standard check time for 'post-meal' monitoring is 2 hours after the first bite of food, not 2 hours after finishing the meal."
+    },
+    {
+        "id": "gluc_int_023",
+        "category": "glucose",
+        "subcategory": "dehydration",
+        "source": "WHO",
+        "text": "Dehydration raises measured blood glucose concentration by reducing blood volume and concentrating glucose. A patient who is dehydrated may have a glucose reading 30–50 mg/dL higher than their true metabolic glucose level. Adequate hydration is essential for accurate glucose monitoring."
+    },
+    {
+        "id": "diet_int_001",
+        "category": "diet",
+        "subcategory": "plate_method",
+        "source": "ADA",
+        "text": "The Diabetes Plate Method divides a standard dinner plate into: 50% non-starchy vegetables (greens, tomatoes, peppers, broccoli), 25% lean protein (fish, chicken, legumes, eggs), and 25% complex carbohydrates (whole grains, legumes, starchy vegetables). This approach requires no calorie counting and is effective for glucose control."
+    },
+    {
+        "id": "diet_int_002",
+        "category": "diet",
+        "subcategory": "carbohydrates",
+        "source": "ADA",
+        "text": "Carbohydrate quantity and quality are both important in type 2 diabetes management. Total carbohydrate intake of 45–60 grams per meal is a reasonable starting point for most adults. Choosing carbohydrates with high fiber content slows absorption and meaningfully reduces postprandial glucose spikes."
+    },
+    {
+        "id": "diet_int_003",
+        "category": "diet",
+        "subcategory": "glycemic_index",
+        "source": "IDF",
+        "text": "Glycemic index (GI) measures how quickly a food raises blood glucose compared to pure glucose. Low GI foods (below 55) cause a slower glucose rise: most legumes, intact whole grains, and most vegetables. High GI foods (above 70) cause rapid spikes: white bread, white rice, sugary drinks, and most breakfast cereals."
+    },
+    {
+        "id": "diet_int_004",
+        "category": "diet",
+        "subcategory": "fiber",
+        "source": "WHO",
+        "text": "Dietary fiber slows glucose absorption, improves insulin sensitivity, and promotes satiety. Adults with diabetes should aim for 25–38 grams of fiber daily. Soluble fiber found in oats, legumes, psyllium, and vegetables is particularly effective at blunting postprandial glucose spikes."
+    },
+    {
+        "id": "diet_int_005",
+        "category": "diet",
+        "subcategory": "protein",
+        "source": "ADA",
+        "text": "Protein does not significantly raise blood glucose and promotes satiety. Lean protein sources (fish, legumes, eggs, low-fat dairy, poultry) should be included at every meal. Protein at breakfast specifically reduces postprandial glucose elevation after subsequent meals through hormonal satiety mechanisms."
+    },
+    {
+        "id": "diet_int_006",
+        "category": "diet",
+        "subcategory": "fat",
+        "source": "ADA 2024",
+        "text": "Unsaturated fats found in olive oil, avocado, nuts, and fatty fish improve insulin sensitivity and reduce cardiovascular risk. Saturated fats found in butter, fatty meat, and full-fat dairy should be limited. Trans fats found in processed and fried foods should be avoided entirely in diabetes management."
+    },
+    {
+        "id": "diet_int_007",
+        "category": "diet",
+        "subcategory": "sugar",
+        "source": "WHO",
+        "text": "Free sugars (added sugars and sugars in fruit juices, honey, and syrups) should be less than 10% of total energy intake, ideally below 5%. For a 2000-calorie diet this means less than 25 grams (about 6 teaspoons) of added sugar per day, including all food and beverage sources."
+    },
+    {
+        "id": "diet_int_008",
+        "category": "diet",
+        "subcategory": "beverages",
+        "source": "ADA",
+        "text": "Sugar-sweetened beverages including soda, fruit juices, sweetened tea, and energy drinks cause rapid glucose spikes and should be eliminated from the diet of people with type 2 diabetes. Water, plain tea, and black coffee are the safest beverage choices for glucose control."
+    },
+    {
+        "id": "diet_int_009",
+        "category": "diet",
+        "subcategory": "meal_timing",
+        "source": "ADA",
+        "text": "Consistent meal timing helps stabilize blood glucose throughout the day. Eating at the same times daily, with consistent carbohydrate amounts per meal, makes medication dosing more predictable and reduces glucose variability. Irregular eating patterns are a common but underrecognized cause of unexplained glucose swings."
+    },
+    {
+        "id": "diet_int_010",
+        "category": "diet",
+        "subcategory": "meal_skipping",
+        "source": "IDF",
+        "text": "Skipping meals — especially breakfast — is associated with higher postprandial glucose spikes at subsequent meals in type 2 diabetes. The second-meal effect means the glucose response to lunch is significantly influenced by what happened metabolically at breakfast."
+    },
+    {
+        "id": "diet_int_011",
+        "category": "diet",
+        "subcategory": "legumes",
+        "source": "ADA",
+        "text": "Legumes (lentils, chickpeas, kidney beans, split peas) are among the most beneficial foods for type 2 diabetes management. They have a very low glycemic index, are high in protein and fiber, and their regular consumption is associated with significant reductions in postprandial glucose and HbA1c in clinical trials."
+    },
+    {
+        "id": "diet_int_012",
+        "category": "diet",
+        "subcategory": "vegetables",
+        "source": "WHO",
+        "text": "Non-starchy vegetables (spinach, kale, broccoli, cauliflower, green beans, tomatoes, cucumbers) can be eaten in generous quantities with minimal glucose impact. They provide fiber, antioxidants, and essential micronutrients that support metabolic health and reduce complication risk."
+    },
+    {
+        "id": "diet_int_013",
+        "category": "diet",
+        "subcategory": "fruit",
+        "source": "ADA",
+        "text": "Whole fruits are beneficial in type 2 diabetes due to their fiber content, which slows glucose absorption compared to juice. Berries, apples, pears, and citrus fruits have the lowest glycemic impact. A single medium fruit or a small handful is an appropriate serving."
+    },
+    {
+        "id": "diet_int_014",
+        "category": "diet",
+        "subcategory": "fruit_juice",
+        "source": "IDF",
+        "text": "Fruit juice — even 100% pure juice — removes the fruit's fiber and concentrates its sugars, causing rapid glucose spikes similar to soft drinks. A whole orange has a glycemic index of approximately 40; orange juice has a glycemic index of approximately 65. Always choose whole fruit over any juice."
+    },
+    {
+        "id": "diet_int_015",
+        "category": "diet",
+        "subcategory": "food_order",
+        "source": "ADA 2024",
+        "text": "The order in which food is eaten during a meal significantly affects postprandial glucose. Eating vegetables and protein first, followed by carbohydrates last, can reduce the postprandial glucose spike by 20–30% compared to eating carbohydrates first. This is a simple, evidence-based behavioral meal strategy."
+    },
+    {
+        "id": "diet_int_016",
+        "category": "diet",
+        "subcategory": "portion",
+        "source": "ADA",
+        "text": "Portion control is fundamental in type 2 diabetes. Common portion mistakes: a serving of cooked rice is half a cup, not the bowl you eat from. A serving of meat is 85 grams (palm-sized). A serving of nuts is 30 grams (a small closed handful). Visual estimation tools improve portion accuracy."
+    },
+    {
+        "id": "diet_int_017",
+        "category": "diet",
+        "subcategory": "weight_loss",
+        "source": "ADA 2024",
+        "text": "Weight loss of 5–10% of body weight in overweight or obese individuals with type 2 diabetes significantly reduces fasting glucose, HbA1c, blood pressure, and triglycerides. Weight loss of 15% or more is associated with diabetes remission in many patients with shorter disease duration."
+    },
+    {
+        "id": "diet_int_018",
+        "category": "diet",
+        "subcategory": "salt",
+        "source": "WHO",
+        "text": "Sodium restriction to less than 2000mg per day is important for patients with type 2 diabetes, who have a high prevalence of hypertension and chronic kidney disease. High salt intake raises blood pressure and accelerates the progression of diabetic nephropathy independently of glucose control."
+    },
+    {
+        "id": "diet_int_019",
+        "category": "diet",
+        "subcategory": "cooking",
+        "source": "ADA",
+        "text": "Cooking methods significantly affect the glycemic impact of carbohydrate foods. Al dente pasta has a lower glycemic index than overcooked pasta. Cooling and reheating cooked potatoes or rice increases their resistant starch content, reducing postprandial glucose impact compared to freshly cooked and immediately eaten versions."
+    },
+    {
+        "id": "diet_int_020",
+        "category": "diet",
+        "subcategory": "processed_food",
+        "source": "WHO",
+        "text": "Ultra-processed foods (packaged snacks, instant noodles, processed meats, fast food) are strongly associated with worse glycemic control, weight gain, and higher cardiovascular risk in type 2 diabetes. They typically contain high sugar, refined carbohydrates, saturated fat, sodium, and negligible fiber."
+    },
+    {
+        "id": "diet_int_021",
+        "category": "diet",
+        "subcategory": "alcohol",
+        "source": "ADA",
+        "text": "Alcohol lowers blood glucose by blocking hepatic gluconeogenesis. In patients on sulfonylureas or insulin, alcohol consumption — especially without food — can cause dangerous hypoglycemia several hours after drinking. The symptoms of alcohol intoxication can mask the warning signs of hypoglycemia."
+    },
+    {
+        "id": "diet_int_022",
+        "category": "diet",
+        "subcategory": "mediterranean",
+        "source": "ADA 2024",
+        "text": "The Mediterranean dietary pattern — high in vegetables, legumes, whole grains, olive oil, and fish — is associated with improved glycemic control, reduced cardiovascular risk, and better quality of life in type 2 diabetes. It reduces HbA1c by 0.3–0.5% compared to standard low-fat dietary advice."
+    },
+    {
+        "id": "diet_eth_001",
+        "category": "diet",
+        "subcategory": "injera",
+        "source": "Ethiopian MoH",
+        "text": "Injera made from teff has a lower glycemic index (approximately 65–74) compared to injera made from barley (GI ~80) or wheat (GI ~85). The fermentation process during injera preparation produces organic acids that slow starch digestion and meaningfully lower the glycemic response compared to non-fermented flatbreads."
+    },
+    {
+        "id": "diet_eth_002",
+        "category": "diet",
+        "subcategory": "injera",
+        "source": "Ethiopian MoH",
+        "text": "The amount of injera consumed per meal affects postprandial glucose more than its glycemic index. A single large injera (40cm diameter) contains approximately 60–80 grams of carbohydrates — equivalent to 3–4 slices of bread. Portion control of injera is one of the most impactful dietary changes for Ethiopian patients with type 2 diabetes."
+    },
+    {
+        "id": "diet_eth_003",
+        "category": "diet",
+        "subcategory": "injera",
+        "source": "Ethiopian MoH",
+        "text": "Teff is highly nutritious compared to most global grains — rich in iron (2x wheat), calcium (5x wheat), and fiber. Regular teff injera consumption provides approximately 5–8 grams of fiber per large piece, which is beneficial for glucose control, digestive health, and cholesterol management in type 2 diabetes."
+    },
+    {
+        "id": "diet_eth_004",
+        "category": "diet",
+        "subcategory": "injera_pairing",
+        "source": "Research",
+        "text": "Pairing injera with high-fiber, high-protein accompaniments (shiro, gomen, ayib, tibs) significantly reduces the overall glycemic impact of the meal. The protein and fat in tibs slow gastric emptying; the fiber in gomen blunts glucose absorption. The combination of foods eaten together matters as much as the injera portion size."
+    },
+    {
+        "id": "diet_eth_005",
+        "category": "diet",
+        "subcategory": "injera_pairing",
+        "source": "Ethiopian MoH",
+        "text": "Eating injera with lentil-based wots (misir wot, ye'ater kik wot) produces a lower postprandial glucose spike than eating injera with shiro alone or with doro wot. Lentils have an extremely low glycemic index (~30) and their high fiber and protein content beneficially modulates the overall meal glycemic response."
+    },
+    {
+        "id": "diet_eth_006",
+        "category": "diet",
+        "subcategory": "injera_fermentation",
+        "source": "Research",
+        "text": "The fermentation time of injera significantly affects its glycemic index. Longer fermentation (48–72 hours) produces more lactic acid, which lowers starch digestibility and glycemic index. Traditional long-fermented injera is metabolically superior to quick-fermented commercial injera for blood glucose control."
+    },
+    {
+        "id": "diet_eth_007",
+        "category": "diet",
+        "subcategory": "shiro",
+        "source": "Ethiopian MoH",
+        "text": "Shiro (ground chickpea or fava bean flour stew) is a beneficial main dish for people with type 2 diabetes. As a legume-based food, shiro has significant protein and fiber content that moderates postprandial glucose compared to meat-based accompaniments. However, added oils and butter in preparation should be monitored."
+    },
+    {
+        "id": "diet_eth_008",
+        "category": "diet",
+        "subcategory": "gomen",
+        "source": "Ethiopian MoH",
+        "text": "Gomen (Ethiopian kale and collard greens) is an excellent food for people with type 2 diabetes. It has a near-zero glycemic index, provides essential micronutrients including vitamin K, vitamin C, calcium, magnesium, and folate, and its fiber content helps slow absorption of carbohydrates eaten in the same meal."
+    },
+    {
+        "id": "diet_eth_009",
+        "category": "diet",
+        "subcategory": "gomen",
+        "source": "Research",
+        "text": "Regular consumption of gomen and other Ethiopian leafy green vegetables (yatakilt, tikil gomen) is associated with lower HbA1c levels in Ethiopian patients with type 2 diabetes. Leafy greens contain magnesium, which improves insulin sensitivity and is commonly deficient in people with type 2 diabetes globally."
+    },
+    {
+        "id": "diet_eth_010",
+        "category": "diet",
+        "subcategory": "tibs",
+        "source": "Ethiopian MoH",
+        "text": "Tibs (sautéed meat) provides high-quality protein that does not raise blood glucose. However, fatty cuts of beef or lamb with high saturated fat content increase cardiovascular risk. Lean tibs prepared with minimal added niter kibbeh and plenty of onions, tomatoes, and peppers is a diabetes-friendly preparation."
+    },
+    {
+        "id": "diet_eth_011",
+        "category": "diet",
+        "subcategory": "fasting",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian Orthodox fasting (Tsome) involves abstaining from all animal products for approximately 180–250 days per year, including major fasts like Tsome Nebiyat, Tsome Hawariat, and Filseta. This predominantly plant-based diet during fasting periods is generally beneficial for glucose control in type 2 diabetes."
+    },
+    {
+        "id": "diet_eth_012",
+        "category": "diet",
+        "subcategory": "fasting_foods",
+        "source": "Ethiopian MoH",
+        "text": "During Ethiopian Orthodox fasting periods, the common diet of misir wot, ye'ater kik wot, gomen, atakilt wot, and fasting injera is a legume-heavy, vegetable-rich pattern that significantly reduces postprandial glucose spikes and improves overall glycemic control compared to typical non-fasting eating patterns."
+    },
+    {
+        "id": "diet_eth_013",
+        "category": "diet",
+        "subcategory": "fasting_impact",
+        "source": "Research",
+        "text": "Ethiopian patients with type 2 diabetes often show measurably improved HbA1c during Orthodox fasting periods due to reduced animal fat and dramatically increased legume and vegetable intake. Healthcare providers should ask about religious fasting schedules when evaluating quarterly glucose trends and considering medication adjustments."
+    },
+    {
+        "id": "diet_eth_014",
+        "category": "diet",
+        "subcategory": "misir",
+        "source": "Ethiopian MoH",
+        "text": "Misir wot (red lentil stew) is one of the most beneficial foods for type 2 diabetes management in Ethiopian cuisine. Red lentils have a glycemic index of approximately 26–30, are rich in protein (18g per cup cooked) and fiber (16g per cup cooked), and produce minimal postprandial glucose elevation even in large portions."
+    },
+    {
+        "id": "diet_eth_015",
+        "category": "diet",
+        "subcategory": "tej_tella",
+        "source": "Ethiopian MoH",
+        "text": "Tej (Ethiopian honey wine) and tella (fermented grain beer) both contain significant amounts of fermentable sugars and alcohol. Both should be strictly limited or avoided in type 2 diabetes. Tej in particular has very high honey sugar content that can cause dangerous postprandial glucose spikes within 30–60 minutes of consumption."
+    },
+    {
+        "id": "diet_eth_016",
+        "category": "diet",
+        "subcategory": "tej_social",
+        "source": "Ethiopian MoH",
+        "text": "Even one birille (glass) of tej can raise blood glucose by 80–120 mg/dL in patients with type 2 diabetes due to its concentrated honey content. Patients can politely decline tej at social gatherings and request plain water or unsweetened herbal tea as alternatives without disrupting social customs."
+    },
+    {
+        "id": "diet_eth_017",
+        "category": "diet",
+        "subcategory": "coffee",
+        "source": "Research",
+        "text": "Ethiopian coffee (buna) consumed plain (without sugar) has neutral to slightly beneficial effects on blood glucose. Polyphenols in coffee may modestly improve insulin sensitivity. However, the Ethiopian coffee ceremony tradition often involves 2–3 cups with 2–3 teaspoons of sugar each — the sugar content is the concern, not the coffee itself."
+    },
+    {
+        "id": "diet_eth_018",
+        "category": "diet",
+        "subcategory": "coffee_strategy",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian patients with type 2 diabetes can fully participate in the coffee ceremony by requesting coffee without sugar or with a small amount of artificial sweetener. Participating in the social ritual while protecting glucose control is entirely achievable and avoids unnecessary social isolation."
+    },
+    {
+        "id": "diet_eth_019",
+        "category": "diet",
+        "subcategory": "spices",
+        "source": "Research",
+        "text": "Fenugreek seeds (abish in Amharic) are traditionally used in Ethiopian cooking and have well-documented glucose-lowering properties in multiple clinical studies. Fenugreek contains soluble fiber and galactomannan that slow glucose absorption. Including 10–15 grams per day in food preparation is safe and potentially beneficial for type 2 diabetes."
+    },
+    {
+        "id": "diet_eth_020",
+        "category": "diet",
+        "subcategory": "berbere",
+        "source": "Research",
+        "text": "Berbere spice blend used extensively in Ethiopian cooking contains capsaicin (from dried chilies), turmeric, ginger, fenugreek, and other spices with documented anti-inflammatory and potentially insulin-sensitizing properties. Moderate use of berbere in cooking may contribute modest metabolic benefits in type 2 diabetes management."
+    },
+    {
+        "id": "diet_eth_021",
+        "category": "diet",
+        "subcategory": "ayib",
+        "source": "Ethiopian MoH",
+        "text": "Ayib (Ethiopian fresh white cheese) is a low-carbohydrate, high-protein food that is beneficial for type 2 diabetes. It provides calcium and protein without significant glucose impact. Ayib combined with gomen is a nutritionally dense, diabetes-friendly combination that is affordable and widely available across Ethiopia."
+    },
+    {
+        "id": "diet_eth_022",
+        "category": "diet",
+        "subcategory": "bread",
+        "source": "Ethiopian MoH",
+        "text": "Ambasha (Ethiopian sweet bread) and dabo kolo (fried dough snack balls) have high glycemic indices and are best avoided or consumed in very small quantities by people with type 2 diabetes. These foods are high in refined wheat flour and sometimes added sugar, causing rapid postprandial glucose spikes."
+    },
+    {
+        "id": "diet_eth_023",
+        "category": "diet",
+        "subcategory": "genfo",
+        "source": "Ethiopian MoH",
+        "text": "Genfo (Ethiopian thick porridge) made from roasted barley flour has a moderate glycemic index when consumed plain. The traditional serving style with a well of niter kibbeh and berbere adds significant saturated fat. Barley genfo with a small amount of fat eaten as part of a balanced meal is a reasonable breakfast option for people with diabetes."
+    },
+    {
+        "id": "diet_eth_024",
+        "category": "diet",
+        "subcategory": "atmit",
+        "source": "Research",
+        "text": "Atmit (thin Ethiopian barley porridge) is a traditional convalescent food. Barley contains beta-glucan, a soluble fiber that significantly reduces postprandial glucose spikes and improves insulin sensitivity. Thin atmit prepared without sugar is a nourishing, diabetes-friendly food suitable for recovery from illness."
+    },
+    {
+        "id": "diet_eth_025",
+        "category": "diet",
+        "subcategory": "vegetables_eth",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian variety greens including yatakilt (cabbage), tikil gomen (cauliflower), fosolia (green beans), and dinich (potato) provide different glycemic impacts. Cabbage and green beans are non-starchy with negligible glucose impact; potato and carrot have moderate glycemic impact and should be portioned carefully."
+    },
+    {
+        "id": "diet_eth_026",
+        "category": "diet",
+        "subcategory": "enset",
+        "source": "Research",
+        "text": "Kocho (fermented enset flatbread), the staple food of Southern Ethiopia and Sidama region, has a moderate carbohydrate content. Its fermentation process and resistant starch content partially moderate its glycemic impact. Patients in enset-consuming regions should monitor their glucose response to kocho and be aware of appropriate portion sizes."
+    },
+    {
+        "id": "diet_eth_027",
+        "category": "diet",
+        "subcategory": "water",
+        "source": "Ethiopian MoH",
+        "text": "Adequate water intake is essential for type 2 diabetes management in Ethiopia's variable climate. Dehydration raises blood glucose concentration, strains kidneys already affected by diabetes, and increases the risk of urinary tract infections. Adults should aim for at least 8–10 glasses of plain water daily, more during hot weather or exercise."
+    },
+    {
+        "id": "diet_eth_028",
+        "category": "diet",
+        "subcategory": "atakilt",
+        "source": "Ethiopian MoH",
+        "text": "Atakilt wot (Ethiopian mixed vegetable stew with cabbage, carrot, and potato) has variable glycemic impact depending on composition. The potato and carrot raise glycemic load; cabbage does not. Eating a larger proportion of the cabbage and a smaller portion of potato, and pairing with protein, reduces overall postprandial glucose elevation."
+    },
+    {
+        "id": "diet_eth_029",
+        "category": "diet",
+        "subcategory": "market",
+        "source": "Ethiopian MoH",
+        "text": "Fresh vegetables available year-round at Ethiopian local markets (tomatoes, carrots, cabbage, peppers, onions, kale) are affordable, nutritious, and diabetes-friendly. Building meals around these locally available non-starchy vegetables reduces both meal cost and glycemic load, making diabetes-friendly eating economically accessible."
+    },
+    {
+        "id": "diet_eth_030",
+        "category": "diet",
+        "subcategory": "celebration",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian celebrations including Enkutatash (New Year), Timkat, Meskel, and Eid involve festive meals with higher fat and calorie content. Patients with diabetes can enjoy these occasions by eating moderate portions, choosing protein and vegetable dishes first, checking glucose more frequently, and being prepared to adjust medication timing if needed."
+    },
+    {
+        "id": "ex_int_001",
+        "category": "exercise",
+        "subcategory": "recommendations",
+        "source": "WHO/ADA",
+        "text": "Adults with type 2 diabetes should perform at least 150 minutes of moderate-intensity aerobic activity per week, spread over at least 3 days per week. Even 10-minute walking sessions accumulated throughout the day provide meaningful and clinically significant glucose-lowering benefit."
+    },
+    {
+        "id": "ex_int_002",
+        "category": "exercise",
+        "subcategory": "walking",
+        "source": "ADA",
+        "text": "Walking is the most accessible and evidence-based exercise for type 2 diabetes management. A 30-minute brisk walk lowers blood glucose by 20–50 mg/dL in most patients. The glucose-lowering effect continues for 2–24 hours after walking, depending on exercise intensity, duration, and the individual's fitness level."
+    },
+    {
+        "id": "ex_int_003",
+        "category": "exercise",
+        "subcategory": "post_meal_walk",
+        "source": "ADA 2024",
+        "text": "Post-meal walking (15–20 minutes after eating) is particularly effective at blunting postprandial glucose spikes in type 2 diabetes. A short walk after dinner reduces the 2-hour post-dinner glucose reading by an average of 22 mg/dL compared to sitting after the same meal — a clinically meaningful difference achievable by almost everyone."
+    },
+    {
+        "id": "ex_int_004",
+        "category": "exercise",
+        "subcategory": "resistance",
+        "source": "ADA",
+        "text": "Resistance training (bodyweight exercises, weight lifting, resistance bands) improves insulin sensitivity independently of aerobic exercise. Muscle tissue is the primary site of glucose uptake after meals — building and maintaining muscle mass directly improves both acute and long-term glucose control in type 2 diabetes."
+    },
+    {
+        "id": "ex_int_005",
+        "category": "exercise",
+        "subcategory": "bodyweight",
+        "source": "ADA",
+        "text": "Effective bodyweight resistance exercises for people with type 2 diabetes include squats, lunges, wall push-ups, chair stands, step-ups, and core exercises. These require no equipment, can be performed at home, and significantly improve insulin sensitivity when performed 2–3 times per week for 20–30 minutes per session."
+    },
+    {
+        "id": "ex_int_006",
+        "category": "exercise",
+        "subcategory": "mechanism",
+        "source": "ADA",
+        "text": "Exercise improves glucose control through multiple complementary mechanisms: muscle contractions cause glucose uptake independent of insulin via GLUT4 transporters, exercise reduces hepatic glucose output, and regular training increases mitochondrial density in muscle cells, improving long-term insulin sensitivity that persists for days after each exercise session."
+    },
+    {
+        "id": "ex_int_007",
+        "category": "exercise",
+        "subcategory": "frequency",
+        "source": "IDF",
+        "text": "The acute glucose-lowering effect of exercise lasts 2–72 hours depending on intensity and duration. Exercise performed every day produces significantly better glucose control than the same total exercise volume performed in one or two weekly sessions. Frequency of exercise matters more than any single session duration."
+    },
+    {
+        "id": "ex_int_008",
+        "category": "exercise",
+        "subcategory": "sitting_breaks",
+        "source": "ADA 2024",
+        "text": "Prolonged sitting (more than 90 minutes without movement) raises blood glucose and increases insulin resistance even in otherwise physically active people. Breaking up sitting with 3–5 minutes of walking or light movement every 30 minutes significantly improves postprandial glucose control throughout the day."
+    },
+    {
+        "id": "ex_int_009",
+        "category": "exercise",
+        "subcategory": "safety",
+        "source": "ADA",
+        "text": "Patients with type 2 diabetes and known or suspected cardiovascular disease, diabetic nephropathy, or peripheral neuropathy should receive medical clearance before beginning a new exercise program. Peripheral neuropathy (foot numbness) requires appropriate protective footwear and daily foot inspection before and after all exercise."
+    },
+    {
+        "id": "ex_int_010",
+        "category": "exercise",
+        "subcategory": "benefits",
+        "source": "ADA 2024",
+        "text": "Regular exercise in type 2 diabetes reduces HbA1c by 0.5–1.0%, lowers blood pressure, improves LDL and HDL cholesterol, reduces body weight, improves sleep quality, reduces depression and anxiety, and decreases cardiovascular mortality by up to 39%. No single medication provides this breadth of simultaneous benefit."
+    },
+    {
+        "id": "ex_int_011",
+        "category": "exercise",
+        "subcategory": "inactivity",
+        "source": "WHO",
+        "text": "Physical inactivity is an independent risk factor for progression of type 2 diabetes and its complications. Sedentary individuals with type 2 diabetes have 50% higher cardiovascular mortality than physically active individuals with the same diagnosis, independent of age, body weight, blood pressure, and cholesterol levels."
+    },
+    {
+        "id": "ex_int_012",
+        "category": "exercise",
+        "subcategory": "timing",
+        "source": "ADA",
+        "text": "Afternoon exercise (3–7 PM) produces the greatest glucose-lowering effect in type 2 diabetes due to natural circadian patterns in insulin sensitivity and muscle glucose uptake. However, any time of day that allows consistent habit formation is clinically beneficial — the best exercise time is the one the patient can maintain consistently."
+    },
+    {
+        "id": "ex_eth_001",
+        "category": "exercise",
+        "subcategory": "walking_ethiopia",
+        "source": "Ethiopian MoH",
+        "text": "Walking is deeply embedded in Ethiopian daily life and is the most practical and accessible exercise for most Ethiopian patients with type 2 diabetes. Walking to church, mosque, markets, or between neighborhoods — when done briskly for 30 or more continuous minutes — provides significant cardiovascular and glucose-lowering benefit."
+    },
+    {
+        "id": "ex_eth_002",
+        "category": "exercise",
+        "subcategory": "terrain",
+        "source": "Ethiopian MoH",
+        "text": "The hilly terrain of many Ethiopian cities including Addis Ababa, Gondar, Lalibela, and Axum provides additional cardiovascular benefit from walking compared to flat terrain. Uphill walking increases caloric expenditure by 20–30% and produces greater glucose-lowering effects per step than flat-ground walking of the same duration."
+    },
+    {
+        "id": "ex_eth_003",
+        "category": "exercise",
+        "subcategory": "farming",
+        "source": "Ethiopian MoH",
+        "text": "Agricultural work including farming, digging, harvesting, and carrying loads is physically demanding and constitutes vigorous-intensity exercise. Ethiopian patients in rural areas engaged in regular farming activity typically have better glucose control related to their high daily activity levels, though formal glucose monitoring remains essential."
+    },
+    {
+        "id": "ex_eth_004",
+        "category": "exercise",
+        "subcategory": "eskista",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian cultural dance (Eskista) involves vigorous upper body, shoulder, and neck movements and constitutes moderate-intensity aerobic exercise. Traditional dancing at social events and celebrations, when performed for 30 or more minutes, meaningfully contributes to weekly physical activity goals in type 2 diabetes management."
+    },
+    {
+        "id": "ex_eth_005",
+        "category": "exercise",
+        "subcategory": "urban",
+        "source": "Ethiopian MoH",
+        "text": "Urban Ethiopian patients in Addis Ababa can use Entoto mountain park, Unity Park, and neighborhood streets for daily walking exercise. Morning walks before the peak heat and traffic of the day are both safer and more comfortable in Ethiopia's climate, particularly during the dry season months of October to May."
+    },
+    {
+        "id": "ex_eth_006",
+        "category": "exercise",
+        "subcategory": "heat",
+        "source": "Ethiopian MoH",
+        "text": "During the dry season when temperatures are highest in the lowland regions of Ethiopia, outdoor exercise should be scheduled for early morning or late evening hours. Dehydration from heat during exercise raises blood glucose and significantly increases cardiovascular strain. Adequate water intake before, during, and after exercise is essential year-round."
+    },
+    {
+        "id": "ex_eth_007",
+        "category": "exercise",
+        "subcategory": "church_walking",
+        "source": "Ethiopian MoH",
+        "text": "Walking to and from Ethiopian Orthodox church, especially during major feast days when worship attendance involves extended walking, constitutes meaningful physical activity. Patients who walk 20–40 minutes to church services regularly are often meeting a significant portion of their weekly exercise targets through this religious practice."
+    },
+    {
+        "id": "comp_int_001",
+        "category": "complication",
+        "subcategory": "retinopathy",
+        "source": "IDF",
+        "text": "Diabetic retinopathy affects approximately 35% of people with type 2 diabetes and is the leading cause of preventable blindness in working-age adults globally. Annual dilated eye examinations are essential from the time of diagnosis, as retinopathy is often already present when type 2 diabetes is first detected."
+    },
+    {
+        "id": "comp_int_002",
+        "category": "complication",
+        "subcategory": "retinopathy_silent",
+        "source": "ADA",
+        "text": "Early diabetic retinopathy (non-proliferative) causes no visual symptoms whatsoever. This is precisely why annual eye screening is critical — by the time visual changes are noticed by the patient, significant irreversible damage has already occurred. Regular eye exams detect changes early and allow preventive treatment before vision is affected."
+    },
+    {
+        "id": "comp_int_003",
+        "category": "complication",
+        "subcategory": "nephropathy",
+        "source": "ADA",
+        "text": "Diabetic nephropathy is the leading cause of chronic kidney disease and kidney failure globally. It begins asymptomatically with microalbuminuria (small amounts of protein in urine) that progresses over years to macroalbuminuria and declining kidney function. Annual urine albumin-to-creatinine ratio testing is the essential early detection tool."
+    },
+    {
+        "id": "comp_int_004",
+        "category": "complication",
+        "subcategory": "nephropathy_bp",
+        "source": "WHO",
+        "text": "Blood pressure control is as important as glucose control for preventing kidney disease progression in type 2 diabetes. Target blood pressure for patients with diabetic kidney disease is below 130/80 mmHg. ACE inhibitors or ARBs are the preferred blood pressure medications due to their specific kidney-protective properties beyond blood pressure reduction."
+    },
+    {
+        "id": "comp_int_005",
+        "category": "complication",
+        "subcategory": "neuropathy",
+        "source": "ADA",
+        "text": "Diabetic peripheral neuropathy typically begins in the feet and lower legs with tingling, burning, numbness, or shooting pain. It follows a stocking-and-glove distribution — feet affected before hands. Annual monofilament testing detects loss of protective sensation before foot ulcers develop, allowing preventive intervention."
+    },
+    {
+        "id": "comp_int_006",
+        "category": "complication",
+        "subcategory": "neuropathy_falls",
+        "source": "ADA",
+        "text": "Peripheral neuropathy significantly increases fall risk in older adults with type 2 diabetes due to impaired proprioception — the sense of foot and ankle position that guides balance. Balance exercises, proper footwear, and home safety modifications (removing floor rugs, improving lighting, adding grab bars) are important preventive measures."
+    },
+    {
+        "id": "comp_int_007",
+        "category": "complication",
+        "subcategory": "foot",
+        "source": "IDF",
+        "text": "Diabetic foot complications affect 15–25% of people with type 2 diabetes during their lifetime. The dangerous combination of peripheral neuropathy (reduced pain sensation), peripheral vascular disease (poor blood circulation), and impaired immune function creates conditions where minor foot injuries can rapidly progress to severe infections and limb amputation."
+    },
+    {
+        "id": "comp_int_008",
+        "category": "complication",
+        "subcategory": "foot_care",
+        "source": "ADA",
+        "text": "Daily foot inspection is essential for all patients with peripheral neuropathy or peripheral vascular disease. Using a mirror to check the soles, looking between toes, and feeling for temperature differences can detect early problems before they progress. Any wound, blister, redness, or swelling not improving within 24 hours requires prompt medical evaluation."
+    },
+    {
+        "id": "comp_int_009",
+        "category": "complication",
+        "subcategory": "foot_footwear",
+        "source": "IDF",
+        "text": "Proper footwear is one of the most important preventive measures for diabetic foot disease. Shoes should have adequate depth and width to prevent pressure points, closed toes, no internal seams that could cause blisters, and a firm heel counter. Walking barefoot — even indoors or in the bathroom — is dangerous for patients with diabetic neuropathy."
+    },
+    {
+        "id": "comp_int_010",
+        "category": "complication",
+        "subcategory": "cardiovascular",
+        "source": "ADA 2024",
+        "text": "Cardiovascular disease is the leading cause of death in type 2 diabetes, accounting for 50–80% of all mortality. People with type 2 diabetes have 2–4 times higher risk of heart attack and stroke compared to the general population. Comprehensive cardiovascular risk factor management is an essential, non-optional component of diabetes care."
+    },
+    {
+        "id": "comp_int_011",
+        "category": "complication",
+        "subcategory": "infection",
+        "source": "ADA",
+        "text": "Type 2 diabetes impairs immune function, increasing susceptibility to infections and impairing wound healing. High glucose provides an optimal growth environment for bacteria and fungi. Annual influenza vaccination and pneumococcal vaccination are recommended for all adults with type 2 diabetes as preventive measures."
+    },
+    {
+        "id": "comp_int_012",
+        "category": "complication",
+        "subcategory": "depression",
+        "source": "ADA 2024",
+        "text": "Depression is twice as common in people with type 2 diabetes compared to the general population. Depression worsens diabetes self-management across all domains — reducing medication adherence, physical activity, dietary control, and healthcare attendance. Screening for depression should be a routine part of diabetes care every year."
+    },
+    {
+        "id": "comp_int_013",
+        "category": "complication",
+        "subcategory": "silent_mi",
+        "source": "ADA",
+        "text": "People with diabetes can experience silent heart attacks — myocardial infarctions without the typical severe crushing chest pain — due to cardiac autonomic neuropathy blunting pain perception. Any unexplained shortness of breath, jaw pain, left arm discomfort, unusual fatigue, or nausea in a patient with diabetes warrants urgent cardiac evaluation."
+    },
+    {
+        "id": "comp_int_014",
+        "category": "complication",
+        "subcategory": "stroke",
+        "source": "ADA",
+        "text": "Type 2 diabetes doubles stroke risk. Hypertension, smoking, elevated LDL cholesterol, atrial fibrillation, and poor glucose control are the primary modifiable stroke risk factors in diabetes. Warning signs (FAST: Face drooping, Arm weakness, Speech difficulty, Time to call emergency services) require immediate emergency response."
+    },
+    {
+        "id": "comp_int_015",
+        "category": "complication",
+        "subcategory": "uti",
+        "source": "WHO",
+        "text": "Urinary tract infections are significantly more common and more severe in people with type 2 diabetes, particularly women. High glucose in urine provides an optimal environment for bacterial growth. Symptoms including painful urination, urinary urgency, foul-smelling urine, or fever require prompt evaluation and antibiotic treatment."
+    },
+    {
+        "id": "comp_eth_001",
+        "category": "complication",
+        "subcategory": "access",
+        "source": "Ethiopian MoH",
+        "text": "Access to ophthalmology services for diabetic retinopathy screening is limited outside major Ethiopian cities. Patients in Addis Ababa have access at Tikur Anbessa (Black Lion) Hospital, Menelik II Hospital, and private ophthalmic clinics. Patients outside Addis Ababa should inquire about eye clinic services at their nearest regional or zonal hospital."
+    },
+    {
+        "id": "comp_eth_002",
+        "category": "complication",
+        "subcategory": "foot_barefoot",
+        "source": "Ethiopian MoH",
+        "text": "Barefoot walking, common in some rural Ethiopian communities and required in certain religious settings (entering Orthodox churches), is a significant injury risk for patients with diabetic peripheral neuropathy who cannot feel foot injuries. Patients with neuropathy should wear protective footwear at all times and carry lightweight sandals for entry into religious spaces."
+    },
+    {
+        "id": "comp_eth_003",
+        "category": "complication",
+        "subcategory": "tb_diabetes",
+        "source": "Research/WHO",
+        "text": "Ethiopia has one of the highest tuberculosis burdens globally, and type 2 diabetes triples the risk of developing active TB. People with diabetes should receive annual TB symptom screening (persistent cough lasting more than 2 weeks, night sweats, unintended weight loss, fever) and receive priority testing if symptomatic."
+    },
+    {
+        "id": "comp_eth_004",
+        "category": "complication",
+        "subcategory": "tb_bidirectional",
+        "source": "Ethiopian MoH",
+        "text": "The bidirectional relationship between TB and diabetes in Ethiopia is clinically critical: TB worsens glucose control through inflammation and the effect of rifampicin on drug metabolism, while diabetes worsens TB treatment outcomes and increases TB recurrence rates. Every patient diagnosed with either condition should be actively screened for the other."
+    },
+    {
+        "id": "comp_eth_005",
+        "category": "complication",
+        "subcategory": "hypertension",
+        "source": "Ethiopian MoH",
+        "text": "Hypertension is present in approximately 50–70% of Ethiopian patients with type 2 diabetes and is frequently underdiagnosed because blood pressure measurement may not occur at every healthcare contact. Every clinical encounter for diabetes management should include blood pressure measurement as a standard, non-negotiable component of care."
+    },
+    {
+        "id": "comp_eth_006",
+        "category": "complication",
+        "subcategory": "kidney_access",
+        "source": "Ethiopian MoH",
+        "text": "Chronic kidney disease from diabetic nephropathy is an increasing cause of illness and death in Ethiopia, but dialysis and kidney transplantation services are severely limited and largely restricted to Addis Ababa. Prevention of kidney disease through optimal glucose control and blood pressure management is absolutely critical in the Ethiopian healthcare context."
+    },
+    {
+        "id": "comp_eth_007",
+        "category": "complication",
+        "subcategory": "foot_traditional",
+        "source": "Ethiopian MoH",
+        "text": "Traditional remedies applied to diabetic foot wounds including plant poultices, butter, or ash can introduce infection, delay healing, and mask the severity of injury. Patients should be explicitly counseled to seek medical evaluation for any foot wound rather than applying traditional treatments, as the consequences of delayed care in a diabetic foot can be rapid and severe."
+    },
+    {
+        "id": "life_int_001",
+        "category": "lifestyle",
+        "subcategory": "sleep",
+        "source": "ADA 2024",
+        "text": "Adequate sleep of 7–9 hours per night is essential for glucose control in type 2 diabetes. Sleep deprivation increases insulin resistance, raises cortisol levels, stimulates hunger hormones (ghrelin), reduces satiety hormones (leptin), and disrupts circadian regulation of glucose metabolism. Even one week of poor sleep can worsen HbA1c by an estimated 0.5%."
+    },
+    {
+        "id": "life_int_002",
+        "category": "lifestyle",
+        "subcategory": "stress",
+        "source": "ADA",
+        "text": "Chronic psychological stress is a direct cause of worsened glycemic control in type 2 diabetes. Stress hormones (cortisol, adrenaline) directly raise blood glucose through increased hepatic glucose production and reduced insulin sensitivity. Stress management is a legitimate and evidence-based component of comprehensive diabetes care."
+    },
+    {
+        "id": "life_int_003",
+        "category": "lifestyle",
+        "subcategory": "smoking",
+        "source": "WHO",
+        "text": "Smoking doubles the risk of cardiovascular disease and kidney disease in people with type 2 diabetes. Smoking raises blood glucose, increases insulin resistance, accelerates vascular damage, and worsens diabetic neuropathy. Smoking cessation is one of the most high-impact interventions a person with type 2 diabetes can make for their long-term health."
+    },
+    {
+        "id": "life_int_004",
+        "category": "lifestyle",
+        "subcategory": "weight",
+        "source": "ADA 2024",
+        "text": "Body weight is the most important modifiable risk factor in type 2 diabetes for most patients. Even modest weight loss of 5% of body weight significantly improves glucose control, blood pressure, and lipid profile. Weight loss of 15% or more is associated with diabetes remission in many patients with shorter disease duration."
+    },
+    {
+        "id": "life_int_005",
+        "category": "lifestyle",
+        "subcategory": "abdominal_fat",
+        "source": "ADA",
+        "text": "Abdominal (visceral) adipose tissue is metabolically active and strongly associated with insulin resistance. Waist circumference above 94cm in men or 80cm in women indicates elevated metabolic risk regardless of total body weight. Reducing waist circumference through dietary modification and exercise is a primary treatment target in type 2 diabetes."
+    },
+    {
+        "id": "life_int_006",
+        "category": "lifestyle",
+        "subcategory": "mental_health",
+        "source": "ADA 2024",
+        "text": "Diabetes distress — the specific emotional burden of living with a chronic condition requiring constant self-management — affects approximately 20–35% of people with diabetes. It differs from clinical depression but equally impairs self-management behaviors including medication adherence, monitoring frequency, and dietary choices."
+    },
+    {
+        "id": "life_int_007",
+        "category": "lifestyle",
+        "subcategory": "social_support",
+        "source": "IDF",
+        "text": "Strong social support from family members is one of the strongest predictors of better diabetes outcomes. Family involvement in diabetes education — particularly the person who prepares household meals — improves dietary adherence more than patient education alone. The social environment significantly determines self-management success."
+    },
+    {
+        "id": "life_int_008",
+        "category": "lifestyle",
+        "subcategory": "sick_day",
+        "source": "ADA",
+        "text": "Sick day management rules for type 2 diabetes: continue all diabetes medications unless vomiting prevents them, check glucose every 2–4 hours, stay hydrated with sugar-free fluids, eat easily digestible carbohydrates if possible, and contact a healthcare provider if glucose exceeds 250 mg/dL or symptoms worsen significantly."
+    },
+    {
+        "id": "life_int_009",
+        "category": "lifestyle",
+        "subcategory": "burnout",
+        "source": "ADA",
+        "text": "Diabetes burnout — complete emotional disengagement from diabetes self-management — is common and understandable. Signs include stopping glucose monitoring, ignoring medications, and abandoning dietary changes while feeling unable to care anymore. Burnout requires compassionate, non-judgmental support and problem-solving, not additional education or criticism."
+    },
+    {
+        "id": "life_int_010",
+        "category": "lifestyle",
+        "subcategory": "positive",
+        "source": "ADA 2024",
+        "text": "Positive psychology approaches in diabetes care — recognizing strengths, celebrating meaningful progress, and building self-efficacy rather than focusing only on deficits — consistently produce better long-term self-management outcomes than deficit-focused approaches. Acknowledging what patients are doing well is clinically effective, not merely supportive."
+    },
+    {
+        "id": "life_eth_001",
+        "category": "lifestyle",
+        "subcategory": "herbal_remedies",
+        "source": "Ethiopian MoH",
+        "text": "Traditional Ethiopian herbal remedies used for diabetes including koseret, jatropha, vernonia amygdalina (grawa), and moringa are widely used. Some demonstrate modest glucose-lowering properties; others carry risks of organ toxicity or dangerous interactions with diabetes medications. All herbal remedy use must be disclosed to the healthcare provider without exception."
+    },
+    {
+        "id": "life_eth_002",
+        "category": "lifestyle",
+        "subcategory": "fenugreek",
+        "source": "Research",
+        "text": "Bitter melon (yefikir enkuay), moringa (shiferaw), and fenugreek (abish) are among the most commonly used plant-based remedies in Ethiopia with documented glucose-lowering properties. When used as concentrated supplements alongside diabetes medications, these can cause additive hypoglycemia. Food quantities are generally safe; supplement doses require medical oversight."
+    },
+    {
+        "id": "life_eth_003",
+        "category": "lifestyle",
+        "subcategory": "religious_fasting",
+        "source": "Ethiopian MoH",
+        "text": "Religious practices are central to health behaviors for many Ethiopian patients with type 2 diabetes. Ethiopian Orthodox Christians observe 180+ fasting days annually — these periods of predominantly plant-based eating can significantly improve glucose control and should be discussed proactively with healthcare providers when adjusting medications."
+    },
+    {
+        "id": "life_eth_004",
+        "category": "lifestyle",
+        "subcategory": "community",
+        "source": "Ethiopian MoH",
+        "text": "The Ethiopian edir (community mutual aid group) and idir networks can serve as diabetes support communities. Members who understand diabetes management can support medication adherence, encourage healthcare attendance, and provide practical help during illness. Community Health Extension Workers (HEWs) at kebele health posts are valuable ongoing support resources."
+    },
+    {
+        "id": "life_eth_005",
+        "category": "lifestyle",
+        "subcategory": "healthcare_access",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopia's Health Extension Workers (HEWs) provide community-level health support including basic diabetes education, medication supply assistance, blood pressure measurement, and referral to higher-level facilities. Patients in rural areas and kebele-level communities should register at their local health post to access ongoing diabetes monitoring support."
+    },
+    {
+        "id": "life_eth_006",
+        "category": "lifestyle",
+        "subcategory": "medication_supply",
+        "source": "Ethiopian MoH",
+        "text": "The Ethiopian NCD program provides subsidized or free diabetes medications including metformin and glibenclamide at government health facilities. Patients who face medication stock-out challenges should immediately contact their health center NCD clinic coordinator, district health bureau, or regional health office for supply assistance."
+    },
+    {
+        "id": "life_eth_007",
+        "category": "lifestyle",
+        "subcategory": "economic",
+        "source": "Ethiopian MoH",
+        "text": "Economic barriers to diabetes management in Ethiopia include cost of glucose test strips, private medications, and specialist consultations. Practical strategies include: enrolling in the government NCD program for subsidized medication, using community health centers for free monitoring, prioritizing affordable high-nutrition foods like legumes and seasonal vegetables."
+    },
+    {
+        "id": "life_eth_008",
+        "category": "lifestyle",
+        "subcategory": "traditional_healer",
+        "source": "Ethiopian MoH",
+        "text": "Traditional healing practices including seeking advice from traditional healers (tenquay) and using holy water (tsebel) are common first responses to illness for many Ethiopian patients. Healthcare providers should acknowledge these practices respectfully and encourage patients to continue medical treatment simultaneously, without requiring patients to choose between them."
+    },
+    {
+        "id": "life_eth_009",
+        "category": "lifestyle",
+        "subcategory": "khat",
+        "source": "Research",
+        "text": "Khat (chat) chewing is common in some Ethiopian communities, particularly in the Harar, Dire Dawa, and Somali regions. Khat contains cathinone which raises blood pressure and heart rate, disrupts sleep patterns, suppresses appetite (affecting meal regularity), and can interfere with medication adherence. These effects worsen glycemic control in type 2 diabetes."
+    },
+    {
+        "id": "life_eth_010",
+        "category": "lifestyle",
+        "subcategory": "family_education",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian family structures typically involve multi-generational households where food decisions and meal preparation are often shared or delegated to a specific household member. Educating the household meal preparer — often the mother or wife — alongside the patient with diabetes significantly improves dietary adherence outcomes in the Ethiopian context."
+    },
+    {
+        "id": "edu_int_001",
+        "category": "education",
+        "subcategory": "basics",
+        "source": "ADA",
+        "text": "Type 2 diabetes is a progressive metabolic condition characterized by insulin resistance (cells respond poorly to insulin) and progressive insulin deficiency (the pancreas gradually produces less insulin over time). Both mechanisms together cause blood glucose to remain elevated after meals and even overnight in a fasting state."
+    },
+    {
+        "id": "edu_int_002",
+        "category": "education",
+        "subcategory": "cause",
+        "source": "ADA",
+        "text": "Type 2 diabetes is not caused by eating too much sugar. It develops from a complex interaction of genetic predisposition, lifestyle factors, and aging. However, poor diet, physical inactivity, and excess body fat — particularly abdominal fat — are the most important modifiable triggers in genetically susceptible individuals."
+    },
+    {
+        "id": "edu_int_003",
+        "category": "education",
+        "subcategory": "insulin",
+        "source": "IDF",
+        "text": "The human body requires glucose for energy, and insulin is the hormone that unlocks cells to allow glucose to enter. In type 2 diabetes, cells gradually become resistant to insulin's signal, so glucose accumulates in the bloodstream instead of entering the muscle and organ cells where it is needed for energy."
+    },
+    {
+        "id": "edu_int_004",
+        "category": "education",
+        "subcategory": "warning_signs",
+        "source": "ADA",
+        "text": "Classic symptoms of uncontrolled type 2 diabetes include: excessive thirst (polydipsia), frequent urination especially at night (polyuria), unexplained weight loss despite increased appetite, persistent fatigue, blurred vision, slow wound healing, and recurrent infections. These symptoms indicate dangerously elevated glucose levels that have often persisted for months."
+    },
+    {
+        "id": "edu_int_005",
+        "category": "education",
+        "subcategory": "emergency_signs",
+        "source": "ADA",
+        "text": "Symptoms requiring urgent medical attention in type 2 diabetes: glucose reading above 400 mg/dL, extreme thirst and urination, nausea and vomiting, severe abdominal pain, confusion or difficulty staying awake, fruity breath odor, or difficulty breathing. These may indicate hyperosmolar hyperglycemic state, a life-threatening emergency."
+    },
+    {
+        "id": "edu_int_006",
+        "category": "education",
+        "subcategory": "screening",
+        "source": "WHO",
+        "text": "Type 2 diabetes screening is recommended for all adults over 35 years old, or younger if risk factors are present. Key risk factors include: first-degree family history of diabetes, overweight or obesity, physical inactivity, previous gestational diabetes, hypertension, elevated triglycerides, and history of cardiovascular disease."
+    },
+    {
+        "id": "edu_int_007",
+        "category": "education",
+        "subcategory": "self_management",
+        "source": "IDF",
+        "text": "Diabetes self-management education (DSME) significantly improves outcomes beyond medication alone. Patients who understand their condition, know their glucose targets, can recognize early complication signs, and know when to seek help achieve better glycemic control and have significantly fewer hospitalizations compared to those without structured education."
+    },
+    {
+        "id": "edu_int_008",
+        "category": "education",
+        "subcategory": "five_behaviors",
+        "source": "ADA",
+        "text": "The five critical self-management behaviors in type 2 diabetes: consistent medication taking at prescribed times, balanced dietary choices at consistent meal times, regular physical activity most days of the week, regular glucose monitoring, and regular scheduled healthcare provider visits. Each behavior independently and cumulatively reduces complication risk."
+    },
+    {
+        "id": "edu_int_009",
+        "category": "education",
+        "subcategory": "know_numbers",
+        "source": "ADA",
+        "text": "Every person with type 2 diabetes should know and track their four key numbers: HbA1c (target below 7%), blood pressure (target below 130/80 mmHg), LDL cholesterol (target below 70 mg/dL for high cardiovascular risk), and kidney albumin-to-creatinine ratio (target below 30 mg/g). These four numbers collectively predict long-term diabetes outcomes."
+    },
+    {
+        "id": "edu_int_010",
+        "category": "education",
+        "subcategory": "visit_frequency",
+        "source": "ADA",
+        "text": "Recommended minimum healthcare visit frequency for type 2 diabetes: HbA1c every 3 months until at target, then every 6 months; annual comprehensive foot examination, dilated eye examination, kidney function testing, lipid panel, and dental evaluation. Blood pressure should be measured at every visit."
+    },
+    {
+        "id": "edu_int_011",
+        "category": "education",
+        "subcategory": "progression",
+        "source": "ADA",
+        "text": "Type 2 diabetes is a progressive condition — most patients will eventually require additional medications or insulin over years to decades. This natural progression reflects the decline of pancreatic beta cell function with time and is not evidence of patient failure. Early initiation of needed additional therapy prevents the compounding of organ damage."
+    },
+    {
+        "id": "edu_int_012",
+        "category": "education",
+        "subcategory": "myths",
+        "source": "ADA",
+        "text": "Common harmful myths about type 2 diabetes that must be corrected: insulin is addictive (false), people with diabetes cannot eat any carbohydrates (false — quality and quantity both matter), natural sugar is safe because it is natural (false — honey and fruit juice raise glucose significantly), and diabetes only affects blood sugar (false — it progressively affects eyes, kidneys, nerves, heart, and immune function)."
+    },
+    {
+        "id": "edu_int_013",
+        "category": "education",
+        "subcategory": "remission",
+        "source": "ADA 2024",
+        "text": "Type 2 diabetes remission — defined as HbA1c below 6.5% for at least 3 months without glucose-lowering medications — is genuinely achievable for many patients through sustained significant weight loss. Remission is more likely in patients with shorter diabetes duration, younger age, and less pancreatic beta cell damage at the time of intervention."
+    },
+    {
+        "id": "edu_int_014",
+        "category": "education",
+        "subcategory": "prevention",
+        "source": "WHO",
+        "text": "Type 2 diabetes can be prevented or significantly delayed in high-risk individuals. The landmark Diabetes Prevention Program demonstrated that lifestyle intervention achieving 7% weight loss and 150 minutes of exercise per week reduced diabetes incidence by 58% in people with prediabetes — substantially more effective than metformin medication alone."
+    },
+    {
+        "id": "edu_eth_001",
+        "category": "education",
+        "subcategory": "awareness",
+        "source": "Ethiopian MoH",
+        "text": "Awareness of type 2 diabetes remains significantly limited in many Ethiopian communities. Studies show that many Ethiopian patients present to healthcare with long-standing complications including advanced retinopathy and neuropathy because they were unaware of their diagnosis or delayed seeking care for years after symptoms appeared."
+    },
+    {
+        "id": "edu_eth_002",
+        "category": "education",
+        "subcategory": "amharic",
+        "source": "Ethiopian MoH",
+        "text": "In Amharic, type 2 diabetes is referred to as 'ye'sikuar beshita' (የስኳር በሽታ — sugar illness). While this name emphasizes sugar, understanding that the condition involves insulin function — not only dietary sugar intake — helps patients make more comprehensive and informed lifestyle and dietary decisions beyond simply avoiding sweet foods."
+    },
+    {
+        "id": "edu_eth_003",
+        "category": "education",
+        "subcategory": "stigma",
+        "source": "Ethiopian MoH",
+        "text": "In some Ethiopian communities, chronic illness including diabetes carries social stigma that causes patients to conceal their diagnosis from family members, friends, or employers. Healthcare providers should proactively address stigma, clearly communicating that type 2 diabetes is a metabolic and hormonal condition entirely unrelated to moral character or personal failing."
+    },
+    {
+        "id": "edu_eth_004",
+        "category": "education",
+        "subcategory": "family_education",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopian family structures often involve multi-generational households where food decisions are collective. Educating both the patient and the household member who prepares meals (commonly the mother or wife) dramatically improves dietary adherence outcomes in Ethiopian patients with type 2 diabetes — often more effectively than patient education alone."
+    },
+    {
+        "id": "edu_eth_005",
+        "category": "education",
+        "subcategory": "diagnosis_ethiopia",
+        "source": "Ethiopian MoH",
+        "text": "In Ethiopia, fasting blood glucose measured at accredited laboratory facilities is the most commonly used and most accessible diagnostic test for diabetes. A confirmed fasting plasma glucose of 126 mg/dL (7.0 mmol/L) or above on two separate occasions establishes the diagnosis of diabetes mellitus according to WHO diagnostic criteria."
+    },
+    {
+        "id": "edu_eth_006",
+        "category": "education",
+        "subcategory": "hew",
+        "source": "Ethiopian MoH",
+        "text": "Ethiopia's Health Extension Workers (HEWs), deployed to kebele-level health posts throughout the country, provide first-line NCD education, blood pressure screening, medication supply support, and referral services for people with diabetes. Patients should know the location of their nearest kebele health post and maintain contact with their assigned HEW."
+    },
+    {
+        "id": "symp_001",
+        "category": "symptoms",
+        "subcategory": "thirst",
+        "source": "ADA",
+        "text": "Excessive thirst (polydipsia) in type 2 diabetes is caused by osmotic diuresis — high blood glucose draws water from cells into the bloodstream and then into urine, causing cellular dehydration and constant thirst. This thirst is not relieved by drinking water until blood glucose levels are substantially reduced through medication and dietary control."
+    },
+    {
+        "id": "symp_002",
+        "category": "symptoms",
+        "subcategory": "urination",
+        "source": "ADA",
+        "text": "Frequent urination (polyuria), especially at night (nocturia), occurs when blood glucose exceeds the kidney's reabsorption threshold of approximately 180 mg/dL. Glucose spills into urine and draws water with it, producing large volumes of light-colored urine. This is a classic and often first-noticed warning sign of uncontrolled type 2 diabetes."
+    },
+    {
+        "id": "symp_003",
+        "category": "symptoms",
+        "subcategory": "fatigue",
+        "source": "ADA",
+        "text": "Fatigue in type 2 diabetes results from multiple simultaneous causes: cells cannot efficiently access glucose for energy due to insulin resistance, high glucose causes chronic oxidative stress and inflammation, diabetes often disrupts sleep quality, and depression — which is twice as common in diabetes — contributes independently to persistent fatigue."
+    },
+    {
+        "id": "symp_004",
+        "category": "symptoms",
+        "subcategory": "blurred_vision",
+        "source": "ADA",
+        "text": "Blurred vision during periods of high blood glucose is caused by glucose drawing fluid into the eye's lens, temporarily changing its shape and focusing power. This acute glucose-related blurring is reversible with improved glucose control over 2–4 weeks. Persistent blurring despite good glucose control always requires ophthalmology evaluation for diabetic retinopathy."
+    },
+    {
+        "id": "symp_005",
+        "category": "symptoms",
+        "subcategory": "weight_loss",
+        "source": "ADA",
+        "text": "Unexplained weight loss in type 2 diabetes despite normal or increased appetite occurs because cells cannot access glucose for energy and break down muscle and fat stores instead. Unintentional weight loss of more than 5% of body weight over 6–12 months without dietary change is a warning sign requiring prompt medical evaluation."
+    },
+    {
+        "id": "symp_006",
+        "category": "symptoms",
+        "subcategory": "infections",
+        "source": "ADA",
+        "text": "Recurrent infections (urinary tract infections, skin boils, thrush, slow wound healing) are common and important signs of poorly controlled type 2 diabetes. High blood glucose impairs neutrophil function, reduces immune surveillance capacity, and provides optimal growth conditions for bacteria and fungi in tissues and urine."
+    },
+    {
+        "id": "symp_007",
+        "category": "symptoms",
+        "subcategory": "neuropathy",
+        "source": "ADA",
+        "text": "Diabetic peripheral neuropathy initially presents as tingling, numbness, or burning pain in the feet and toes, typically worse at night and partially relieved by walking. The sensation is commonly described as walking on sand, hot coals, or wearing invisible tight socks. Some patients experience complete numbness without any pain, which is equally dangerous."
+    },
+    {
+        "id": "symp_008",
+        "category": "symptoms",
+        "subcategory": "hypo_adrenergic",
+        "source": "ADA",
+        "text": "Hypoglycemia adrenergic warning symptoms include: sweating (often cold and clammy), palpitations, trembling, anxiety, intense hunger, pallor, and lightheadedness. These warning symptoms typically occur when glucose falls below 70 mg/dL and are the body's signal to eat or drink something containing glucose immediately."
+    },
+    {
+        "id": "symp_009",
+        "category": "symptoms",
+        "subcategory": "hypo_severe",
+        "source": "ADA",
+        "text": "Neuroglycopenic symptoms of severe hypoglycemia occur when brain glucose falls critically low below 54 mg/dL: confusion, slurred speech, impaired concentration, unusual aggressive or childlike behavior, vision disturbances, difficulty walking, and in severe cases, seizures or loss of consciousness. These require immediate emergency assistance."
+    },
+    {
+        "id": "symp_010",
+        "category": "symptoms",
+        "subcategory": "chest_pain",
+        "source": "ADA",
+        "text": "Chest pain or pressure in a patient with type 2 diabetes requires immediate emergency evaluation without delay. People with diabetes can experience silent myocardial infarctions (heart attacks without typical crushing chest pain) due to cardiac autonomic neuropathy. Any chest discomfort, jaw pain, left arm pain, or unexplained shortness of breath warrants emergency care."
+    },
+    {
+        "id": "symp_011",
+        "category": "symptoms",
+        "subcategory": "kidney_symptoms",
+        "source": "ADA",
+        "text": "Early diabetic kidney disease produces no symptoms — this is the reason annual urine albumin testing is essential and non-negotiable. Late-stage diabetic kidney disease symptoms include bilateral leg swelling (edema), facial puffiness, reduced urine output, fatigue, nausea, and shortness of breath from fluid accumulation. By the time these appear, significant irreversible damage has already occurred."
+    },
+    {
+        "id": "symp_012",
+        "category": "symptoms",
+        "subcategory": "foot_warning",
+        "source": "IDF",
+        "text": "Warning signs in a patient with diabetes that require same-day medical evaluation: any break in foot skin including blisters or callus cracks, redness or warmth spreading from a wound, foot swelling, black or discolored skin area, foul odor, or any drainage from a wound. Diabetic foot infections can progress from minor wound to limb-threatening infection within days."
+    },
+    {
+        "id": "symp_013",
+        "category": "symptoms",
+        "subcategory": "hunger",
+        "source": "ADA",
+        "text": "Polyphagia (excessive hunger) in uncontrolled type 2 diabetes occurs because despite high blood glucose, cells cannot access that glucose for energy due to insulin resistance. The brain signals hunger regardless of blood sugar level. This paradox — high blood sugar causing constant hunger — is a hallmark of inadequately treated insulin resistance."
+    },
+    {
+        "id": "screen_001",
+        "category": "screening",
+        "subcategory": "annual_review",
+        "source": "ADA",
+        "text": "Annual comprehensive diabetes assessment should include: HbA1c, fasting lipid panel, serum creatinine and eGFR, urine albumin-to-creatinine ratio (UACR), dilated eye examination, comprehensive foot examination including monofilament testing, blood pressure, body weight and waist circumference, and assessment of self-management behaviors."
+    },
+    {
+        "id": "screen_002",
+        "category": "screening",
+        "subcategory": "retinopathy",
+        "source": "ADA",
+        "text": "Diabetic retinopathy screening should be performed at diagnosis and then annually. Early non-proliferative retinopathy detected at screening can often be managed by improving glucose and blood pressure control alone. Advanced proliferative retinopathy detected early responds very well to laser treatment or anti-VEGF injections, preventing vision loss in the majority of treated patients."
+    },
+    {
+        "id": "screen_003",
+        "category": "screening",
+        "subcategory": "kidney",
+        "source": "ADA",
+        "text": "Annual kidney screening using urine albumin-to-creatinine ratio (UACR) enables detection of early diabetic nephropathy. Normal UACR is below 30 mg/g. UACR of 30–300 mg/g indicates microalbuminuria (early kidney disease). UACR above 300 mg/g indicates macroalbuminuria requiring aggressive treatment with ACE inhibitors or ARBs and optimized glucose and blood pressure control."
+    },
+    {
+        "id": "screen_004",
+        "category": "screening",
+        "subcategory": "foot",
+        "source": "IDF",
+        "text": "Annual comprehensive foot examination in type 2 diabetes assesses: peripheral pulses (posterior tibial and dorsalis pedis), skin integrity, nail health, foot deformities (bunions, hammer toes, Charcot joint), temperature differences, vibration sensation with 128-Hz tuning fork, and pressure sensation with 10g monofilament. Absence of monofilament sensation at any tested site indicates high-risk foot status."
+    },
+    {
+        "id": "screen_005",
+        "category": "screening",
+        "subcategory": "cardiovascular",
+        "source": "ADA",
+        "text": "Cardiovascular risk assessment in type 2 diabetes includes: annual blood pressure measurement and lipid panel, resting ECG for adults with cardiac symptoms or long diabetes duration, and assessment of symptoms suggestive of angina or peripheral arterial disease. The ankle-brachial index (ABI) is a simple non-invasive test that detects peripheral vascular disease, which significantly increases foot complication risk."
+    },
+    {
+        "id": "screen_006",
+        "category": "screening",
+        "subcategory": "depression",
+        "source": "ADA 2024",
+        "text": "Screening for depression and diabetes distress using validated tools (PHQ-9 and Diabetes Distress Scale) is recommended annually for all people with type 2 diabetes. Positive depression screening should lead to appropriate mental health referral or treatment. Addressing mental health improves glycemic control as effectively as many pharmacological interventions."
+    },
+    {
+        "id": "screen_007",
+        "category": "screening",
+        "subcategory": "ethiopia_hba1c",
+        "source": "Ethiopian MoH",
+        "text": "HbA1c testing availability in Ethiopia is improving but remains limited to major hospitals and larger health facilities. Where HbA1c is unavailable, quarterly fasting plasma glucose measurement at a laboratory combined with regular clinical assessment provides the next best monitoring approach. Patients should advocate for HbA1c at referral hospital annual reviews."
+    },
+    {
+        "id": "adh_001",
+        "category": "adherence",
+        "subcategory": "definition",
+        "source": "WHO",
+        "text": "Medication adherence in diabetes is defined as taking the correct prescribed dose at the correct time, on a consistent basis, over the long term. Poor adherence is the most common cause of apparent treatment failure in type 2 diabetes worldwide — more common than actual medication ineffectiveness or inappropriate prescribing."
+    },
+    {
+        "id": "adh_002",
+        "category": "adherence",
+        "subcategory": "impact",
+        "source": "ADA",
+        "text": "Consistent medication adherence in type 2 diabetes reduces HbA1c by 0.5–1.0%, reduces diabetes-related hospitalizations by approximately 20%, and reduces all-cause mortality by approximately 30% compared to poor adherence, independent of which specific medications are prescribed or the patient's baseline glucose control."
+    },
+    {
+        "id": "adh_003",
+        "category": "adherence",
+        "subcategory": "barriers",
+        "source": "IDF",
+        "text": "The most common patient-reported barriers to diabetes medication adherence globally: cost of medications, complex multi-drug dosing schedules, actual or feared side effects, forgetfulness, feeling well with no perceived immediate need for medication, and lack of understanding of how medications work and why they must be taken even when feeling healthy."
+    },
+    {
+        "id": "adh_004",
+        "category": "adherence",
+        "subcategory": "ethiopia_supply",
+        "source": "Ethiopian MoH",
+        "text": "In Ethiopia, medication supply interruptions at government health facilities are a significant practical barrier to adherence. Patients may arrive for refills and find medications out of stock. Building a small 1–2 week buffer supply at home when medications are available, and knowing alternative supply locations, helps prevent treatment gaps."
+    },
+    {
+        "id": "adh_005",
+        "category": "adherence",
+        "subcategory": "strategies",
+        "source": "ADA",
+        "text": "Evidence-based adherence strategies include: weekly pill organizers filled each Sunday, linking medication to an existing non-negotiable daily habit (brushing teeth, having morning coffee, going to bed), setting two daily phone alarms, keeping medications in a highly visible location, and using a medication tracking log or app."
+    },
+    {
+        "id": "adh_006",
+        "category": "adherence",
+        "subcategory": "habit",
+        "source": "Research",
+        "text": "Habit formation research demonstrates that health behaviors become semi-automatic after approximately 21 consecutive days of consistent practice. The first 3 weeks of any new medication are the highest-risk period for discontinuation — establishing the habit during this critical window dramatically improves long-term adherence to the medication schedule."
+    },
+    {
+        "id": "adh_007",
+        "category": "adherence",
+        "subcategory": "streak",
+        "source": "ADA",
+        "text": "Patients who maintain a 7-consecutive-day medication adherence streak are statistically 3 times more likely to achieve their HbA1c target at the 3-month review compared to patients without a consistent streak pattern. Each consecutive day of adherence builds the neural habit pathway that makes the next day's dose feel automatic rather than requiring deliberate effort."
+    },
+    {
+        "id": "adh_008",
+        "category": "adherence",
+        "subcategory": "missed_consequence",
+        "source": "ADA",
+        "text": "Missing just 3 consecutive doses of metformin allows hepatic glucose production to begin returning toward pre-treatment levels within 36–48 hours. For patients who had achieved meaningful fasting glucose improvements, 3 missed days can begin to reverse several weeks of hard-won metabolic progress. Recovery after a gap takes longer than the gap itself."
+    },
+    {
+        "id": "adh_009",
+        "category": "adherence",
+        "subcategory": "encouragement",
+        "source": "ADA 2024",
+        "text": "Setbacks including missed doses, poor dietary choices, and skipped glucose checks are a predictable and normal part of managing any chronic condition requiring daily self-management over a lifetime. What determines outcomes is not perfection but the overall pattern across weeks and months. One missed dose does not undo the benefit of 12 days of consistent adherence."
+    },
+    {
+        "id": "adh_010",
+        "category": "adherence",
+        "subcategory": "side_effect_management",
+        "source": "ADA",
+        "text": "Side effects are the most commonly reported reason for stopping diabetes medications early. Most metformin gastrointestinal side effects (nausea, loose stools, abdominal cramping) are dose-dependent and timing-related. Starting at 500mg daily, increasing by 500mg every 2 weeks, and always taking with the largest meal of the day reduces side effects in over 80% of affected patients."
+    },
+    {
+        "id": "mh_001",
+        "category": "mental_health",
+        "subcategory": "distress",
+        "source": "ADA 2024",
+        "text": "Diabetes distress is the specific emotional burden of living with the demands of diabetes management — persistent worry about complications, feeling overwhelmed by the complexity of self-care, fear of hypoglycemia, and frustration with glucose results despite consistent effort. It affects 20–35% of people with type 2 diabetes and impairs all self-management behaviors."
+    },
+    {
+        "id": "mh_002",
+        "category": "mental_health",
+        "subcategory": "distress_signs",
+        "source": "ADA",
+        "text": "Signs of diabetes distress include: feeling that diabetes has completely taken over your life, avoiding glucose checks due to fear of the results, feeling nothing you do is ever enough to manage it properly, and feeling extreme frustration when self-management efforts don't produce the expected glucose outcomes."
+    },
+    {
+        "id": "mh_003",
+        "category": "mental_health",
+        "subcategory": "depression_cycle",
+        "source": "ADA 2024",
+        "text": "Depression in type 2 diabetes creates a documented vicious cycle: depression reduces motivation for all self-care behaviors including medication adherence, exercise, dietary control, and monitoring frequency. This worsens glucose control, which worsens depression symptoms, which further reduces self-management capacity. Breaking this cycle with appropriate mental health treatment improves both conditions simultaneously."
+    },
+    {
+        "id": "mh_004",
+        "category": "mental_health",
+        "subcategory": "motivation",
+        "source": "IDF",
+        "text": "Sustained behavior change in chronic disease management requires intrinsic motivation — the patient's own deeply held values and life goals must drive self-care, not only healthcare provider recommendations or fear of complications. Connecting diabetes management goals to what the individual values most (protecting their family, being present for grandchildren, maintaining independence) produces better long-term outcomes."
+    },
+    {
+        "id": "mh_005",
+        "category": "mental_health",
+        "subcategory": "celebration",
+        "source": "ADA 2024",
+        "text": "Recognizing and celebrating progress in diabetes management — regardless of how small — strengthens motivation and builds self-efficacy. A 7-day medication adherence streak, a week of consistent daily glucose logging, or a fasting reading 20 points lower than the previous month are all clinically meaningful achievements that deserve genuine acknowledgment and reinforcement."
+    },
+    {
+        "id": "mh_006",
+        "category": "mental_health",
+        "subcategory": "setbacks",
+        "source": "ADA",
+        "text": "Setbacks in diabetes self-management are universal and expected. Missing doses, making a poor food choice, or going a week without exercising does not define the patient's ability to manage their condition. What matters is the overall trajectory over months — acknowledging setbacks without judgment and returning immediately to the self-care plan produces the best outcomes."
+    },
+    {
+        "id": "mh_007",
+        "category": "mental_health",
+        "subcategory": "ethiopia",
+        "source": "Ethiopian MoH",
+        "text": "In Ethiopian cultural contexts, mental health challenges including depression and anxiety are often expressed through somatic (physical) complaints rather than explicit emotional language. Healthcare providers should screen for both physical and emotional well-being in Ethiopian patients with diabetes, asking about sleep quality, energy, enjoyment of life, and social engagement."
+    },
+    {
+        "id": "mh_008",
+        "category": "mental_health",
+        "subcategory": "coping",
+        "source": "ADA",
+        "text": "Adaptive coping strategies for type 2 diabetes management include: problem-focused coping (actively solving practical barriers to self-care), emotional regulation (managing difficult feelings about diagnosis), acceptance (coming to terms with having a lifelong condition), and social support seeking. Maladaptive coping — denial, avoidance, substance use — consistently worsens outcomes over time."
+    },
+    {
+        "id": "hhs_001",
+        "category": "emergency",
+        "subcategory": "hhs",
+        "source": "ADA",
+        "text": "Hyperosmolar Hyperglycemic State (HHS) is a life-threatening emergency specific to type 2 diabetes. It occurs when glucose rises extremely high (above 600 mg/dL) over days to weeks, causing severe dehydration. Unlike diabetic ketoacidosis in type 1 diabetes, HHS does not typically produce acidosis or ketones. It carries a mortality rate of 5–20%."
+    },
+    {
+        "id": "hhs_002",
+        "category": "emergency",
+        "subcategory": "hhs_triggers",
+        "source": "ADA",
+        "text": "Common triggers of HHS in type 2 diabetes: acute illness or infection (especially pneumonia or urinary tract infection), medication non-adherence, inadequate hydration, surgery, undiagnosed new-onset diabetes, or medications that raise glucose (steroids, diuretics). Elderly patients with restricted access to water are at highest risk."
+    },
+    {
+        "id": "hhs_003",
+        "category": "emergency",
+        "subcategory": "hhs_symptoms",
+        "source": "ADA",
+        "text": "Warning signs progressing toward HHS: glucose readings consistently above 400 mg/dL over several days, extreme thirst that cannot be quenched, high-volume urination gradually decreasing as dehydration worsens, progressive weakness and fatigue, confusion or altered mental state, and eventually decreased consciousness. Any glucose above 400 mg/dL requires immediate medical contact."
+    },
+    {
+        "id": "hhs_004",
+        "category": "emergency",
+        "subcategory": "hhs_prevention",
+        "source": "ADA",
+        "text": "HHS prevention strategies for patients with type 2 diabetes: maintain consistent medication adherence, increase fluid intake at the first sign of illness or high glucose, check glucose more frequently during illness or heat, recognize early warning signs of glucose elevation, and have a clear plan for when to seek emergency medical care."
+    },
+    {
+        "id": "preg_001",
+        "category": "special_situations",
+        "subcategory": "pregnancy",
+        "source": "ADA",
+        "text": "Women with type 2 diabetes who become pregnant require intensive glucose management. Glucose targets during pregnancy are significantly tighter than for non-pregnant adults: fasting glucose below 95 mg/dL, 1-hour post-meal below 140 mg/dL. Poor glucose control during early pregnancy (first trimester) significantly increases the risk of fetal abnormalities."
+    },
+    {
+        "id": "preg_002",
+        "category": "special_situations",
+        "subcategory": "pregnancy_medications",
+        "source": "ADA",
+        "text": "Most oral diabetes medications (metformin, sulfonylureas, SGLT2 inhibitors, DPP-4 inhibitors) should be reviewed and often replaced with insulin during pregnancy. Insulin is the safest, most well-studied glucose-lowering treatment in pregnancy. Any woman with type 2 diabetes who is planning pregnancy should consult their provider in advance."
+    },
+    {
+        "id": "bp_001",
+        "category": "cardiovascular_risk",
+        "subcategory": "blood_pressure",
+        "source": "ADA 2024",
+        "text": "Hypertension (blood pressure above 130/80 mmHg) is present in up to 75% of people with type 2 diabetes. Hypertension and diabetes together are multiplicative in their damage to kidneys, eyes, and the heart — not merely additive. Achieving blood pressure below 130/80 mmHg is one of the highest-yield interventions in diabetes management."
+    },
+    {
+        "id": "bp_002",
+        "category": "cardiovascular_risk",
+        "subcategory": "blood_pressure",
+        "source": "ADA",
+        "text": "Lifestyle interventions that lower blood pressure in type 2 diabetes: sodium restriction below 2300mg daily, DASH dietary pattern (rich in potassium, calcium, and magnesium), regular aerobic exercise (reduces BP by 4–8 mmHg), limiting alcohol, maintaining healthy weight, and stopping smoking. These reduce BP comparably to one antihypertensive medication."
+    },
+    {
+        "id": "bp_003",
+        "category": "cardiovascular_risk",
+        "subcategory": "cholesterol",
+        "source": "ADA 2024",
+        "text": "Dyslipidemia is nearly universal in type 2 diabetes. The typical pattern is elevated triglycerides, low HDL (good) cholesterol, and LDL particles that are smaller and more atherogenic than average. Statin therapy targeting LDL below 70 mg/dL is recommended for most adults with type 2 diabetes aged 40–75 regardless of baseline LDL level."
+    },
+    {
+        "id": "bp_004",
+        "category": "cardiovascular_risk",
+        "subcategory": "cholesterol",
+        "source": "ADA",
+        "text": "Dietary approaches to improve cholesterol in type 2 diabetes: eliminate trans fats completely, limit saturated fat to less than 10% of calories, increase soluble fiber (oats, legumes, psyllium), increase plant sterols and stanols, and increase omega-3 fatty acids (fatty fish, flaxseed, walnuts). These changes can reduce LDL by 15–30% as monotherapy."
+    }
+]

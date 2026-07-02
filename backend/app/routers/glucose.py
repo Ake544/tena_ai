@@ -7,6 +7,7 @@ from app.models.patient import Patient
 from app.models.glucose import GlucoseLog
 from app.schemas.glucose import GlucoseLogCreate, GlucoseLogResponse, GlucoseTodaySlot, GlucoseSyncRequest, GlucoseSyncItem
 from app.routers.patient import get_current_patient
+from app.services.alert_engine import evaluate_alerts
 from typing import Optional
 
 router = APIRouter(prefix="/glucose", tags=["glucose"])
@@ -40,6 +41,7 @@ def create_glucose_log(payload: GlucoseLogCreate, current_patient: Patient = Dep
     db.add(log)
     db.commit()
     db.refresh(log)
+    evaluate_alerts(current_patient.id, db)
     return log
 
 

@@ -7,7 +7,7 @@ from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
 from app.core.config import get_settings
 from app.core.scheduler import start as start_scheduler, shutdown as stop_scheduler
-from app.routers import auth, patient, glucose, medications, appointments, symptoms
+from app.routers import auth, patient, glucose, medications, appointments, symptoms, tips, alerts, chat
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,6 +41,9 @@ app.include_router(glucose.router)
 app.include_router(medications.router)
 app.include_router(appointments.router)
 app.include_router(symptoms.router)
+app.include_router(tips.router)
+app.include_router(alerts.router)
+app.include_router(chat.router)
 
 
 
