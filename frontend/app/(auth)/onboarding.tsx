@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -37,6 +37,8 @@ export default function OnboardingScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [age, setAge] = useState('');
   const [sex, setSex] = useState('');
   const [weight, setWeight] = useState('');
@@ -121,8 +123,8 @@ export default function OnboardingScreen() {
       </View>
       <Input label="Full name" placeholder="e.g. Abebe Bekele" value={fullName} onChangeText={setFullName} />
       <Input label="Email address" placeholder="you@gmail.com" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
-      <Input label="Password" placeholder="Minimum 8 characters" secureTextEntry value={password} onChangeText={setPassword} />
-      <Input label="Confirm password" placeholder="Repeat password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
+      <Input label="Password" placeholder="Minimum 8 characters" secureTextEntry={!showPassword} value={password} onChangeText={setPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
+      <Input label="Confirm password" placeholder="Repeat password" secureTextEntry={!showConfirm} value={confirmPassword} onChangeText={setConfirmPassword} rightIcon={<Feather name={showConfirm ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowConfirm(!showConfirm)} />
       <View style={styles.termsRow}>
         <TouchableOpacity style={styles.checkbox} onPress={() => setTermsAccepted(!termsAccepted)}>
           {termsAccepted && <Feather name="check" size={14} color={colors.green} />}
@@ -241,6 +243,7 @@ export default function OnboardingScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.flex}>
         <LinearGradient colors={gradientSets[step]} style={styles.header}>
           <View style={styles.iconBoxSm}>
@@ -256,6 +259,7 @@ export default function OnboardingScreen() {
           {step === 2 && renderStep2()}
         </View>
       </View>
+      </TouchableWithoutFeedback>
 
       {(showTerms || showPrivacy) && (
         <View style={styles.modalOverlay}>

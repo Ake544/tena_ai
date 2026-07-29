@@ -14,6 +14,7 @@ class PatientCreate(BaseModel):
     sex: Optional[str] = None
     education_level: Optional[str] = None
     family_history: bool = False
+    family_history_details: Optional[str] = None
     exercise_habit: Optional[str] = None
     staple_diet: Optional[str] = None
 
@@ -25,6 +26,7 @@ class PatientUpdate(BaseModel):
     bmi: Optional[float] = None
     education_level: Optional[str] = None
     family_history: Optional[bool] = None
+    family_history_details: Optional[str] = None
     exercise_habit: Optional[str] = None
     staple_diet: Optional[str] = None
     language: Optional[str] = None
@@ -42,6 +44,7 @@ class PatientResponse(BaseModel):
     bmi: Optional[float]
     education_level: Optional[str]
     family_history: bool
+    family_history_details: Optional[str] = None
     exercise_habit: Optional[str]
     staple_diet: Optional[str]
     timezone: str

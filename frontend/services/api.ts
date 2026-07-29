@@ -42,42 +42,49 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status !== 401 || originalRequest._retry) {
-      return Promise.reject(error);
-    }
-
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        refreshQueue.push({ resolve, reject });
-      }).then((token) => {
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        return api(originalRequest);
-      });
-    }
-
-    originalRequest._retry = true;
-    isRefreshing = true;
-
     try {
+      const originalRequest = error?.config;
+      if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
+        return Promise.reject(error);
+      }
+
       const refreshToken = await SecureStore.getItemAsync('refresh_token');
-      if (!refreshToken) throw new Error('No refresh token');
-      const baseUrl = getBaseUrl();
-      const res = await axios.post(`${baseUrl}/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`);
-      const { access_token } = res.data;
-      await SecureStore.setItemAsync('access_token', access_token);
-      refreshQueue.forEach(({ resolve }) => resolve(access_token));
-      refreshQueue = [];
-      originalRequest.headers.Authorization = `Bearer ${access_token}`;
-      return api(originalRequest);
-    } catch (err) {
-      refreshQueue.forEach(({ reject }) => reject(err));
-      refreshQueue = [];
-      await SecureStore.deleteItemAsync('access_token');
-      await SecureStore.deleteItemAsync('refresh_token');
-      return Promise.reject(err);
-    } finally {
-      isRefreshing = false;
+      if (!refreshToken) {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          refreshQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const baseUrl = getBaseUrl();
+        const res = await axios.post(`${baseUrl}/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`);
+        const { access_token } = res.data;
+        await SecureStore.setItemAsync('access_token', access_token);
+        refreshQueue.forEach(({ resolve }) => resolve(access_token));
+        refreshQueue = [];
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return api(originalRequest);
+      } catch (err) {
+        refreshQueue.forEach(({ reject }) => reject(err));
+        refreshQueue = [];
+        await SecureStore.deleteItemAsync('access_token');
+        await SecureStore.deleteItemAsync('refresh_token');
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    } catch (unexpectedErr) {
+      return Promise.reject(error);
     }
   }
 );

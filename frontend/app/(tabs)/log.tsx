@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
@@ -352,8 +352,9 @@ export default function LogScreen() {
         </Modal>
 
         <Modal visible={severityTarget !== null} animationType="slide" transparent>
-          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
-            <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40 }}>
+          <TouchableWithoutFeedback onPress={() => setSeverityTarget(null)}>
+          <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40, ...shadows.md }} onStartShouldSetResponder={() => true}>
               <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
               <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 4 }}>{severityTarget}</Text>
               <Text style={{ fontSize: 13, color: colors.t3, marginBottom: 16 }}>Severity: {severityTempValue}/10</Text>
@@ -369,6 +370,7 @@ export default function LogScreen() {
               </TouchableOpacity>
             </View>
           </View>
+          </TouchableWithoutFeedback>
         </Modal>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>

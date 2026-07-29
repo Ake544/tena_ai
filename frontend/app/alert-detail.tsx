@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert as RNAlert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, shadows } from '../constants/theme';
 import { alertService, Alert } from '../services/alerts';
@@ -13,6 +13,7 @@ const SEVERITY_CONFIG: Record<string, { bg: string; border: string; icon: string
 
 export default function AlertDetailScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {
@@ -21,8 +22,13 @@ export default function AlertDetailScreen() {
 
   const loadAlerts = async () => {
     try {
-      const data = await alertService.getActive();
-      setAlerts(data);
+      if (id) {
+        const alert = await alertService.getOne(id);
+        setAlerts([alert]);
+      } else {
+        const data = await alertService.getActive();
+        setAlerts(data);
+      }
     } catch (err) {
       console.log('Failed to load alerts', err);
     }
@@ -46,7 +52,7 @@ export default function AlertDetailScreen() {
           </TouchableOpacity>
           <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>Alerts</Text>
         </View>
-        <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginLeft: 8 }}>{alerts.length} unread</Text>
+        <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginLeft: 8 }}>{alerts.length}{id ? '' : ' unread'}</Text>
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 96 }}>

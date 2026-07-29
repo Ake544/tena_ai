@@ -1,11 +1,13 @@
 import { Tabs } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { View, StatusBar } from 'react-native';
 import BottomNav from '../../components/BottomNav';
+import OfflineBanner from '../../components/OfflineBanner';
 
 export default function TabsLayout() {
   return (
-    <>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1 }}>
+      <StatusBar backgroundColor="#F07A30" barStyle="light-content" />
+      <OfflineBanner />
       <Tabs
         tabBar={(props) => <BottomNav {...props} />}
         screenOptions={{ headerShown: false }}
@@ -16,6 +18,6 @@ export default function TabsLayout() {
         <Tabs.Screen name="history" />
         <Tabs.Screen name="profile" />
       </Tabs>
-    </>
+    </View>
   );
 }

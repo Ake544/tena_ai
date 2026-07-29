@@ -11,11 +11,14 @@ export interface PatientProfile {
   bmi: number | null;
   education_level: string | null;
   family_history: boolean;
+  family_history_details: string | null;
   exercise_habit: string | null;
   staple_diet: string | null;
   timezone: string;
   created_at: string;
 }
+
+export type ProfileUpdate = Partial<Pick<PatientProfile, 'full_name' | 'age' | 'sex' | 'bmi' | 'education_level' | 'family_history' | 'family_history_details' | 'exercise_habit' | 'staple_diet' | 'language' | 'timezone'>>;
 
 export interface GlucoseStats {
   last_glucose: number | null;
@@ -86,5 +89,9 @@ export const patientService = {
   async syncLogs(logs: any[]) {
     const res = await api.post('/glucose/sync', { logs });
     return res.data;
+  },
+
+  async deleteAccount(): Promise<void> {
+    await api.delete('/patient/account');
   },
 };

@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, cast, Date
@@ -10,6 +11,8 @@ from app.routers.patient import get_current_patient
 from app.services.alert_engine import evaluate_alerts
 from typing import Optional
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/glucose", tags=["glucose"])
 
 READING_TYPES = ["Fasting", "Post-Breakfast", "Pre-Lunch", "Post-Lunch", "Pre-Dinner", "Bedtime"]
@@ -18,8 +21,10 @@ READING_TYPES = ["Fasting", "Post-Breakfast", "Pre-Lunch", "Post-Lunch", "Pre-Di
 @router.post("/log", response_model=GlucoseLogResponse)
 def create_glucose_log(payload: GlucoseLogCreate, current_patient: Patient = Depends(get_current_patient), db: Session = Depends(get_db)):
     if payload.value < 20 or payload.value > 600:
+        logger.warning(f"400: value out of range: {payload.value}")
         raise HTTPException(status_code=400, detail="Glucose value must be between 20 and 600 mg/dL")
     if payload.reading_type not in READING_TYPES:
+        logger.warning(f"400: invalid reading_type: {payload.reading_type}")
         raise HTTPException(status_code=400, detail=f"Invalid reading type. Must be one of: {', '.join(READING_TYPES)}")
 
     ts = payload.timestamp

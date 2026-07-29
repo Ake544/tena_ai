@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, typography, shadows, borderRadius, spacing } from '../../constants/theme';
 import Card from '../../components/Card';
-import { colors, typography, shadows } from '../../constants/theme';
-import { patientService, GlucoseStats } from '../../services/patient';
-
-const barColors = ['#D94F3D', '#FDECEA', '#E3F0EB', '#0B4D3B'];
+import { historyService, GlucoseSummary, GlucoseChartPoint, AlertItem } from '../../services/history';
+import { exportService } from '../../services/export';
+import { medicationService, Medication } from '../../services/medication';
 
 function getBarColor(value: number) {
-  if (value > 180) return barColors[0];
-  if (value > 140) return barColors[1];
-  if (value > 100) return barColors[2];
-  return barColors[3];
+  if (value > 180) return colors.red;
+  if (value > 140) return colors.amber;
+  if (value > 100) return colors.greenLight;
+  return colors.green;
 }
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const [stats, setStats] = useState<GlucoseStats | null>(null);
-  const [history, setHistory] = useState<any[]>([]);
+  const [summary, setSummary] = useState<GlucoseSummary | null>(null);
+  const [chartData, setChartData] = useState<GlucoseChartPoint[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -26,398 +30,193 @@ export default function HistoryScreen() {
 
   const loadData = async () => {
     try {
-      const [s, h] = await Promise.all([
-        patientService.getStats(),
-        patientService.getHistory(30),
+      const [s, c, a, m] = await Promise.allSettled([
+        historyService.getSummary(30),
+        historyService.getGlucoseChart(30),
+        historyService.getAlerts(30),
+        medicationService.list(),
       ]);
-      setStats(s);
-      setHistory(h?.logs || []);
+      if (s.status === 'fulfilled') setSummary(s.value);
+      if (c.status === 'fulfilled') setChartData(c.value);
+      if (a.status === 'fulfilled') setAlerts(a.value);
+      if (m.status === 'fulfilled') setMedications(m.value);
     } catch (err) {
       console.log('Failed to load history', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const daysLogged = stats?.days_logged ?? 0;
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const url = await exportService.generatePdf(90);
+      router.push({ pathname: '/pdf-preview', params: { url } });
+    } catch (err) {
+      console.log('Export failed', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const maxBarHeight = (val: number | null) => {
+    if (val === null) return '10%';
+    const pct = (val / 300) * 100;
+    return `${Math.min(Math.max(pct, 10), 95)}%`;
+  };
+
+  const daysLogged = summary?.total_readings ? Math.min(summary.total_readings, 30) : 0;
   const adherence = Math.round((daysLogged / 30) * 100);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.titleRow}>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <View style={{ paddingHorizontal: 24, paddingTop: 52, paddingBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <View>
-          <Text style={styles.title}>History</Text>
-          <Text style={styles.titleSub}>Last 30 days</Text>
+          <Text style={{ ...typography.title, color: colors.t1 }}>History</Text>
+          <Text style={{ ...typography.small, color: colors.t3, marginTop: 2 }}>Last 30 days</Text>
         </View>
-        <TouchableOpacity onPress={() => {}} style={styles.exportBtn}>
+        <TouchableOpacity onPress={handleExport} disabled={exporting} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.greenLight, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 9999, opacity: exporting ? 0.6 : 1 }}>
+          {exporting ? (
+            <ActivityIndicator size="small" color={colors.green} />
+          ) : (
             <Feather name="download" size={16} color={colors.green} />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.green, marginLeft: 6 }}>Export PDF</Text>
-          </TouchableOpacity>
+          )}
+          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.green, marginLeft: 6 }}>{exporting ? 'Generating...' : 'Export PDF'}</Text>
+        </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.statsGrid}>
-          <Card variant="sm" style={styles.statCard}>
-            <Text style={[styles.statValue, { color: colors.red }]}>{stats?.avg_fasting ?? '—'}</Text>
-            <Text style={styles.statLabel}>Avg fasting</Text>
-            <Text style={styles.statUnit}>mg/dL</Text>
-          </Card>
-          <Card variant="sm" style={styles.statCard}>
-            <Text style={[styles.statValue, { color: colors.green }]}>{adherence}%</Text>
-            <Text style={styles.statLabel}>Med adherence</Text>
-            <Text style={styles.statUnit}>this month</Text>
-          </Card>
-          <Card variant="sm" style={styles.statCard}>
-            <Text style={[styles.statValue, { color: colors.green }]}>{daysLogged}</Text>
-            <Text style={styles.statLabel}>Days logged</Text>
-            <Text style={styles.statUnit}>of 30</Text>
-          </Card>
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.green} />
         </View>
-
-        <Text style={styles.sectionTitle}>30-day glucose trend</Text>
-        <Card style={styles.chartCard}>
-          <View style={styles.chartBars}>
-            {history.length > 0 ? (
-              history.slice(0, 30).map((entry: any, i: number) => (
-                <View key={i} style={[styles.bar, { height: `${Math.min((entry.value / 300) * 100, 95)}%` as any, backgroundColor: getBarColor(entry.value) }]} />
-              ))
-            ) : (
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ fontSize: 12, color: colors.t4 }}>No data yet</Text>
-              </View>
-            )}
-          </View>
-          <View style={styles.chartLabels}>
-            <Text style={styles.chartLabel}>{new Date(Date.now() - 30*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-            <Text style={[styles.chartLabel, { flex: 1, textAlign: 'center' }]}>{new Date(Date.now() - 15*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-            <Text style={styles.chartLabel}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-          </View>
-          <View style={styles.legend}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendBox, { backgroundColor: colors.green }]} />
-              <Text style={styles.legendText}>Normal</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendBox, { backgroundColor: colors.red }]} />
-              <Text style={styles.legendText}>High</Text>
-            </View>
-          </View>
-        </Card>
-
-        <Text style={styles.sectionTitle}>Medication adherence</Text>
-        <Card style={styles.medCard}>
-          <View style={styles.medHeader}>
-            <View>
-              <Text style={styles.medName}>Metformin 500mg</Text>
-              <Text style={styles.medSchedule}>Twice daily</Text>
-            </View>
-            <View style={styles.medBadge}>
-              <Text style={styles.medBadgeText}>{adherence}%</Text>
-            </View>
-          </View>
-          <View style={styles.medCalendar}>
-            {Array.from({ length: 30 }, (_, i) => {
-              const day = i + 1;
-              const hasLog = history.some((h: any) => {
-                const d = new Date(h.timestamp);
-                return d.getDate() === day && (d.getMonth() === new Date().getMonth() || d.getMonth() === new Date(Date.now() - 30*86400000).getMonth());
-              });
-              const isUpcoming = day > daysLogged;
-              const isMissed = !hasLog && !isUpcoming;
-              let status = 'taken';
-              if (isUpcoming) status = 'upcoming';
-              else if (isMissed) status = 'missed';
-              return (
-                <View
-                  key={day}
-                  style={[
-                    styles.medDay,
-                    status === 'taken' && styles.medDayTaken,
-                    status === 'missed' && styles.medDayMissed,
-                    status === 'upcoming' && styles.medDayUpcoming,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.medDayText,
-                      status === 'taken' && styles.medDayTextTaken,
-                      status === 'missed' && styles.medDayTextMissed,
-                      status === 'upcoming' && styles.medDayTextUpcoming,
-                    ]}
-                  >
-                    {day}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-          <View style={styles.medLegend}>
-            <View style={styles.medLegendItem}>
-              <View style={[styles.medLegendDot, { backgroundColor: colors.green }]} />
-              <Text style={styles.medLegendText}>Taken</Text>
-            </View>
-            <View style={styles.medLegendItem}>
-              <View style={[styles.medLegendDot, { backgroundColor: colors.redLight, borderWidth: 1, borderColor: colors.red }]} />
-              <Text style={styles.medLegendText}>Missed</Text>
-            </View>
-            <View style={styles.medLegendItem}>
-              <View style={[styles.medLegendDot, { backgroundColor: colors.bg2 }]} />
-              <Text style={styles.medLegendText}>Upcoming</Text>
-            </View>
-          </View>
-        </Card>
-
-        {stats && stats.today_high_count > 0 && (
-          <>
-            <Text style={styles.sectionTitle}>Alerts & episodes</Text>
-            <Card>
-              <View style={styles.alertRow}>
-                <View style={styles.alertIcon}><Feather name="alert-triangle" size={20} color={colors.red} /></View>
-                <View style={styles.alertInfo}>
-                  <Text style={styles.alertTitle}>High glucose today</Text>
-                  <Text style={styles.alertSub}>{stats.today_high_count} readings above 180 mg/dL</Text>
-                </View>
-                <View style={[styles.alertBadge, { backgroundColor: colors.redLight }]}>
-                  <Text style={[styles.alertBadgeText, { color: colors.red }]}>Urgent</Text>
-                </View>
-              </View>
+      ) : (
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>
+          <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 16 }}>
+            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: colors.green }}>{summary?.avg_readings?.Fasting ?? '—'}</Text>
+              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>Avg fasting</Text>
+              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>mg/dL</Text>
             </Card>
-          </>
-        )}
-      </ScrollView>
+            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: colors.t1 }}>{daysLogged}</Text>
+              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>Days logged</Text>
+              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>of 30</Text>
+            </Card>
+            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: colors.green }}>{summary?.days_in_range ?? 0}</Text>
+              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>In range</Text>
+              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>days</Text>
+            </Card>
+          </View>
+
+          <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>30-day glucose trend</Text>
+          <Card style={{ marginHorizontal: 16, marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: 80, marginBottom: 8 }}>
+              {chartData.length > 0 ? (
+                chartData.slice(0, 30).map((point, i) => (
+                  <View key={i} style={{ flex: 1, alignItems: 'center' }}>
+                    <View style={{ width: '100%', backgroundColor: getBarColor(point.value), borderRadius: 4, height: maxBarHeight(point.value) }} />
+                  </View>
+                ))
+              ) : (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 12, color: colors.t4 }}>No data yet</Text>
+                </View>
+              )}
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ fontSize: 10, color: colors.t4 }}>{new Date(Date.now() - 30 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+              <Text style={{ fontSize: 10, color: colors.t4 }}>{new Date(Date.now() - 15 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+              <Text style={{ fontSize: 10, color: colors.t4 }}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: colors.green }} />
+                <Text style={{ fontSize: 11, color: colors.t3 }}>Normal</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: colors.red }} />
+                <Text style={{ fontSize: 11, color: colors.t3 }}>High</Text>
+              </View>
+            </View>
+          </Card>
+
+          <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>Medication adherence</Text>
+          <Card style={{ marginHorizontal: 16, marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <View>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{medications.length > 0 ? medications[0].name : 'No medications'}</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>{medications.length > 0 ? medications[0].frequency : 'Add medications to track'}</Text>
+              </View>
+              <View style={{ backgroundColor: colors.greenLight, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50 }}>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>{adherence}%</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
+              {Array.from({ length: 30 }, (_, i) => {
+                const day = i + 1;
+                const isLogged = day <= daysLogged;
+                const isUpcoming = day > daysLogged;
+                return (
+                  <View
+                    key={day}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 8,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: isLogged ? colors.green : isUpcoming ? colors.bg2 : colors.redLight,
+                      borderWidth: !isLogged && !isUpcoming ? 1 : 0,
+                      borderColor: colors.red,
+                    }}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: isLogged ? colors.white : isUpcoming ? colors.t4 : colors.red }}>{day}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.green }} />
+                <Text style={{ fontSize: 11, color: colors.t3 }}>Taken</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.redLight, borderWidth: 1, borderColor: colors.red }} />
+                <Text style={{ fontSize: 11, color: colors.t3 }}>Missed</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.bg2 }} />
+                <Text style={{ fontSize: 11, color: colors.t3 }}>Upcoming</Text>
+              </View>
+            </View>
+          </Card>
+
+          {alerts.length > 0 && (
+            <>
+              <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>Alerts</Text>
+              {alerts.map((alert) => (
+                <TouchableOpacity key={alert.id} onPress={() => router.push(`/alert-detail?id=${alert.id}`)}>
+                  <Card style={{ marginHorizontal: 16, marginBottom: 8 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 }}>
+                      <View style={{ width: 32, alignItems: 'center', justifyContent: 'center' }}>
+                        <Feather name={alert.severity === 'urgent' ? 'alert-triangle' : 'alert-circle'} size={20} color={alert.severity === 'urgent' ? colors.red : colors.amber} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{alert.title}</Text>
+                        <Text style={{ fontSize: 11, color: colors.t3, marginTop: 2 }}>{alert.body}</Text>
+                      </View>
+                      <View style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 50, backgroundColor: alert.severity === 'urgent' ? colors.redLight : colors.amberLight }}>
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: alert.severity === 'urgent' ? colors.red : colors.amber }}>{alert.severity}</Text>
+                      </View>
+                    </View>
+                  </Card>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  titleRow: {
-    paddingHorizontal: 24,
-    paddingTop: 52,
-    paddingBottom: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  title: {
-    ...typography.title,
-    color: colors.t1,
-  },
-  titleSub: {
-    ...typography.small,
-    color: colors.t3,
-    marginTop: 2,
-  },
-  exportBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.greenLight,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 9999,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 96,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  statCard: {
-    flex: 1,
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  statValue: {
-    fontSize: 22,
-    fontWeight: '800',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: colors.t3,
-    marginTop: 2,
-  },
-  statUnit: {
-    fontSize: 9,
-    color: colors.t4,
-    marginTop: 1,
-  },
-  sectionTitle: {
-    ...typography.subtitle,
-    color: colors.t1,
-    marginHorizontal: 16,
-    marginBottom: 12,
-  },
-  chartCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  chartBars: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 3,
-    height: 80,
-    marginBottom: 8,
-  },
-  bar: {
-    flex: 1,
-    borderRadius: 4,
-    minHeight: 4,
-  },
-  chartLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  chartLabel: {
-    fontSize: 10,
-    color: colors.t4,
-  },
-  legend: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  legendBox: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
-  },
-  legendText: {
-    fontSize: 11,
-    color: colors.t3,
-  },
-  medCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  medHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  medName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.t1,
-  },
-  medSchedule: {
-    fontSize: 12,
-    color: colors.t3,
-    marginTop: 2,
-  },
-  medBadge: {
-    backgroundColor: colors.greenLight,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 50,
-  },
-  medBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.green,
-  },
-  medCalendar: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 5,
-    marginBottom: 12,
-  },
-  medDay: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  medDayTaken: {
-    backgroundColor: colors.green,
-  },
-  medDayMissed: {
-    backgroundColor: colors.redLight,
-    borderWidth: 1,
-    borderColor: colors.red,
-  },
-  medDayUpcoming: {
-    backgroundColor: colors.bg2,
-  },
-  medDayText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  medDayTextTaken: {
-    color: colors.white,
-  },
-  medDayTextMissed: {
-    color: colors.red,
-  },
-  medDayTextUpcoming: {
-    color: colors.t4,
-  },
-  medLegend: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  medLegendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  medLegendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  medLegendText: {
-    fontSize: 11,
-    color: colors.t3,
-  },
-  alertRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-  },
-  alertIcon: {
-    width: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  alertInfo: {
-    flex: 1,
-  },
-  alertTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.t1,
-  },
-  alertSub: {
-    fontSize: 11,
-    color: colors.t3,
-    marginTop: 2,
-  },
-  alertBadge: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
-    borderRadius: 50,
-  },
-  alertBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  alertDivider: {
-    height: 1,
-    backgroundColor: colors.bg2,
-  },
-});

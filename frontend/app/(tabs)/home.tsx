@@ -7,10 +7,13 @@ import { useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
 import { syncService } from '../../services/sync';
+import { dbService } from '../../services/db';
 import { medicationService, Medication, Appointment } from '../../services/medication';
 import { tipService, Tip } from '../../services/tips';
 import { alertService, Alert } from '../../services/alerts';
 import { chatService } from '../../services/chat';
+
+const HOME_CACHE_KEY = 'tena_ai_home_cache';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -34,23 +37,54 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      syncService.syncPending();
-      const [p, s, t, m, a] = await Promise.all([
+      syncService.syncPending().catch(() => {});
+      const [p, s, t, m, a] = await Promise.allSettled([
         patientService.getProfile(),
         patientService.getStats(),
         patientService.getTodayReadings(),
         medicationService.list(),
         medicationService.listAppointments(),
       ]);
-      setProfile(p);
-      setStats(s);
-      setTodaySlots(t.slots);
-      setMedications(m);
-      setAppointments(a);
-      tipService.getToday().then(d => setTips(d.today)).catch(() => {});
-      alertService.getActive().then(d => setUnreadAlerts(d)).catch(() => {});
+      if (p.status === 'fulfilled') setProfile(p.value);
+      if (s.status === 'fulfilled') setStats(s.value);
+      if (t.status === 'fulfilled') setTodaySlots(t.value.slots);
+      if (m.status === 'fulfilled') setMedications(m.value);
+      if (a.status === 'fulfilled') setAppointments(a.value);
+      await tipService.getToday().then(d => setTips(d.today)).catch(() => {});
+      await alertService.getActive().then(d => setUnreadAlerts(d)).catch(() => {});
+      const failed = [p, s, t, m, a].filter(r => r.status === 'rejected');
+      if (failed.length === 0) {
+        dbService.cacheSet(HOME_CACHE_KEY, JSON.stringify({
+          profile: p.status === 'fulfilled' ? p.value : null,
+          stats: s.status === 'fulfilled' ? s.value : null,
+          todaySlots: t.status === 'fulfilled' ? t.value.slots : [],
+          medications: m.status === 'fulfilled' ? m.value : [],
+          appointments: a.status === 'fulfilled' ? a.value : [],
+        })).catch(() => {});
+      } else {
+        const cached = await dbService.cacheGet(HOME_CACHE_KEY).catch(() => null);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (p.status === 'rejected') setProfile(parsed.profile);
+          if (s.status === 'rejected') setStats(parsed.stats);
+          if (t.status === 'rejected') setTodaySlots(parsed.todaySlots);
+          if (m.status === 'rejected') setMedications(parsed.medications);
+          if (a.status === 'rejected') setAppointments(parsed.appointments);
+        }
+      }
     } catch (err) {
       console.log('Failed to load home data', err);
+      const cached = await dbService.cacheGet(HOME_CACHE_KEY).catch(() => null);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.profile) setProfile(parsed.profile);
+          if (parsed.stats) setStats(parsed.stats);
+          if (parsed.todaySlots) setTodaySlots(parsed.todaySlots);
+          if (parsed.medications) setMedications(parsed.medications);
+          if (parsed.appointments) setAppointments(parsed.appointments);
+        } catch {}
+      }
     }
   };
 
@@ -285,6 +319,8 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
+        {(pendingMeds.length > 0 || medications.length === 0 || nextAppt || !bedtimeLogged) && (
+        <>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Reminders</Text>
         </View>
@@ -342,6 +378,8 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
         </View>
+        </>
+        )}
       </ScrollView>
 
       <TouchableOpacity onPress={() => { setChatVisible(true); }} style={{ position: 'absolute', right: 24, bottom: 88, width: 48, height: 48, borderRadius: 24, backgroundColor: colors.green, alignItems: 'center', justifyContent: 'center', ...shadows.gold }}>
@@ -382,7 +420,7 @@ export default function HomeScreen() {
                   <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: msg.role === 'user' ? colors.goldLight : colors.greenLight, alignItems: 'center', justifyContent: 'center' }}>
                     <Feather name={msg.role === 'user' ? 'user' : 'message-circle'} size={14} color={msg.role === 'user' ? '#9A6200' : colors.green} />
                   </View>
-                  <View style={{ maxWidth: '75%', backgroundColor: msg.role === 'user' ? colors.green : colors.surface, borderRadius: 16, borderBottomRightRadius: msg.role === 'user' ? 4 : 16, borderBottomLeftRadius: msg.role === 'user' ? 16 : 4, padding: 12, ...(msg.role === 'assistant' ? shadows.xs : {}) }}>
+                  <View style={{ maxWidth: '75%', backgroundColor: msg.role === 'user' ? colors.green : colors.surface, borderRadius: 16, borderBottomRightRadius: msg.role === 'user' ? 4 : 16, borderBottomLeftRadius: msg.role === 'user' ? 16 : 4, padding: 12, ...(msg.role === 'assistant' ? shadows.sm : {}) }}>
                     <Text style={{ fontSize: 14, color: msg.role === 'user' ? colors.white : colors.t1, lineHeight: 22 }}>{msg.content}</Text>
                   </View>
                 </View>
@@ -393,7 +431,7 @@ export default function HomeScreen() {
                 <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center' }}>
                   <Feather name="message-circle" size={14} color={colors.green} />
                 </View>
-                <View style={{ backgroundColor: colors.surface, borderRadius: 16, borderBottomLeftRadius: 4, padding: 14, ...shadows.xs }}>
+                <View style={{ backgroundColor: colors.surface, borderRadius: 16, borderBottomLeftRadius: 4, padding: 14, ...shadows.sm }}>
                   <ActivityIndicator size="small" color={colors.green} />
                 </View>
               </View>

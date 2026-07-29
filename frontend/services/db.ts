@@ -14,6 +14,10 @@ async function getDb(): Promise<SQLite.SQLiteDatabase> {
         symptoms TEXT,
         synced INTEGER DEFAULT 0
       );
+      CREATE TABLE IF NOT EXISTS cache (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      );
     `);
   }
   return db;
@@ -29,11 +33,11 @@ export interface LocalLog {
 }
 
 export const dbService = {
-  async saveLog(log: Omit<LocalLog, 'id' | 'synced'>): Promise<void> {
+  async saveLog(log: Omit<LocalLog, 'id' | 'synced'> & { synced?: boolean }): Promise<void> {
     const database = await getDb();
     await database.runAsync(
-      'INSERT INTO pending_logs (value, reading_type, timestamp, symptoms, synced) VALUES (?, ?, ?, ?, 0)',
-      [log.value, log.reading_type, log.timestamp, log.symptoms]
+      'INSERT INTO pending_logs (value, reading_type, timestamp, symptoms, synced) VALUES (?, ?, ?, ?, ?)',
+      [log.value, log.reading_type, log.timestamp, log.symptoms, log.synced ? 1 : 0]
     );
   },
 
@@ -60,6 +64,22 @@ export const dbService = {
   async clearSynced(): Promise<void> {
     const database = await getDb();
     await database.runAsync('DELETE FROM pending_logs WHERE synced = 1');
+  },
+
+  async cacheSet(key: string, value: string): Promise<void> {
+    const database = await getDb();
+    await database.runAsync('INSERT OR REPLACE INTO cache (key, value) VALUES (?, ?)', [key, value]);
+  },
+
+  async cacheGet(key: string): Promise<string | null> {
+    const database = await getDb();
+    const row = await database.getFirstAsync<any>('SELECT value FROM cache WHERE key = ?', [key]);
+    return row?.value ?? null;
+  },
+
+  async clearAllLogs(): Promise<void> {
+    const database = await getDb();
+    await database.runAsync('DELETE FROM pending_logs');
   },
 
   async getAllLogs(): Promise<LocalLog[]> {

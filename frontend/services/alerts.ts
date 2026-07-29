@@ -21,6 +21,11 @@ export const alertService = {
     return res.data;
   },
 
+  async getOne(id: string): Promise<Alert> {
+    const res = await api.get(`/alerts/${id}`);
+    return res.data;
+  },
+
   async acknowledge(id: string): Promise<Alert> {
     const res = await api.post(`/alerts/${id}/acknowledge`);
     return res.data;

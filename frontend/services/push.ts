@@ -19,13 +19,28 @@ let retryTimeout: ReturnType<typeof setTimeout> | null = null;
 export const pushService = {
   async register(): Promise<{ token: string; deviceId: string } | null> {
     try {
-      const { isDevice } = await import('expo-device');
+      let isDevice: boolean;
+      try {
+        const expoDevice = await import('expo-device');
+        isDevice = expoDevice.isDevice;
+      } catch {
+        console.log('Push: expo-device not available (Expo Go?)');
+        return null;
+      }
+
       if (!isDevice) {
         console.log('Push: not a physical device');
         return null;
       }
 
-      const Notifications = await import('expo-notifications');
+      let Notifications: typeof import('expo-notifications');
+      try {
+        Notifications = await import('expo-notifications');
+      } catch {
+        console.log('Push: expo-notifications not available');
+        return null;
+      }
+
       Notifications.setNotificationHandler({
         handleNotification: async () => ({
           shouldShowAlert: true,
@@ -56,6 +71,11 @@ export const pushService = {
       }
 
       const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+      if (!projectId) {
+        console.log('Push: no projectId configured');
+        return null;
+      }
+
       const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
       const deviceId = await getDeviceId();
 

@@ -19,6 +19,7 @@ detectLanguage().then((lang) => {
     lng: lang,
     fallbackLng: 'en',
     interpolation: { escapeValue: false },
+    compatibilityJSON: 'v3',
   });
 });
 

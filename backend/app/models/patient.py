@@ -19,6 +19,7 @@ class Patient(Base):
     bmi = Column(Float, nullable=True)
     education_level = Column(String, nullable=True)
     family_history = Column(Boolean, default=False)
+    family_history_details = Column(Text, nullable=True)
     exercise_habit = Column(String, nullable=True)
     staple_diet = Column(Text, nullable=True)
     timezone = Column(String, default="Africa/Addis_Ababa")

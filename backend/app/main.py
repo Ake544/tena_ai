@@ -1,13 +1,14 @@
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
 from app.core.config import get_settings
 from app.core.scheduler import start as start_scheduler, shutdown as stop_scheduler
-from app.routers import auth, patient, glucose, medications, appointments, symptoms, tips, alerts, chat
+from app.routers import auth, patient, glucose, medications, appointments, symptoms, tips, alerts, chat, history, export
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,7 +45,22 @@ app.include_router(symptoms.router)
 app.include_router(tips.router)
 app.include_router(alerts.router)
 app.include_router(chat.router)
+app.include_router(history.router)
+app.include_router(export.router)
 
+
+
+@app.middleware("http")
+async def log_400_errors(request: Request, call_next):
+    response = await call_next(request)
+    if response.status_code == 400:
+        body = b""
+        try:
+            body = await request.body()
+        except Exception:
+            pass
+        logger.warning(f"400 {request.method} {request.url.path} body={body.decode('utf-8', errors='replace')[:500]}")
+    return response
 
 
 @app.get("/health")

@@ -1,13 +1,15 @@
-import { View, TextInput, Text, StyleSheet, TextInputProps } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TextInputProps, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { colors, spacing, borderRadius, typography } from '../constants/theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
+  rightIcon?: React.ReactNode;
+  onRightIconPress?: () => void;
 }
 
-export default function Input({ label, error, style, onFocus, onBlur, ...props }: InputProps) {
+export default function Input({ label, error, style, onFocus, onBlur, rightIcon, onRightIconPress, ...props }: InputProps) {
   const [focused, setFocused] = useState(false);
 
   const handleFocus = (e: any) => {
@@ -23,18 +25,26 @@ export default function Input({ label, error, style, onFocus, onBlur, ...props }
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TextInput
-        style={[
-          styles.input,
-          focused && styles.inputFocused,
-          error && styles.inputError,
-          style,
-        ]}
-        placeholderTextColor={colors.t4}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        {...props}
-      />
+      <View style={styles.inputRow}>
+        <TextInput
+          style={[
+            styles.input,
+            focused && styles.inputFocused,
+            error && styles.inputError,
+            rightIcon ? { paddingRight: 44 } : undefined,
+            style,
+          ]}
+          placeholderTextColor={colors.t4}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...props}
+        />
+        {rightIcon && (
+          <TouchableOpacity onPress={onRightIconPress} style={styles.iconBtn}>
+            {rightIcon}
+          </TouchableOpacity>
+        )}
+      </View>
       {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
@@ -51,6 +61,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: colors.t3,
     marginBottom: 6,
+  },
+  inputRow: {
+    position: 'relative',
   },
   input: {
     width: '100%',
@@ -73,6 +86,15 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: colors.red,
+  },
+  iconBtn: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   error: {
     fontSize: 12,

@@ -50,6 +50,7 @@ def signup(request: Request, payload: PatientCreate, db: Session = Depends(get_d
         sex=payload.sex,
         education_level=payload.education_level,
         family_history=payload.family_history,
+        family_history_details=payload.family_history_details,
         exercise_habit=payload.exercise_habit,
         staple_diet=payload.staple_diet,
     )

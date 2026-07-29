@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { colors } from '../../constants/theme';
 import { authService } from '../../services/auth';
-import { pushService } from '../../services/push';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lang, setLang] = useState('am');
 
@@ -22,12 +23,9 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await authService.login({ email, password });
-      pushService.register().then(r => {
-        if (r) pushService.sendTokenToBackend(r.token, r.deviceId);
-      });
       router.replace('/(tabs)/home');
     } catch (err: any) {
-      Alert.alert(t('common.error'), err.response?.data?.detail || t('common.error'));
+      Alert.alert(t('common.error'), err?.response?.data?.detail || t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -35,6 +33,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.flex}>
         <LinearGradient colors={['#0B4D3B', '#071F18']} style={styles.header}>
           <View style={styles.iconBoxSm}>
@@ -61,8 +60,8 @@ export default function LoginScreen() {
               <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>English</Text>
             </TouchableOpacity>
           </View>
-          <Input label={t('auth.email')} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-          <Input label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry />
+          <Input label={t('auth.email')} placeholder="you@gmail.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+          <Input label={t('auth.password')} placeholder="Enter your password" value={password} onChangeText={setPassword} secureTextEntry={!showPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
           <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')}>
             <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
           </TouchableOpacity>
@@ -73,6 +72,7 @@ export default function LoginScreen() {
           </Text>
         </View>
       </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }

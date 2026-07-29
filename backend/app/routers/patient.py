@@ -4,6 +4,13 @@ from app.core.database import get_db
 from app.core.security import decode_token
 from app.models.patient import Patient
 from app.models.device import Device
+from app.models.glucose import GlucoseLog
+from app.models.medication import Medication, Appointment
+from app.models.symptom import SymptomLog
+from app.models.alert import Alert
+from app.models.tip import Tip
+from app.models.chat import ChatMessage
+from app.models.pending_notification import PendingNotification
 from app.schemas.patient import PatientUpdate, PatientResponse, PushTokenUpdate
 from fastapi import Header
 
@@ -55,3 +62,20 @@ def update_push_token(payload: PushTokenUpdate, current_patient: Patient = Depen
         current_patient.push_token = payload.push_token
     db.commit()
     return {"status": "ok"}
+
+
+@router.delete("/account")
+def delete_account(current_patient: Patient = Depends(get_current_patient), db: Session = Depends(get_db)):
+    patient_id = current_patient.id
+    db.query(GlucoseLog).filter(GlucoseLog.patient_id == patient_id).delete()
+    db.query(Medication).filter(Medication.patient_id == patient_id).delete()
+    db.query(Appointment).filter(Appointment.patient_id == patient_id).delete()
+    db.query(SymptomLog).filter(SymptomLog.patient_id == patient_id).delete()
+    db.query(Device).filter(Device.patient_id == patient_id).delete()
+    db.query(PendingNotification).filter(PendingNotification.patient_id == patient_id).delete()
+    db.query(ChatMessage).filter(ChatMessage.patient_id == patient_id).delete()
+    db.query(Alert).filter(Alert.patient_id == patient_id).delete()
+    db.query(Tip).filter(Tip.patient_id == patient_id).delete()
+    db.query(Patient).filter(Patient.id == patient_id).delete()
+    db.commit()
+    return {"status": "ok", "message": "Account and all data permanently deleted"}
