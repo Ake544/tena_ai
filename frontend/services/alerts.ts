@@ -30,4 +30,8 @@ export const alertService = {
     const res = await api.post(`/alerts/${id}/acknowledge`);
     return res.data;
   },
+
+  async acknowledgeAll(): Promise<void> {
+    await api.post('/alerts/acknowledge-all');
+  },
 };

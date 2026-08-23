@@ -1,5 +1,6 @@
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors, borderRadius, shadows } from '../constants/theme';
+import Spinner from './Spinner';
 
 interface ButtonProps {
   title: string;
@@ -21,7 +22,7 @@ export default function Button({ title, onPress, variant = 'primary', size = 'md
       activeOpacity={0.8}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'gold' || variant === 'outline' || variant === 'ghost' ? colors.green : colors.white} />
+        <Spinner color={variant === 'gold' || variant === 'outline' || variant === 'ghost' ? colors.green : colors.white} />
       ) : (
         <Text style={[styles.text, styles[`text_${variant}`], styles[`textSize_${size}`]]}>{title}</Text>
       )}

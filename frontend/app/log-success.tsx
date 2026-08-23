@@ -1,21 +1,14 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, BackHandler } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, shadows } from '../constants/theme';
 import { patientService } from '../services/patient';
 import { syncService } from '../services/sync';
 
-const affirmations: Record<string, string> = {
-  Fasting: 'Great start to the day! Fasting is the most important reading.',
-  'Post-Breakfast': "You're staying on top of your morning levels — nice work.",
-  'Pre-Lunch': 'Checking before meals helps you understand your patterns.',
-  'Post-Lunch': 'Tracking after lunch builds a complete picture of your day.',
-  'Pre-Dinner': 'Consistent evening checks keep you in control.',
-  Bedtime: 'Finishing the day with a reading shows real commitment.',
-};
-
 export default function LogSuccessScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { value, reading_type } = useLocalSearchParams<{ value: string; reading_type: string }>();
   const [streak, setStreak] = useState(0);
@@ -44,7 +37,15 @@ export default function LogSuccessScreen() {
 
   const numValue = parseInt(value || '0', 10);
   const isNormal = numValue >= 70 && numValue <= 180;
-  const affirmation = affirmations[reading_type || ''] || 'Every reading brings you closer to understanding your body.';
+  const affirmationKey: Record<string, string> = {
+    Fasting: 'affirmation1',
+    'Post-Breakfast': 'affirmation2',
+    'Pre-Lunch': 'affirmation3',
+    'Post-Lunch': 'affirmation4',
+    'Pre-Dinner': 'affirmation5',
+    Bedtime: 'affirmation6',
+  };
+  const affirmation = t(`logSuccess.${affirmationKey[reading_type || ''] || 'fallback'}`);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -57,7 +58,7 @@ export default function LogSuccessScreen() {
           )}
         </View>
 
-        <Text style={{ fontSize: 28, fontWeight: '800', color: colors.t1, textAlign: 'center' }}>Glucose logged!</Text>
+        <Text style={{ fontSize: 28, fontWeight: '800', color: colors.t1, textAlign: 'center' }}>{t('logSuccess.title')}</Text>
 
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4, marginTop: 16 }}>
           <Text style={{ fontSize: 52, fontWeight: '800', color: isNormal ? colors.green : '#9A6200', fontVariant: ['tabular-nums'] }}>{value}</Text>
@@ -72,7 +73,7 @@ export default function LogSuccessScreen() {
           <MaterialCommunityIcons name="fire" size={28} color={colors.gold2} />
           <View>
             <Text style={{ fontSize: 22, fontWeight: '800', color: colors.t1, fontVariant: ['tabular-nums'] }}>{streak}</Text>
-            <Text style={{ fontSize: 12, color: colors.t3 }}>Day streak</Text>
+            <Text style={{ fontSize: 12, color: colors.t3 }}>{t('logSuccess.dayStreak')}</Text>
           </View>
         </View>
 
@@ -83,7 +84,7 @@ export default function LogSuccessScreen() {
         {!isNormal && (
           <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <Feather name="info" size={14} color={colors.t3} />
-            <Text style={{ fontSize: 12, color: colors.t3 }}>Talk to your doctor if this pattern continues</Text>
+            <Text style={{ fontSize: 12, color: colors.t3 }}>{t('logSuccess.patternWarning')}</Text>
           </View>
         )}
 
@@ -91,14 +92,14 @@ export default function LogSuccessScreen() {
           onPress={() => router.replace('/(tabs)/home')}
           style={{ marginTop: 40, width: '100%', paddingVertical: 16, backgroundColor: colors.green, borderRadius: 9999, alignItems: 'center', ...shadows.md }}
         >
-          <Text style={{ fontSize: 16, fontWeight: '700', color: colors.white }}>Back to home</Text>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: colors.white }}>{t('logSuccess.backHome')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => router.replace('/(tabs)/log')}
           style={{ marginTop: 12, paddingVertical: 12 }}
         >
-          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t3 }}>Log another reading</Text>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t3 }}>{t('logSuccess.logAnother')}</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date
 import uuid
 
 
@@ -15,6 +15,10 @@ class PatientCreate(BaseModel):
     education_level: Optional[str] = None
     family_history: bool = False
     family_history_details: Optional[str] = None
+    diagnosis_date: Optional[date] = None
+    diabetes_type: Optional[int] = None
+    other_conditions: Optional[str] = None
+    hba1c: Optional[float] = None
     exercise_habit: Optional[str] = None
     staple_diet: Optional[str] = None
 
@@ -27,6 +31,10 @@ class PatientUpdate(BaseModel):
     education_level: Optional[str] = None
     family_history: Optional[bool] = None
     family_history_details: Optional[str] = None
+    diagnosis_date: Optional[date] = None
+    diabetes_type: Optional[int] = None
+    other_conditions: Optional[str] = None
+    hba1c: Optional[float] = None
     exercise_habit: Optional[str] = None
     staple_diet: Optional[str] = None
     language: Optional[str] = None
@@ -45,6 +53,10 @@ class PatientResponse(BaseModel):
     education_level: Optional[str]
     family_history: bool
     family_history_details: Optional[str] = None
+    diagnosis_date: Optional[date] = None
+    diabetes_type: Optional[int] = None
+    other_conditions: Optional[str] = None
+    hba1c: Optional[float] = None
     exercise_habit: Optional[str]
     staple_diet: Optional[str]
     timezone: str

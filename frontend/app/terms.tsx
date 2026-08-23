@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../constants/theme';
 
 export default function TermsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -13,7 +15,7 @@ export default function TermsScreen() {
           <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }}>
             <Feather name="arrow-left" size={22} color={colors.white} />
           </TouchableOpacity>
-          <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>Terms of Service</Text>
+          <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>{t('terms.title')}</Text>
         </View>
       </View>
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>

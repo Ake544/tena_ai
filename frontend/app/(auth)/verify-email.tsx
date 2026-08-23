@@ -109,7 +109,7 @@ export default function VerifyEmailScreen() {
             disabled={otp.join('').length !== 6}
           />
           <Text style={styles.footerText}>
-            Didn't receive code?{' '}
+            {t('auth.didntReceiveCode')}{' '}
             <Text style={styles.linkText} onPress={handleResend}>{t('auth.resendCode')}</Text>
           </Text>
           <Text style={styles.backText} onPress={() => router.back()}>{t('common.back')}</Text>

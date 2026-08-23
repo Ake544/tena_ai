@@ -1,26 +1,30 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, typography, shadows, borderRadius, spacing } from '../../constants/theme';
+import { colors, typography, shadows } from '../../constants/theme';
 import Card from '../../components/Card';
-import { historyService, GlucoseSummary, GlucoseChartPoint, AlertItem } from '../../services/history';
+import { historyService, GlucoseSummary, AlertItem } from '../../services/history';
 import { exportService } from '../../services/export';
-import { medicationService, Medication } from '../../services/medication';
+import { symptomService, SymptomLog } from '../../services/symptom';
 
-function getBarColor(value: number) {
-  if (value > 180) return colors.red;
-  if (value > 140) return colors.amber;
-  if (value > 100) return colors.greenLight;
+const SLOT_ORDER = ['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Post-Dinner', 'Bedtime'];
+
+function slotColor(val: number | null) {
+  if (val === null) return colors.t4;
+  if (val > 180) return colors.red;
+  if (val > 140) return colors.amber;
+  if (val < 70) return '#D94F3D';
   return colors.green;
 }
 
 export default function HistoryScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [summary, setSummary] = useState<GlucoseSummary | null>(null);
-  const [chartData, setChartData] = useState<GlucoseChartPoint[]>([]);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [medications, setMedications] = useState<Medication[]>([]);
+  const [symptoms, setSymptoms] = useState<SymptomLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
@@ -30,16 +34,14 @@ export default function HistoryScreen() {
 
   const loadData = async () => {
     try {
-      const [s, c, a, m] = await Promise.allSettled([
+      const [s, a, sy] = await Promise.allSettled([
         historyService.getSummary(30),
-        historyService.getGlucoseChart(30),
         historyService.getAlerts(30),
-        medicationService.list(),
+        symptomService.history(30),
       ]);
       if (s.status === 'fulfilled') setSummary(s.value);
-      if (c.status === 'fulfilled') setChartData(c.value);
       if (a.status === 'fulfilled') setAlerts(a.value);
-      if (m.status === 'fulfilled') setMedications(m.value);
+      if (sy.status === 'fulfilled') setSymptoms(sy.value);
     } catch (err) {
       console.log('Failed to load history', err);
     } finally {
@@ -59,21 +61,39 @@ export default function HistoryScreen() {
     }
   };
 
-  const maxBarHeight = (val: number | null) => {
-    if (val === null) return '10%';
-    const pct = (val / 300) * 100;
-    return `${Math.min(Math.max(pct, 10), 95)}%`;
-  };
-
   const daysLogged = summary?.total_readings ? Math.min(summary.total_readings, 30) : 0;
-  const adherence = Math.round((daysLogged / 30) * 100);
+
+  const slotEntries = SLOT_ORDER
+    .map(name => ({ name, avg: summary?.avg_readings?.[name] ?? null }))
+    .filter(s => s.avg !== null);
+
+  const symptomFreq: { name: string; count: number; avgSev: number }[] = [];
+  if (symptoms.length > 0) {
+    const map = new Map<string, { total: number; sevSum: number; count: number }>();
+    for (const s of symptoms) {
+      const key = s.name.toLowerCase();
+      const existing = map.get(key) || { total: 0, sevSum: 0, count: 0 };
+      existing.total++;
+      existing.sevSum += s.severity ?? 0;
+      existing.count++;
+      map.set(key, existing);
+    }
+    for (const [name, data] of map) {
+      symptomFreq.push({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        count: data.total,
+        avgSev: data.count > 0 ? Math.round((data.sevSum / data.count) * 10) / 10 : 0,
+      });
+    }
+    symptomFreq.sort((a, b) => b.count - a.count);
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ paddingHorizontal: 24, paddingTop: 52, paddingBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <View>
-          <Text style={{ ...typography.title, color: colors.t1 }}>History</Text>
-          <Text style={{ ...typography.small, color: colors.t3, marginTop: 2 }}>Last 30 days</Text>
+          <Text style={{ ...typography.title, color: colors.t1 }}>{t('history.title')}</Text>
+          <Text style={{ ...typography.small, color: colors.t3, marginTop: 2 }}>{t('history.last30Days')}</Text>
         </View>
         <TouchableOpacity onPress={handleExport} disabled={exporting} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.greenLight, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 9999, opacity: exporting ? 0.6 : 1 }}>
           {exporting ? (
@@ -81,7 +101,7 @@ export default function HistoryScreen() {
           ) : (
             <Feather name="download" size={16} color={colors.green} />
           )}
-          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.green, marginLeft: 6 }}>{exporting ? 'Generating...' : 'Export PDF'}</Text>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.green, marginLeft: 6 }}>{exporting ? t('history.exporting') : t('history.exportReport')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -93,108 +113,62 @@ export default function HistoryScreen() {
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>
           <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 16 }}>
             <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: colors.green }}>{summary?.avg_readings?.Fasting ?? '—'}</Text>
-              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>Avg fasting</Text>
-              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>mg/dL</Text>
-            </Card>
-            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: colors.t1 }}>{daysLogged}</Text>
-              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>Days logged</Text>
-              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>of 30</Text>
-            </Card>
-            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
               <Text style={{ fontSize: 22, fontWeight: '800', color: colors.green }}>{summary?.days_in_range ?? 0}</Text>
-              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>In range</Text>
+              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>{t('history.inRange')}</Text>
+              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>days</Text>
+            </Card>
+            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: colors.red }}>{summary?.days_high ?? 0}</Text>
+              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>{t('history.daysHigh')}</Text>
+              <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>days</Text>
+            </Card>
+            <Card variant="sm" style={{ flex: 1, alignItems: 'center', ...shadows.sm }}>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: '#D94F3D' }}>{summary?.days_low ?? 0}</Text>
+              <Text style={{ fontSize: 10, color: colors.t3, marginTop: 2 }}>{t('history.daysLow')}</Text>
               <Text style={{ fontSize: 9, color: colors.t4, marginTop: 1 }}>days</Text>
             </Card>
           </View>
 
-          <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>30-day glucose trend</Text>
-          <Card style={{ marginHorizontal: 16, marginBottom: 16 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: 80, marginBottom: 8 }}>
-              {chartData.length > 0 ? (
-                chartData.slice(0, 30).map((point, i) => (
-                  <View key={i} style={{ flex: 1, alignItems: 'center' }}>
-                    <View style={{ width: '100%', backgroundColor: getBarColor(point.value), borderRadius: 4, height: maxBarHeight(point.value) }} />
-                  </View>
-                ))
-              ) : (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 12, color: colors.t4 }}>No data yet</Text>
+          {slotEntries.length > 0 && (
+            <>
+              <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>{t('history.glucoseBySlot')}</Text>
+              <Card style={{ marginHorizontal: 16, marginBottom: 16 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {slotEntries.map((slot) => (
+                    <View key={slot.name} style={{ width: '30%', minWidth: 90, alignItems: 'center', paddingVertical: 10, backgroundColor: colors.bg2, borderRadius: 12 }}>
+                      <Text style={{ fontSize: 18, fontWeight: '800', color: slotColor(slot.avg), fontVariant: ['tabular-nums'] }}>{slot.avg}</Text>
+                      <Text style={{ fontSize: 9, color: colors.t3, marginTop: 4, textAlign: 'center' }}>{slot.name}</Text>
+                      <Text style={{ fontSize: 8, color: colors.t4 }}>mg/dL</Text>
+                    </View>
+                  ))}
                 </View>
-              )}
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-              <Text style={{ fontSize: 10, color: colors.t4 }}>{new Date(Date.now() - 30 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-              <Text style={{ fontSize: 10, color: colors.t4 }}>{new Date(Date.now() - 15 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-              <Text style={{ fontSize: 10, color: colors.t4 }}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 16 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: colors.green }} />
-                <Text style={{ fontSize: 11, color: colors.t3 }}>Normal</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: colors.red }} />
-                <Text style={{ fontSize: 11, color: colors.t3 }}>High</Text>
-              </View>
-            </View>
-          </Card>
+              </Card>
+            </>
+          )}
 
-          <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>Medication adherence</Text>
-          <Card style={{ marginHorizontal: 16, marginBottom: 16 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <View>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{medications.length > 0 ? medications[0].name : 'No medications'}</Text>
-                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>{medications.length > 0 ? medications[0].frequency : 'Add medications to track'}</Text>
-              </View>
-              <View style={{ backgroundColor: colors.greenLight, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50 }}>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>{adherence}%</Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
-              {Array.from({ length: 30 }, (_, i) => {
-                const day = i + 1;
-                const isLogged = day <= daysLogged;
-                const isUpcoming = day > daysLogged;
-                return (
-                  <View
-                    key={day}
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 8,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: isLogged ? colors.green : isUpcoming ? colors.bg2 : colors.redLight,
-                      borderWidth: !isLogged && !isUpcoming ? 1 : 0,
-                      borderColor: colors.red,
-                    }}
-                  >
-                    <Text style={{ fontSize: 11, fontWeight: '600', color: isLogged ? colors.white : isUpcoming ? colors.t4 : colors.red }}>{day}</Text>
+          {symptomFreq.length > 0 && (
+            <>
+              <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>{t('history.symptoms')}</Text>
+              <Card style={{ marginHorizontal: 16, marginBottom: 16 }}>
+                {symptomFreq.slice(0, 5).map((s, i) => (
+                  <View key={s.name} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < Math.min(symptomFreq.length, 5) - 1 ? 1 : 0, borderBottomColor: colors.bg2 }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{s.name}</Text>
+                      <Text style={{ fontSize: 11, color: colors.t3, marginTop: 2 }}>{s.count} {s.count === 1 ? 'time' : 'times'}</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: s.avgSev >= 7 ? colors.red : s.avgSev >= 4 ? colors.amber : colors.green }}>{s.avgSev}</Text>
+                      <Text style={{ fontSize: 9, color: colors.t4 }}>/10</Text>
+                    </View>
                   </View>
-                );
-              })}
-            </View>
-            <View style={{ flexDirection: 'row', gap: 16 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.green }} />
-                <Text style={{ fontSize: 11, color: colors.t3 }}>Taken</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.redLight, borderWidth: 1, borderColor: colors.red }} />
-                <Text style={{ fontSize: 11, color: colors.t3 }}>Missed</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.bg2 }} />
-                <Text style={{ fontSize: 11, color: colors.t3 }}>Upcoming</Text>
-              </View>
-            </View>
-          </Card>
+                ))}
+              </Card>
+            </>
+          )}
 
           {alerts.length > 0 && (
             <>
-              <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>Alerts</Text>
+              <Text style={{ ...typography.subtitle, color: colors.t1, marginHorizontal: 16, marginBottom: 12 }}>{t('history.alerts')}</Text>
               {alerts.map((alert) => (
                 <TouchableOpacity key={alert.id} onPress={() => router.push(`/alert-detail?id=${alert.id}`)}>
                   <Card style={{ marginHorizontal: 16, marginBottom: 8 }}>
@@ -207,7 +181,7 @@ export default function HistoryScreen() {
                         <Text style={{ fontSize: 11, color: colors.t3, marginTop: 2 }}>{alert.body}</Text>
                       </View>
                       <View style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 50, backgroundColor: alert.severity === 'urgent' ? colors.redLight : colors.amberLight }}>
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: alert.severity === 'urgent' ? colors.red : colors.amber }}>{alert.severity}</Text>
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: alert.severity === 'urgent' ? colors.red : colors.amber }}>{alert.severity === 'urgent' ? t('history.urgent') : t('history.warning')}</Text>
                       </View>
                     </View>
                   </Card>

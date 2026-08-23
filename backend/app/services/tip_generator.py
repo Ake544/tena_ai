@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 from datetime import datetime, timedelta, timezone
 from groq import Groq
 from app.core.config import get_settings
@@ -175,7 +176,7 @@ def _generate_via_groq(context: dict, state: str, language: str) -> dict | None:
         client = Groq(api_key=settings.groq_api_key)
         system = _build_system_prompt(context, state, language)
         resp = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="qwen/qwen3.6-27b",
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": "Generate a personalized tip for today."},
@@ -185,6 +186,8 @@ def _generate_via_groq(context: dict, state: str, language: str) -> dict | None:
             response_format={"type": "json_object"},
         )
         content = resp.choices[0].message.content
+        content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+        content = re.sub(r'<think>.*', '', content, flags=re.DOTALL).strip()
         return json.loads(content)
     except Exception as e:
         logger.error(f"Groq tip generation failed: {e}")

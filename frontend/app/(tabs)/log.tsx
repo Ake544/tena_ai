@@ -5,22 +5,23 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import Button from '../../components/Button';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
+import Spinner from '../../components/Spinner';
 import { patientService, GlucoseTodaySlot } from '../../services/patient';
 import { dbService } from '../../services/db';
 import { syncService } from '../../services/sync';
 import { medicationService, Medication } from '../../services/medication';
 import { symptomService } from '../../services/symptom';
 
-const symptomList = [
-  { iconSet: 'feather' as const, icon: 'activity', label: 'Headache' },
-  { iconSet: 'material' as const, icon: 'water', label: 'Thirst' },
-  { iconSet: 'feather' as const, icon: 'eye', label: 'Blurred vision' },
-  { iconSet: 'material' as const, icon: 'sleep', label: 'Fatigue' },
-  { iconSet: 'material' as const, icon: 'foot-print', label: 'Foot pain' },
-  { iconSet: 'feather' as const, icon: 'zap', label: 'Weakness' },
+const symptomIcons: { iconSet: 'feather' | 'material'; icon: string; labelKey: string }[] = [
+  { iconSet: 'feather', icon: 'activity', labelKey: 'symptomHeadache' },
+  { iconSet: 'material', icon: 'water', labelKey: 'symptomThirst' },
+  { iconSet: 'feather', icon: 'eye', labelKey: 'symptomBlurredVision' },
+  { iconSet: 'material', icon: 'sleep', labelKey: 'symptomFatigue' },
+  { iconSet: 'material', icon: 'foot-print', labelKey: 'symptomFootPain' },
+  { iconSet: 'feather', icon: 'zap', labelKey: 'symptomWeakness' },
 ];
 
-function IconRender({ item, size, color }: { item: typeof symptomList[0]; size: number; color: string }) {
+function IconRender({ item, size, color }: { item: typeof symptomIcons[0]; size: number; color: string }) {
   if (item.iconSet === 'feather') return <Feather name={item.icon as any} size={size} color={color} />;
   return <MaterialCommunityIcons name={item.icon as any} size={size} color={color} />;
 }
@@ -32,7 +33,7 @@ export default function LogScreen() {
   const router = useRouter();
   const [value, setValue] = useState(118);
   const [selectedType, setSelectedType] = useState('Pre-Dinner');
-  const [selectedSymptoms, setSelectedSymptoms] = useState<SymptomEntry[]>([{ name: 'Headache', severity: 5 }]);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<SymptomEntry[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
   const [customSymptoms, setCustomSymptoms] = useState<SymptomEntry[]>([]);
@@ -44,13 +45,10 @@ export default function LogScreen() {
   const [medications, setMedications] = useState<Medication[]>([]);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
   const [showMedModal, setShowMedModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadToday();
-    loadMedications();
-  }, []);
-
-  useEffect(() => {
+    Promise.all([loadToday(), loadMedications()]).finally(() => setLoading(false));
     syncService.syncPending();
   }, []);
 
@@ -198,12 +196,16 @@ export default function LogScreen() {
 
   const allReadingTypes = ['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Bedtime'];
 
-  return (
+  return loading ? (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
+      <Spinner />
+    </View>
+  ) : (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ backgroundColor: colors.green, paddingTop: 52, paddingHorizontal: 24, paddingBottom: 24, flexShrink: 0 }}>
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>Log glucose</Text>
-          <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} · All in mg/dL</Text>
+          <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>{t('log.title')}</Text>
+          <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} · {t('log.allMgdl')}</Text>
         </View>
         <View style={{ flexDirection: 'row', gap: 6 }}>
           {allReadingTypes.map((type, i) => {
@@ -222,9 +224,9 @@ export default function LogScreen() {
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: 96 }}>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
-          <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1, marginBottom: 14 }}>Add a reading</Text>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1, marginBottom: 14 }}>{t('log.addReading')}</Text>
 
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.t3, marginBottom: 10 }}>Reading type</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.t3, marginBottom: 10 }}>{t('log.readingType')}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
             {['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Bedtime'].map((type) => {
               const active = selectedType === type;
@@ -242,11 +244,11 @@ export default function LogScreen() {
             })}
           </View>
 
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.t3, marginBottom: 12 }}>Value (mg/dL)</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.t3, marginBottom: 12 }}>{t('log.valueMgdl')}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <View style={{ flex: 1, backgroundColor: colors.greenXlight, borderRadius: 20, padding: 20, alignItems: 'center', borderWidth: 2, borderColor: colors.greenLight }}>
               <Text style={{ fontSize: 48, fontWeight: '800', color: colors.green, fontVariant: ['tabular-nums'] }}>{value}</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 4 }}>Normal range</Text>
+              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 4 }}>{t('log.normalRange')}</Text>
             </View>
             <View style={{ gap: 10 }}>
               <TouchableOpacity onPress={() => setValue((v) => v + 1)} style={{ width: 48, height: 48, backgroundColor: colors.green, borderRadius: 12, alignItems: 'center', justifyContent: 'center', ...shadows.md }}>
@@ -260,31 +262,32 @@ export default function LogScreen() {
 
           {todaySlots.every(s => s.value != null) ? (
             <View style={{ paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.t3 }}>All readings logged today ✓</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.t3 }}>{t('log.allLogged')}</Text>
             </View>
           ) : (
-            <Button title="Save reading" onPress={handleSave} loading={submitting} variant="primary" />
+            <Button title={t('log.saveReading')} onPress={handleSave} loading={submitting} variant="primary" />
           )}
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Any symptoms today?</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>{t('log.anySymptoms')}</Text>
         </View>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            {symptomList.map((symptom) => {
-              const entry = selectedSymptoms.find(s => s.name === symptom.label);
+            {symptomIcons.map((symptom) => {
+              const label = t(`log.${symptom.labelKey}`);
+              const entry = selectedSymptoms.find(s => s.name === label);
               const active = !!entry;
               return (
                 <TouchableOpacity
-                  key={symptom.label}
-                  onPress={() => toggleSymptom(symptom.label)}
-                  onLongPress={() => active && openSeverityModal(symptom.label)}
+                  key={symptom.labelKey}
+                  onPress={() => toggleSymptom(label)}
+                  onLongPress={() => active && openSeverityModal(label)}
                   style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 50, backgroundColor: active ? colors.goldLight : colors.bg2 }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     <IconRender item={symptom} size={16} color={active ? '#9A6200' : colors.t2} />
-                    <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? '#9A6200' : colors.t2 }}>{symptom.label}</Text>
+                    <Text style={{ fontSize: 12, fontWeight: active ? '700' : '600', color: active ? '#9A6200' : colors.t2 }}>{label}</Text>
                     {active && (
                       <View style={{ backgroundColor: '#9A6200', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
                         <Text style={{ fontSize: 10, fontWeight: '800', color: colors.white }}>{entry!.severity}</Text>
@@ -297,7 +300,7 @@ export default function LogScreen() {
             <TouchableOpacity onPress={() => setShowSymptomInput(true)} style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <Feather name="plus" size={16} color={colors.t2} />
-                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.t2 }}>More</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.t2 }}>{t('log.more')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -321,16 +324,16 @@ export default function LogScreen() {
             <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
               <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40 }}>
                 <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
-                <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 16 }}>Add custom symptom</Text>
+                <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 16 }}>{t('log.addCustomSymptom')}</Text>
                 <TextInput
                   value={symptomInput}
                   onChangeText={setSymptomInput}
-                  placeholder="Type a symptom..."
+                  placeholder={t('log.typeSymptom')}
                   placeholderTextColor={colors.t4}
                   style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1, marginBottom: 16 }}
                   autoFocus
                 />
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 8 }}>Severity</Text>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 8 }}>{t('log.severity')}</Text>
                 <View style={{ flexDirection: 'row', gap: 4, marginBottom: 20 }}>
                   {[1,2,3,4,5,6,7,8,9,10].map(n => (
                     <TouchableOpacity key={n} onPress={() => setSeverityTempValue(n)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: severityTempValue === n ? colors.gold : colors.bg2, alignItems: 'center', justifyContent: 'center' }}>
@@ -340,10 +343,10 @@ export default function LogScreen() {
                 </View>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                   <TouchableOpacity onPress={() => { setShowSymptomInput(false); setSymptomInput(''); }} style={{ flex: 1, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>Cancel</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => { if (symptomInput.trim()) { setCustomSymptoms(prev => [...prev, { name: symptomInput.trim(), severity: severityTempValue }]); setSymptomInput(''); setSeverityTempValue(5); setShowSymptomInput(false); } }} style={{ flex: 2, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.green, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>Add</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>{t('log.add')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -357,7 +360,7 @@ export default function LogScreen() {
             <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40, ...shadows.md }} onStartShouldSetResponder={() => true}>
               <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
               <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 4 }}>{severityTarget}</Text>
-              <Text style={{ fontSize: 13, color: colors.t3, marginBottom: 16 }}>Severity: {severityTempValue}/10</Text>
+              <Text style={{ fontSize: 13, color: colors.t3, marginBottom: 16 }}>{t('log.severity')}: {severityTempValue}/10</Text>
               <View style={{ flexDirection: 'row', gap: 4, marginBottom: 20 }}>
                 {[1,2,3,4,5,6,7,8,9,10].map(n => (
                   <TouchableOpacity key={n} onPress={() => setSeverityTempValue(n)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: severityTempValue === n ? colors.gold : colors.bg2, alignItems: 'center', justifyContent: 'center' }}>
@@ -366,7 +369,7 @@ export default function LogScreen() {
                 ))}
               </View>
               <TouchableOpacity onPress={saveSeverity} style={{ paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.green, alignItems: 'center' }}>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>Done</Text>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: colors.white }}>{t('log.done')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -374,11 +377,11 @@ export default function LogScreen() {
         </Modal>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Medication today</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>{t('log.medicationToday')}</Text>
         </View>
         {medications.length === 0 ? (
           <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 24, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)', alignItems: 'center' }}>
-            <Text style={{ fontSize: 12, color: colors.t4 }}>No medications added yet</Text>
+            <Text style={{ fontSize: 12, color: colors.t4 }}>{t('log.noMedsYet')}</Text>
           </View>
         ) : (
           medications
@@ -415,7 +418,7 @@ export default function LogScreen() {
                     </View>
                   ) : (
                     <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.greenLight }}>
-                      <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>All done ✓</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>{t('log.allDone')}</Text>
                     </View>
                   )}
                 </View>
@@ -444,23 +447,23 @@ export default function LogScreen() {
                           <View style={{ flexDirection: 'row', gap: 8 }}>
                             {taken ? (
                               <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.greenLight }}>
-                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>Taken ✓</Text>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>{t('log.taken')}</Text>
                               </View>
                             ) : skipped ? (
                               <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.t4 }}>
-                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t4 }}>Skipped</Text>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t4 }}>{t('log.skipped')}</Text>
                               </View>
                             ) : !timePassed ? (
                               <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.amberLight }}>
-                                <Text style={{ fontSize: 12, fontWeight: '700', color: '#9A6200' }}>Upcoming</Text>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: '#9A6200' }}>{t('medications.upcoming')}</Text>
                               </View>
                             ) : (
                               <>
                                 <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'taken')} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.green }}>
-                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.white }}>Taken</Text>
+                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.white }}>{t('log.take')}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'skip')} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.t4 }}>
-                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t2 }}>Skip</Text>
+                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t2 }}>{t('log.skip')}</Text>
                                 </TouchableOpacity>
                               </>
                             )}
@@ -470,7 +473,7 @@ export default function LogScreen() {
                     })}
                   </View>
                   <TouchableOpacity onPress={() => setShowMedModal(false)} style={{ marginTop: 20, paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>Close</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t2 }}>{t('log.close')}</Text>
                   </TouchableOpacity>
                 </>
               )}

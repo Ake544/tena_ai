@@ -43,7 +43,7 @@ export const storageService = {
   },
 
   async getNotificationsEnabled(): Promise<boolean> {
-    return (await SecureStore.getItemAsync(KEYS.NOTIFICATIONS_ENABLED)) !== 'false';
+    return (await SecureStore.getItemAsync(KEYS.NOTIFICATIONS_ENABLED)) === 'true';
   },
 
   async setNotificationsEnabled(enabled: boolean) {

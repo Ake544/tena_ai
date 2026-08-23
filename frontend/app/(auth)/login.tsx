@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,7 +16,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [lang, setLang] = useState('am');
+  const [lang, setLang] = useState('en');
 
   const handleLogin = async () => {
     if (!email || !password) return;
@@ -40,37 +40,37 @@ export default function LoginScreen() {
             <View style={styles.crossSmV} />
             <View style={styles.crossSmH} />
           </View>
-          <Text style={styles.welcomeTitle}>Welcome back</Text>
-          <Text style={styles.welcomeSub}>Sign in to continue</Text>
+          <Text style={styles.welcomeTitle}>{t('auth.welcomeBack')}</Text>
+          <Text style={styles.welcomeSub}>{t('auth.signInToContinue')}</Text>
         </LinearGradient>
-        <View style={styles.formScroll}>
+        <ScrollView style={styles.formScroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={styles.toggleWrap}>
             <TouchableOpacity
               style={[styles.toggleOpt, lang === 'am' && styles.toggleOptOn]}
-              onPress={() => setLang('am')}
+              onPress={() => Alert.alert('Coming soon', t('onboarding.amharicComingSoon'))}
             >
-              <Text style={[lang === 'am' ? styles.toggleTextOn : styles.toggleTextOff]}>አማርኛ</Text>
-              <Text style={[styles.toggleSub, lang === 'am' ? styles.toggleSubOn : styles.toggleSubOff]}>Amharic</Text>
+              <Text style={[lang === 'am' ? styles.toggleTextOn : styles.toggleTextOff]}>{t('onboarding.amharic')}</Text>
+              <Text style={[styles.toggleSub, lang === 'am' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.amharic')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.toggleOpt, lang === 'en' && styles.toggleOptOn]}
               onPress={() => setLang('en')}
             >
-              <Text style={[lang === 'en' ? styles.toggleTextOn : styles.toggleTextOff]}>English</Text>
-              <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>English</Text>
+              <Text style={[lang === 'en' ? styles.toggleTextOn : styles.toggleTextOff]}>{t('onboarding.english')}</Text>
+              <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.english')}</Text>
             </TouchableOpacity>
           </View>
-          <Input label={t('auth.email')} placeholder="you@gmail.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-          <Input label={t('auth.password')} placeholder="Enter your password" value={password} onChangeText={setPassword} secureTextEntry={!showPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
+          <Input label={t('auth.email')} placeholder={t('auth.placeEmail')} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+          <Input label={t('auth.password')} placeholder={t('auth.placePassword')} value={password} onChangeText={setPassword} secureTextEntry={!showPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
           <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')}>
             <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
           </TouchableOpacity>
           <Button title={t('auth.login')} onPress={handleLogin} loading={loading} size="lg" />
           <Text style={styles.footerText}>
-            New to Tena AI?{' '}
-            <Text style={styles.linkText} onPress={() => router.push('/(auth)/onboarding')}>Create account</Text>
+            {t('auth.noAccount')}{' '}
+            <Text style={styles.linkText} onPress={() => router.push('/(auth)/onboarding')}>{t('auth.createAccount')}</Text>
           </Text>
-        </View>
+        </ScrollView>
       </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

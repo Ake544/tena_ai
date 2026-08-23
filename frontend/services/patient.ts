@@ -12,13 +12,17 @@ export interface PatientProfile {
   education_level: string | null;
   family_history: boolean;
   family_history_details: string | null;
+  diagnosis_date: string | null;
+  diabetes_type: number | null;
+  other_conditions: string | null;
+  hba1c: number | null;
   exercise_habit: string | null;
   staple_diet: string | null;
   timezone: string;
   created_at: string;
 }
 
-export type ProfileUpdate = Partial<Pick<PatientProfile, 'full_name' | 'age' | 'sex' | 'bmi' | 'education_level' | 'family_history' | 'family_history_details' | 'exercise_habit' | 'staple_diet' | 'language' | 'timezone'>>;
+export type ProfileUpdate = Partial<Pick<PatientProfile, 'full_name' | 'age' | 'sex' | 'bmi' | 'education_level' | 'family_history' | 'family_history_details' | 'diagnosis_date' | 'diabetes_type' | 'other_conditions' | 'hba1c' | 'exercise_habit' | 'staple_diet' | 'language' | 'timezone'>>;
 
 export interface GlucoseStats {
   last_glucose: number | null;

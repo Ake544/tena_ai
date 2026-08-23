@@ -2,11 +2,13 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor, white, black
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from datetime import datetime, timedelta, date
 from app.models.patient import Patient
 from typing import Dict, List, Any, Optional
+import json
 
 W, H = A4
 M_L = 22 * mm
@@ -66,6 +68,125 @@ def glucose_color(value: float, reading_type: str) -> HexColor:
 
 
 BORDERLINE = HexColor('#C47A20')
+
+
+def _fmt_symptoms(symptoms: List[Dict[str, Any]]) -> str:
+    best = {}
+    for s in symptoms:
+        name = s.get("symptom", "")
+        if not name:
+            continue
+        sev = int(s.get("severity", 0) or 0)
+        if name not in best or sev > best[name]:
+            best[name] = sev
+    if not best:
+        return ""
+    return ", ".join(f"{name} ({sev}/10)" for name, sev in sorted(best.items(), key=lambda x: x[1], reverse=True))
+
+
+def _fmt_family_history(patient: Dict[str, Any]) -> str:
+    details = patient.get("family_history_details")
+    if details:
+        try:
+            entries = json.loads(details)
+            if isinstance(entries, list) and entries:
+                return ", ".join(f"{e['relation']}: {e['condition']}" for e in entries if e.get("relation") and e.get("condition"))
+        except Exception:
+            pass
+        if isinstance(details, str) and details.strip():
+            return details
+    if patient.get("family_history"):
+        return "type 2 diabetes in a family member"
+    return ""
+
+
+def _fmt_medications(medications: List[Dict[str, Any]]) -> str:
+    parts = []
+    for m in medications:
+        name = m.get("name", "")
+        dose = m.get("dose", "")
+        times = "; ".join(t.strip() for t in (m.get("times") or "").split(",") if t.strip())
+        entry = " ".join(x for x in [name, dose, times] if x)
+        if entry:
+            parts.append(entry.strip())
+    return parts
+
+
+def build_patient_history(data: Dict[str, Any]) -> str:
+    patient = data.get("patient", {})
+    medications = data.get("medications", [])
+    symptoms = data.get("symptoms", [])
+    adherence_pct = data.get("adherence_pct")
+
+    age = patient.get("age")
+    sex = (patient.get("sex") or "").strip().lower()
+    if sex.startswith("m"):
+        subj_pr, poss = "He", "His"
+    elif sex.startswith("f"):
+        subj_pr, poss = "She", "Her"
+    else:
+        subj_pr, poss = "The patient", "Their"
+
+    diag_date = patient.get("diagnosis_date")
+    diabetes_type = patient.get("diabetes_type")
+    type_str = f" type {diabetes_type}" if diabetes_type else ""
+
+    known = ""
+    if diag_date:
+        try:
+            diag_dt = datetime.strptime(diag_date, "%Y-%m-%d").date()
+            total_m = (date.today().year - diag_dt.year) * 12 + (date.today().month - diag_dt.month)
+            if total_m <= 3:
+                status = "newly diagnosed"
+                dur = f" for {total_m} month{'s' if total_m > 1 else ''}" if total_m > 0 else ""
+            else:
+                status = "known"
+                yr, rm = divmod(max(total_m, 0), 12)
+                if yr > 0 and rm > 0:
+                    dur = f" for {yr} year{'s' if yr > 1 else ''} and {rm} month{'s' if rm > 1 else ''}"
+                elif yr > 0:
+                    dur = f" for {yr} year{'s' if yr > 1 else ''}"
+                else:
+                    dur = f" for {rm} month{'s' if rm > 1 else ''}"
+            known = f"{status}{type_str} diabetes patient{dur}"
+        except Exception:
+            known = f"known{type_str} diabetes patient"
+    else:
+        known = f"known{type_str} diabetes patient" if type_str else "known diabetes patient"
+
+    parts = []
+    age_str = f"{age} years old" if age else "an adult"
+    sex_lbl = sex or "patient"
+    parts.append(f"This is a {age_str} {sex_lbl} who is a {known}.")
+    other_conditions = patient.get("other_conditions")
+    if other_conditions:
+        parts.append(f"{subj_pr} also has {other_conditions}.")
+
+    med_str = _fmt_medications(medications)
+    if med_str:
+        parts.append(f"Currently on {'; '.join(med_str)}.")
+    elif medications is None or len(medications) == 0:
+        parts.append("Currently on no medications.")
+
+    if adherence_pct is not None:
+        status = "adherent" if adherence_pct >= 80 else "non-adherent"
+        parts.append(f"{subj_pr} is {status} ({adherence_pct}% medication adherence).")
+
+    symp_str = _fmt_symptoms(symptoms)
+    if symp_str:
+        parts.append(f"Currently, {subj_pr.lower()} presented {symp_str}.")
+    else:
+        parts.append(f"{subj_pr} has no pertinent medical history.")
+
+    family = _fmt_family_history(patient)
+    if family:
+        parts.append(f"{subj_pr} has a family history of {family}.")
+
+    staple = patient.get("staple_diet")
+    if staple:
+        parts.append(f"{poss} diet consists of {staple}.")
+
+    return " ".join(parts)
 
 
 def build_report_data(patient: Patient, db: Session, days: int = 90) -> Dict[str, Any]:
@@ -158,10 +279,12 @@ def build_report_data(patient: Patient, db: Session, days: int = 90) -> Dict[str
 
     hba1c_est = round((sum(all_values) / len(all_values) + 46.7) / 28.7, 1) if all_values else 0
 
+    hba1c_lab = round(float(patient.hba1c), 1) if patient.hba1c else None
+
     medication_rows = db.execute(
         text(
             """
-            SELECT id, name, dose, frequency, times, taken_today, created_at
+            SELECT id, name, dose, frequency, times, taken_times, skipped_times, taken_today, created_at
             FROM medication
             WHERE patient_id = :pid
             ORDER BY created_at DESC
@@ -171,12 +294,29 @@ def build_report_data(patient: Patient, db: Session, days: int = 90) -> Dict[str
     ).fetchall()
 
     medications = []
+    adherence_pct = None
+    adherence_doses = 0
+    adherence_total = 0
     for row in medication_rows:
+        scheduled = [t.strip() for t in (row.times or "").split(",") if t.strip()]
+        taken = [t.strip() for t in (row.taken_times or "").split(",") if t.strip()]
+        skipped = [t.strip() for t in (row.skipped_times or "").split(",") if t.strip()]
+        done = len(taken) + len(skipped)
+        total = len(scheduled)
+        if total > 0:
+            adherence_doses += done
+            adherence_total += total
+        elif row.taken_today:
+            adherence_doses += 1
+            adherence_total += 1
         medications.append({
             "name": row.name,
             "dose": row.dose,
             "times": row.times,
+            "adherent": done >= total if total > 0 else bool(row.taken_today),
         })
+    if adherence_total > 0:
+        adherence_pct = round(adherence_doses / adherence_total * 100)
 
     symptom_rows = db.execute(
         text(
@@ -210,8 +350,15 @@ def build_report_data(patient: Patient, db: Session, days: int = 90) -> Dict[str
             "bmi": patient.bmi,
             "email": patient.email,
             "language": "English",
-            "timezone": "Africa/Addis_Ababa",
+            "timezone": patient.timezone or "Africa/Addis_Ababa",
+            "diagnosis_date": patient.diagnosis_date.isoformat() if patient.diagnosis_date else None,
+            "diabetes_type": patient.diabetes_type,
+            "other_conditions": patient.other_conditions,
+            "family_history": patient.family_history,
+            "family_history_details": patient.family_history_details,
+            "staple_diet": patient.staple_diet,
         },
+        "adherence_pct": adherence_pct,
         "period_label": f"{days}-day summary",
         "generated_date": datetime.utcnow().strftime("%B %d, %Y"),
         "glucose_summary": {
@@ -226,6 +373,7 @@ def build_report_data(patient: Patient, db: Session, days: int = 90) -> Dict[str
             "days_high": days_high,
             "days_low": days_low,
             "hba1c_est": hba1c_est,
+            "hba1c_lab": hba1c_lab,
         },
         "weekly_fasting": [("Wk " + str(i + 1), v) for i, v in enumerate(weekly_fasting)],
         "glucose_readings": glucose_readings,
@@ -340,7 +488,7 @@ def generate_pdf(data: Dict[str, Any]) -> bytes:
             card_y = y - card_h
             cards = [
                 ("Total Readings", str(gs.get("total_readings", 0)), "readings", GREEN_DARK, GREEN_XLIGHT),
-                ("Est. HbA1c", f"{gs.get('hba1c_est', 0)}%", "estimated", GREEN_MED, GREEN_XLIGHT),
+                ("HbA1c", f"{gs.get('hba1c_lab') or gs.get('hba1c_est', 0)}%", ("lab result" if gs.get("hba1c_lab") else "estimated"), GREEN_MED, GREEN_XLIGHT),
                 ("Days In Range", f"{gs.get('days_in_range', 0)}", "days", GREEN_MED, GREEN_XLIGHT),
                 ("Days Above Range", f"{gs.get('days_high', 0)}", "days", RED, RED_LIGHT),
             ]
@@ -433,98 +581,6 @@ def generate_pdf(data: Dict[str, Any]) -> bytes:
             c.setLineWidth(0.5)
             c.roundRect(M_L, y, CONTENT_W, row_h * 6, 2 * mm, fill=0, stroke=1)
             y -= 10 * mm
-
-        def draw_90day_line_graph():
-            nonlocal y
-            check_space(40)
-            draw_section_title("90-Day Glucose Trend")
-            chart_w = CONTENT_W - 6 * mm
-            chart_h = 26 * mm - 6 * mm
-            chart_x = M_L + 3 * mm
-            chart_y = y - chart_h - 3 * mm
-            c.setFillColor(GRAY_LIGHT)
-            c.roundRect(M_L, y - 26 * mm, CONTENT_W, 26 * mm, 3 * mm, fill=1, stroke=0)
-            c.setStrokeColor(GRAY_BORDER)
-            c.setLineWidth(0.5)
-            c.roundRect(M_L, y - 26 * mm, CONTENT_W, 26 * mm, 3 * mm, fill=0, stroke=1)
-
-            all_vals = [v for row in glucose_readings for v in row[1:] if v is not None]
-            if all_vals:
-                y_min = max(40, min(all_vals) - 20)
-                y_max = max(all_vals) + 20
-                y_range = y_max - y_min if y_max > y_min else 1
-                n_days = len(glucose_readings)
-                day_w = chart_w / n_days if n_days > 0 else chart_w
-
-                target_zone_h = (180 - 80) / y_range * chart_h
-                target_zone_y = chart_y + (80 - y_min) / y_range * chart_h
-                c.setFillColor(HexColor('#D8EFE7'))
-                c.rect(chart_x, target_zone_y, chart_w, target_zone_h, fill=1, stroke=0)
-
-                READING_TYPE_KEY = ["Fasting", "Post-Breakfast", "Pre-Lunch", "Post-Lunch", "Pre-Dinner", "Bedtime"]
-                TYPE_COLORS = [
-                    (GREEN_DARK, "Fasting"), (RED, "Post-B'fast"),
-                    (AMBER, "Pre-Lunch"), (BLUE, "Post-Lunch"),
-                    (GOLD, "Pre-Dinner"), (HexColor('#7A9E90'), "Bedtime"),
-                ]
-
-                for (rt_color, rt_label), rt_key in zip(TYPE_COLORS, READING_TYPE_KEY):
-                    rt_idx = READING_TYPE_KEY.index(rt_key)
-                    pts = []
-                    for day_idx, row in enumerate(glucose_readings):
-                        val = row[1:][rt_idx] if len(row) > 1 + rt_idx else None
-                        if val is not None:
-                            px = chart_x + day_idx * day_w
-                            py = chart_y + (val - y_min) / y_range * chart_h
-                            pts.append((px, py))
-                    if len(pts) >= 2:
-                        c.setStrokeColor(rt_color)
-                        c.setLineWidth(0.6)
-                        for p_i in range(len(pts) - 1):
-                            c.line(pts[p_i][0], pts[p_i][1], pts[p_i + 1][0], pts[p_i + 1][1])
-                    for px, py in pts:
-                        c.setFillColor(rt_color)
-                        c.circle(px, py, 0.8, fill=1, stroke=0)
-
-                c.setStrokeColor(GREEN_DARK)
-                c.setLineWidth(0.5)
-                c.setDash(2, 2)
-                for target_val in [80, 130, 180]:
-                    ty = chart_y + (target_val - y_min) / y_range * chart_h
-                    if chart_y <= ty <= chart_y + chart_h:
-                        c.line(chart_x, ty, chart_x + chart_w, ty)
-                        c.setFillColor(TEXT_MUTED)
-                        c.setFont("Helvetica", 5.5)
-                        c.drawString(chart_x + chart_w + 1, ty - 1.5, str(target_val))
-                c.setDash()
-
-                label_interval = max(1, n_days // 8)
-                for day_idx in range(0, n_days, label_interval):
-                    lx = chart_x + day_idx * day_w
-                    date_str = glucose_readings[day_idx][0]
-                    short_date = date_str[5:] if date_str else ""
-                    c.setFillColor(TEXT_MUTED)
-                    c.setFont("Helvetica", 5)
-                    c.drawCentredString(lx, chart_y - 4 * mm, short_date)
-
-                legend_items = TYPE_COLORS + [(HexColor('#D8EFE7'), "Target Zone (80\u2013180)")]
-                legend_y2 = chart_y - 7 * mm
-                for j, (col, txt) in enumerate(legend_items):
-                    lx = chart_x + j * 23 * mm
-                    if j == 6:
-                        c.setFillColor(col)
-                        c.rect(lx, legend_y2, 3 * mm, 3 * mm, fill=1, stroke=0)
-                        c.setStrokeColor(GRAY_BORDER)
-                        c.setLineWidth(0.3)
-                        c.rect(lx, legend_y2, 3 * mm, 3 * mm, fill=0, stroke=1)
-                    else:
-                        c.setFillColor(col)
-                        c.circle(lx + 1.5 * mm, legend_y2 + 1.5 * mm, 1.5, fill=1, stroke=0)
-                    c.setFillColor(TEXT_MUTED)
-                    c.setFont("Helvetica", 5.5)
-                    c.drawString(lx + 4 * mm, legend_y2 + 0.5 * mm, txt)
-
-            y = y - 26 * mm - 10 * mm
 
         def draw_90day_table():
             nonlocal y
@@ -639,37 +695,53 @@ def generate_pdf(data: Dict[str, Any]) -> bytes:
             if not symptoms: return
             check_space(30)
             draw_section_title("Reported Symptoms")
+
+            grouped = {}
             for sym in symptoms:
-                check_space(12)
-                c.setFillColor(BLACK)
-                c.setFont("Helvetica", 9)
-                c.drawString(M_L + 18 * mm, y - 2 * mm, sym['symptom'])
+                day = sym['date']
+                name = sym['symptom']
+                sev = int(sym['severity'] or 0)
+                if day not in grouped:
+                    grouped[day] = {}
+                grouped[day][name] = max(grouped[day].get(name, 0), sev)
+
+            ordered = sorted(grouped.items(), key=lambda kv: kv[0], reverse=True)
+
+            date_col_x = M_L
+            date_col_w = 24 * mm
+            sym_x = M_L + date_col_w + 3 * mm
+            sym_w = CONTENT_W - date_col_w - 3 * mm
+            lh = 5 * mm
+
+            for day, items in ordered:
+                sym_parts = ", ".join(f"{n} ({s}/10)" for n, s in sorted(items.items(), key=lambda x: x[1], reverse=True))
+                words = sym_parts.split()
+                lines, cur = [], []
+                for w in words:
+                    test = " ".join(cur + [w])
+                    if stringWidth(test, "Helvetica", 9) > sym_w and cur:
+                        lines.append(" ".join(cur))
+                        cur = [w]
+                    else:
+                        cur.append(w)
+                if cur:
+                    lines.append(" ".join(cur))
+                row_h = max(len(lines), 1) * lh + 6 * mm
+
+                if y - row_h < FOOTER_CLEAR:
+                    y = new_page()
+                    draw_section_title("Reported Symptoms (continued)")
+
                 c.setFillColor(TEXT_MUTED)
                 c.setFont("Helvetica-Bold", 8)
-                c.drawString(M_L, y - 2 * mm, sym['date'])
-                severity = sym['severity']
-                dot_x = M_L + CONTENT_W - 30 * mm
-                dot_r = 1.8
-                gap = 5.5
-                for d in range(5):
-                    cx = dot_x + d * gap
-                    cy_dot = y + 1 * mm
-                    if d < severity:
-                        if severity >= 4: c.setFillColor(RED)
-                        elif severity == 3: c.setFillColor(AMBER)
-                        else: c.setFillColor(GREEN_MED)
-                        c.circle(cx, cy_dot, dot_r, fill=1, stroke=0)
-                    else:
-                        c.setStrokeColor(GRAY_BORDER)
-                        c.setFillColor(white)
-                        c.circle(cx, cy_dot, dot_r, fill=1, stroke=1)
-                c.setFillColor(TEXT_MUTED)
-                c.setFont("Helvetica", 7.5)
-                c.drawRightString(M_L + CONTENT_W - 12 * mm, y - 2 * mm, f"{severity}/5")
-                c.setStrokeColor(GRAY_BORDER)
-                c.setLineWidth(0.3)
-                c.line(M_L, y - 5 * mm, W - M_R, y - 5 * mm)
-                y -= 8 * mm
+                c.drawString(date_col_x, y - 3 * mm, day)
+
+                c.setFillColor(BLACK)
+                c.setFont("Helvetica-Bold", 9)
+                for i, line in enumerate(lines):
+                    c.drawString(sym_x, y - 3 * mm - i * lh, line)
+
+                y -= row_h
             y -= 10 * mm
 
         def draw_clinical_summary():
@@ -710,16 +782,51 @@ def generate_pdf(data: Dict[str, Any]) -> bytes:
                 ty -= 4 * mm
             y = box_y - 10 * mm
 
+        def draw_patient_history():
+            nonlocal y
+            history_text = build_patient_history(data)
+            avail_w = CONTENT_W - 10 * mm
+            words = history_text.split()
+            lines, cur = [], []
+            for w in words:
+                test = " ".join(cur + [w])
+                if stringWidth(test, "Helvetica", 9) > avail_w and cur:
+                    lines.append(" ".join(cur))
+                    cur = [w]
+                else:
+                    cur.append(w)
+            if cur:
+                lines.append(" ".join(cur))
+            lh = 5 * mm
+            card_h = len(lines) * lh + 14 * mm
+
+            check_space(card_h / mm + 10)
+            draw_section_title("Patient History")
+            c.setFillColor(BLUE_LIGHT)
+            c.roundRect(M_L, y - card_h, CONTENT_W, card_h, 3 * mm, fill=1, stroke=0)
+            c.setStrokeColor(BLUE)
+            c.setLineWidth(0.8)
+            c.roundRect(M_L, y - card_h, CONTENT_W, card_h, 3 * mm, fill=0, stroke=1)
+            c.setFillColor(BLUE)
+            c.roundRect(M_L, y - card_h, 2.5, card_h, 1.5, fill=1, stroke=0)
+            c.setFont("Helvetica", 9)
+            c.setFillColor(BLACK)
+            for i, line in enumerate(lines):
+                c.drawString(M_L + 5 * mm, y - 7 * mm - i * lh, line)
+            y = y - card_h - 8 * mm
+
         def run():
-            nonlocal page_num
+            nonlocal page_num, y
             page_num = 1
             y_new = CONTENT_TOP
             dl = draw_section_title
             draw_header(c)
             draw_footer(c, page_num, total_pgs)
+            draw_patient_history()
             draw_stat_cards()
             draw_avg_readings_table()
-            draw_90day_line_graph()
+
+            draw_section_title("90-Day Glucose Readings")
             draw_90day_table()
             draw_medications()
             draw_symptoms()

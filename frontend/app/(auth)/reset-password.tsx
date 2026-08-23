@@ -48,7 +48,7 @@ export default function ResetPasswordScreen() {
     try {
       await authService.resetPassword(email, code, newPassword);
       Alert.alert(t('common.confirm'), t('auth.passwordUpdated'), [
-        { text: 'OK', onPress: () => router.replace('/(auth)/login') },
+        { text: t('common.ok'), onPress: () => router.replace('/(auth)/login') },
       ]);
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('common.error'));

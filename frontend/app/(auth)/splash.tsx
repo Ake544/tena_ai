@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import Button from '../../components/Button';
 import { colors } from '../../constants/theme';
 
 export default function SplashScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -18,13 +20,13 @@ export default function SplashScreen() {
         <Text style={styles.title}>
           Tena <Text style={styles.titleGold}>AI</Text>
         </Text>
-        <Text style={styles.subEthiopic}>ጤና AI — የጤና ረዳትዎ</Text>
-        <Text style={styles.subEnglish}>Your AI-powered diabetes companion{'\n'}Designed for Ethiopia</Text>
+        <Text style={styles.subEthiopic}>{t('splash.taglineAm')}</Text>
+        <Text style={styles.subEnglish}>{t('splash.tagline')}</Text>
       </View>
       <View style={styles.footer}>
-        <Button title="Get Started" variant="gold" size="lg" onPress={() => router.push('/(auth)/onboarding')} />
+        <Button title={t('splash.getStarted')} variant="gold" size="lg" onPress={() => router.push('/(auth)/onboarding')} />
         <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/(auth)/login')}>
-          <Text style={styles.secondaryBtnText}>I already have an account</Text>
+          <Text style={styles.secondaryBtnText}>{t('splash.haveAccount')}</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>

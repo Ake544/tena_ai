@@ -42,3 +42,13 @@ def acknowledge_alert(alert_id: str, current_patient: Patient = Depends(get_curr
     db.commit()
     db.refresh(alert)
     return alert
+
+
+@router.post("/acknowledge-all")
+def acknowledge_all(current_patient: Patient = Depends(get_current_patient), db: Session = Depends(get_db)):
+    db.query(Alert).filter(
+        Alert.patient_id == current_patient.id,
+        Alert.acknowledged == False,
+    ).update({"acknowledged": True})
+    db.commit()
+    return {"status": "ok"}

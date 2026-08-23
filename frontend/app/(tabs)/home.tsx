@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
+import Spinner from '../../components/Spinner';
 import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
 import { syncService } from '../../services/sync';
 import { dbService } from '../../services/db';
@@ -29,11 +30,18 @@ export default function HomeScreen() {
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      alertService.getActive().then(d => setUnreadAlerts(d)).catch(() => {});
+    }, [])
+  );
 
   const loadData = async () => {
     try {
@@ -85,6 +93,8 @@ export default function HomeScreen() {
           if (parsed.appointments) setAppointments(parsed.appointments);
         } catch {}
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -162,7 +172,7 @@ export default function HomeScreen() {
       const resp = await chatService.sendMessage(text);
       setChatMessages(prev => [...prev, { role: 'assistant', content: resp }]);
     } catch {
-      setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please try again." }]);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: t('home.chatError') }]);
     } finally {
       setChatLoading(false);
     }
@@ -182,10 +192,14 @@ export default function HomeScreen() {
   };
 
   const today = new Date();
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dateStr = `${dayNames[today.getDay()]}, ${today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+  const dayNames = [t('home.sunday'), t('home.monday'), t('home.tuesday'), t('home.wednesday'), t('home.thursday'), t('home.friday'), t('home.saturday')];
+  const dateStr = t('home.trackingDate', { day: dayNames[today.getDay()], date: today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) });
 
-  return (
+  return loading ? (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
+      <Spinner />
+    </View>
+  ) : (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ backgroundColor: colors.green, paddingTop: 52, paddingHorizontal: 24, paddingBottom: 20, flexShrink: 0 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
@@ -195,7 +209,7 @@ export default function HomeScreen() {
               <Feather name="smile" size={16} color="rgba(255,255,255,0.55)" />
             </View>
             <Text style={{ fontSize: 24, fontWeight: '800', color: colors.white }}>{profile?.full_name || '...'}</Text>
-            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Day {stats?.days_logged || 0} of tracking · {dateStr}</Text>
+            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{t('home.dayOfTracking', { count: stats?.days_logged || 0 })} · {dateStr}</Text>
           </View>
           <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: 16, fontWeight: '700', color: colors.white }}>{profile?.full_name?.split(' ').map(n => n[0]).join('') || 'AB'}</Text>
@@ -204,18 +218,18 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
             <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white, fontVariant: ['tabular-nums'] }}>{stats?.last_glucose ?? '—'}</Text>
-            <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Last glucose</Text>
+            <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>{t('home.lastGlucose')}</Text>
           </View>
           <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <Text style={{ fontSize: 20, fontWeight: '800', color: colors.gold2, fontVariant: ['tabular-nums'] }}>{stats?.days_logged ?? 0}</Text>
               <MaterialCommunityIcons name="fire" size={20} color={colors.gold2} />
             </View>
-            <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Day streak</Text>
+            <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>{t('home.dayStreak')}</Text>
           </View>
             <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, alignItems: 'center' }}>
               <Text style={{ fontSize: 20, fontWeight: '800', color: colors.white }}>{medAdherence != null ? `${medAdherence}%` : '—'}</Text>
-              <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Med adherence</Text>
+              <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>{t('home.medAdherence')}</Text>
           </View>
         </View>
       </View>
@@ -227,28 +241,28 @@ export default function HomeScreen() {
               <Feather name="alert-triangle" size={20} color={colors.white} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.red }}>High readings today</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2, lineHeight: 16 }}>{stats.today_high_count} readings above 180 mg/dL</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.red }}>{t('home.highReadings')}</Text>
+              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2, lineHeight: 16 }}>{t('home.highReadingsSub', { count: stats.today_high_count })}</Text>
             </View>
             <Text style={{ color: colors.t3, fontSize: 16 }}>›</Text>
           </TouchableOpacity>
         )}
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Today's glucose</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>{t('home.todaysGlucose')}</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/log')}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>Log reading</Text>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>{t('home.logReading')}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <View>
-              <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1 }}>Today's readings</Text>
-              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>mg/dL</Text>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1 }}>{t('home.todaysReadings')}</Text>
+              <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>{t('home.mgdl')}</Text>
             </View>
             {stats && stats.today_high_count > 0 && (
               <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.redLight }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.red }}>{stats.today_high_count} high</Text>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.red }}>{t('home.countHigh', { count: stats.today_high_count })}</Text>
               </View>
             )}
           </View>
@@ -261,12 +275,12 @@ export default function HomeScreen() {
             ))}
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-            <Text style={{ fontSize: 9, color: colors.t4 }}>Fasting</Text>
-            <Text style={{ fontSize: 9, color: colors.t4 }}>Post-B'fast</Text>
-            <Text style={{ fontSize: 9, color: colors.t4 }}>Pre-lunch</Text>
-            <Text style={{ fontSize: 9, color: colors.t4 }}>Post-lunch</Text>
-            <Text style={{ fontSize: 9, color: colors.t4 }}>Pre-dinner</Text>
-            <Text style={{ fontSize: 9, color: colors.t4 }}>Bedtime</Text>
+            <Text style={{ fontSize: 9, color: colors.t4 }}>{t('home.fasting')}</Text>
+            <Text style={{ fontSize: 9, color: colors.t4 }}>{t('home.postBreakfast')}</Text>
+            <Text style={{ fontSize: 9, color: colors.t4 }}>{t('home.preLunch')}</Text>
+            <Text style={{ fontSize: 9, color: colors.t4 }}>{t('home.postLunch')}</Text>
+            <Text style={{ fontSize: 9, color: colors.t4 }}>{t('home.preDinner')}</Text>
+            <Text style={{ fontSize: 9, color: colors.t4 }}>{t('home.bedtime')}</Text>
           </View>
         </View>
 
@@ -275,7 +289,7 @@ export default function HomeScreen() {
             <View style={{ backgroundColor: unreadAlerts.some(a => a.severity === 'urgent') ? '#FEE2E2' : '#FEF3C7', borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: unreadAlerts.some(a => a.severity === 'urgent') ? '#FECACA' : '#FDE68A' }}>
               <Feather name={unreadAlerts.some(a => a.severity === 'urgent') ? 'alert-triangle' : 'alert-circle'} size={20} color={unreadAlerts.some(a => a.severity === 'urgent') ? '#DC2626' : '#D97706'} />
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E' }}>{unreadAlerts.length} unread alert{unreadAlerts.length > 1 ? 's' : ''}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E' }}>{t('home.unreadAlerts', { count: unreadAlerts.length })}</Text>
                 <Text style={{ fontSize: 11, color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E', marginTop: 1 }}>{unreadAlerts[0].title}</Text>
               </View>
               <Text style={{ fontSize: 18, color: unreadAlerts.some(a => a.severity === 'urgent') ? '#991B1B' : '#92400E' }}>›</Text>
@@ -284,9 +298,9 @@ export default function HomeScreen() {
         )}
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Today's tip</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>{t('home.todaysTip')}</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/tips')}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>See all {tips.length}</Text>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.green }}>{t('home.seeAll', { count: tips.length })}</Text>
           </TouchableOpacity>
         </View>
         {tips.length > 0 ? (
@@ -305,7 +319,7 @@ export default function HomeScreen() {
                 </View>
               )}
               <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{tips.length - 1} more tip{tips.length > 2 ? 's' : ''} today</Text>
+                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{t('home.moreTips', { count: tips.length - 1 })}</Text>
                 <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>›</Text>
               </View>
             </LinearGradient>
@@ -314,7 +328,7 @@ export default function HomeScreen() {
           <TouchableOpacity onPress={() => router.push('/(tabs)/tips')} style={{ marginHorizontal: 16, marginBottom: 16, borderRadius: 24, backgroundColor: colors.surface, padding: 20, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)', ...shadows.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Feather name="info" size={16} color={colors.t3} />
-              <Text style={{ fontSize: 13, color: colors.t3 }}>Log a glucose reading to get your personalized tip</Text>
+              <Text style={{ fontSize: 13, color: colors.t3 }}>{t('home.logForTip')}</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -322,7 +336,7 @@ export default function HomeScreen() {
         {(pendingMeds.length > 0 || medications.length === 0 || nextAppt || !bedtimeLogged) && (
         <>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>Reminders</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>{t('home.reminders')}</Text>
         </View>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           {pendingMeds.length > 0 ? pendingMeds.map(({ med, nearest }, idx) => (
@@ -332,10 +346,10 @@ export default function HomeScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{med.name} {med.dose}</Text>
-                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Due at {formatTime(nearest!.time)} · {nearest!.status === 'overdue' ? 'Overdue' : 'Not yet taken'}</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>{t('home.dueAt', { time: formatTime(nearest!.time) })} · {nearest!.status === 'overdue' ? t('home.overdueStatus') : t('home.notYetTaken')}</Text>
               </View>
               <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: nearest!.status === 'overdue' ? '#FEE2E2' : colors.goldLight }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: nearest!.status === 'overdue' ? '#DC2626' : '#9A6200' }}>{nearest!.status === 'overdue' ? 'Overdue' : 'Pending'}</Text>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: nearest!.status === 'overdue' ? '#DC2626' : '#9A6200' }}>{nearest!.status === 'overdue' ? t('home.overdueStatus') : t('home.pending')}</Text>
               </View>
             </TouchableOpacity>
           )) : medications.length > 0 ? null : (
@@ -344,8 +358,8 @@ export default function HomeScreen() {
                 <MaterialCommunityIcons name="pill" size={20} color={colors.t3} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>No medications yet</Text>
-                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Add medications in Profile to track adherence</Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{t('home.noMedsYet')}</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>{t('home.noMedsSub')}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -369,11 +383,11 @@ export default function HomeScreen() {
                 <MaterialCommunityIcons name="water" size={20} color={colors.t3} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>Bedtime glucose log</Text>
-                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>Not yet logged today</Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.t1 }}>{t('home.bedtimeGlucose')}</Text>
+                <Text style={{ fontSize: 12, color: colors.t3, marginTop: 1 }}>{t('home.notYetLogged')}</Text>
               </View>
               <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 50, backgroundColor: colors.amberLight }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.amber }}>Tonight</Text>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.amber }}>{t('home.tonight')}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -391,18 +405,18 @@ export default function HomeScreen() {
 
       <Modal visible={chatVisible} animationType="slide">
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.bg }}>
-          <View style={{ backgroundColor: colors.green, paddingTop: 52, paddingHorizontal: 24, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ backgroundColor: colors.green, paddingTop: Platform.OS === 'ios' ? 52 : 24, paddingHorizontal: 24, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
                 <Feather name="message-circle" size={18} color={colors.white} />
               </View>
               <View>
-                <Text style={{ fontSize: 17, fontWeight: '800', color: colors.white }}>Tena AI Chat</Text>
-                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Diabetes assistant</Text>
+                <Text style={{ fontSize: 17, fontWeight: '800', color: colors.white }}>{t('home.chatTitle')}</Text>
+                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{t('home.chatSub')}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => setChatVisible(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-              <Feather name="x" size={18} color={colors.white} />
+            <TouchableOpacity onPress={() => setChatVisible(false)}>
+              <Feather name="x" size={24} color={colors.white} />
             </TouchableOpacity>
           </View>
           <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} onContentSizeChange={() => scrollViewRef.current?.scrollToEnd()}>
@@ -411,8 +425,8 @@ export default function HomeScreen() {
                 <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                   <Feather name="message-square" size={28} color={colors.green} />
                 </View>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: colors.t1 }}>Ask me anything</Text>
-                <Text style={{ fontSize: 13, color: colors.t3, marginTop: 8, textAlign: 'center', lineHeight: 20 }}>I can help with your diabetes care — from meal ideas to understanding your glucose readings.</Text>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: colors.t1 }}>{t('home.chatAskAnything')}</Text>
+                <Text style={{ fontSize: 13, color: colors.t3, marginTop: 8, textAlign: 'center', lineHeight: 20 }}>{t('home.chatWelcome')}</Text>
               </View>
             ) : (
               chatMessages.map((msg, i) => (
@@ -441,7 +455,7 @@ export default function HomeScreen() {
             <TextInput
               value={chatInput}
               onChangeText={setChatInput}
-              placeholder="Ask Tena AI..."
+              placeholder={t('home.chatPlaceholder')}
               placeholderTextColor={colors.t4}
               style={{ flex: 1, backgroundColor: colors.surface, borderRadius: 50, paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: colors.t1, borderWidth: 1, borderColor: 'rgba(11,77,59,0.1)' }}
               onSubmitEditing={handleSend}

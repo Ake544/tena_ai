@@ -11,6 +11,11 @@ interface SignupData {
   sex?: string;
   education_level?: string;
   family_history?: boolean;
+  family_history_details?: string;
+  diagnosis_date?: string;
+  diabetes_type?: number;
+  other_conditions?: string;
+  hba1c?: number;
   exercise_habit?: string;
   staple_diet?: string;
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Button from '../../components/Button';
@@ -14,25 +15,11 @@ const gradientSets = [
   ['#0B4D3B', '#071F18'] as const,
 ];
 
-const headers = [
-  { title: 'Welcome!', sub: 'Create your account to get started' },
-  { title: 'About your\ncondition', sub: 'Step 2 of 3 \u00B7 All info is private' },
-  { title: 'Your lifestyle &\nknowledge', sub: 'Step 3 of 3 \u00B7 Helps us personalize tips' },
-];
-
-const exercises = ['Walking', 'Running', 'Gym', 'None'];
-const diets = ['Injera', 'Rice', 'Bread', 'Mix'];
-
-const knowledgeLevels = [
-  { iconSet: 'material' as const, icon: 'leaf', title: 'Just getting started', desc: 'I want to learn the basics' },
-  { iconSet: 'feather' as const, icon: 'book', title: 'I know the basics', desc: 'Managing for 1\u20133 years' },
-  { iconSet: 'feather' as const, icon: 'award', title: 'I know it well', desc: 'Managing for many years' },
-];
-
 export default function OnboardingScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const [lang, setLang] = useState('am');
+  const [lang, setLang] = useState('en');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,25 +33,40 @@ export default function OnboardingScreen() {
   const [medication, setMedication] = useState('');
   const [conditions, setConditions] = useState('');
   const [familyHistory, setFamilyHistory] = useState<'yes' | 'no' | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState('Walking');
-  const [selectedDiet, setSelectedDiet] = useState('Injera');
+  const [selectedExercise, setSelectedExercise] = useState(t('onboarding.walking'));
+  const [selectedDiet, setSelectedDiet] = useState(t('onboarding.injera'));
   const [selectedKnowledge, setSelectedKnowledge] = useState(0);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const headers = [
+    { title: t('onboarding.welcome'), sub: t('onboarding.createAccountSub') },
+    { title: t('onboarding.aboutCondition'), sub: t('onboarding.step2of3') },
+    { title: t('onboarding.lifestyleKnowledge'), sub: t('onboarding.step3of3') },
+  ];
+
+  const exercises = [t('onboarding.walking'), t('onboarding.running'), t('onboarding.gym'), t('onboarding.none')];
+  const diets = [t('onboarding.injera'), t('onboarding.rice'), t('onboarding.bread'), t('onboarding.mix')];
+
+  const knowledgeLevels = [
+    { iconSet: 'material' as const, icon: 'leaf', title: t('onboarding.knowledgeBeginner'), desc: t('onboarding.knowledgeBeginnerSub') },
+    { iconSet: 'feather' as const, icon: 'book', title: t('onboarding.knowledgeIntermediate'), desc: t('onboarding.knowledgeIntermediateSub') },
+    { iconSet: 'feather' as const, icon: 'award', title: t('onboarding.knowledgeAdvanced'), desc: t('onboarding.knowledgeAdvancedSub') },
+  ];
+
   const handleStep0Next = () => {
     if (!fullName || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('common.error'), t('onboarding.errorFields'));
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(t('common.error'), t('onboarding.errorPasswords'));
       return;
     }
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
+      Alert.alert(t('common.error'), t('onboarding.errorPasswordLength'));
       return;
     }
     setStep(1);
@@ -83,13 +85,14 @@ export default function OnboardingScreen() {
         age: age ? parseInt(age, 10) : undefined,
         sex: sex || undefined,
         family_history: familyHistory === 'yes',
+        other_conditions: conditions || undefined,
         exercise_habit: selectedExercise,
         staple_diet: selectedDiet,
       });
       router.push({ pathname: '/(auth)/verify-email', params: { email, password } });
     } catch (err: any) {
       console.log('[signup] error:', err.message, err.code, err.response?.status, JSON.stringify(err.response?.data));
-      Alert.alert('Error', err.response?.data?.detail || err.message || 'Signup failed. Please try again.');
+      Alert.alert(t('common.error'), err.response?.data?.detail || err.message || t('onboarding.errorSignup'));
     } finally {
       setSubmitting(false);
     }
@@ -108,38 +111,38 @@ export default function OnboardingScreen() {
       <View style={styles.toggleWrap}>
         <TouchableOpacity
           style={[styles.toggleOpt, lang === 'am' && styles.toggleOptOn]}
-          onPress={() => setLang('am')}
+          onPress={() => Alert.alert('Coming soon', t('onboarding.amharicComingSoon'))}
         >
-          <Text style={[lang === 'am' ? styles.toggleTextOn : styles.toggleTextOff]}>አማርኛ</Text>
-          <Text style={[styles.toggleSub, lang === 'am' ? styles.toggleSubOn : styles.toggleSubOff]}>Amharic</Text>
+          <Text style={[lang === 'am' ? styles.toggleTextOn : styles.toggleTextOff]}>{t('onboarding.amharic')}</Text>
+          <Text style={[styles.toggleSub, lang === 'am' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.amharic')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.toggleOpt, lang === 'en' && styles.toggleOptOn]}
           onPress={() => setLang('en')}
         >
-          <Text style={[lang === 'en' ? styles.toggleTextOn : styles.toggleTextOff]}>English</Text>
-          <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>English</Text>
+          <Text style={[lang === 'en' ? styles.toggleTextOn : styles.toggleTextOff]}>{t('onboarding.english')}</Text>
+          <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.english')}</Text>
         </TouchableOpacity>
       </View>
-      <Input label="Full name" placeholder="e.g. Abebe Bekele" value={fullName} onChangeText={setFullName} />
-      <Input label="Email address" placeholder="you@gmail.com" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
-      <Input label="Password" placeholder="Minimum 8 characters" secureTextEntry={!showPassword} value={password} onChangeText={setPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
-      <Input label="Confirm password" placeholder="Repeat password" secureTextEntry={!showConfirm} value={confirmPassword} onChangeText={setConfirmPassword} rightIcon={<Feather name={showConfirm ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowConfirm(!showConfirm)} />
+      <Input label={t('onboarding.fullName')} placeholder={t('onboarding.placeName')} value={fullName} onChangeText={setFullName} />
+      <Input label={t('onboarding.email')} placeholder={t('onboarding.placeEmail')} keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+      <Input label={t('onboarding.password')} placeholder={t('onboarding.placePassword')} secureTextEntry={!showPassword} value={password} onChangeText={setPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
+      <Input label={t('onboarding.confirmPassword')} placeholder={t('onboarding.placeConfirmPassword')} secureTextEntry={!showConfirm} value={confirmPassword} onChangeText={setConfirmPassword} rightIcon={<Feather name={showConfirm ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowConfirm(!showConfirm)} />
       <View style={styles.termsRow}>
         <TouchableOpacity style={styles.checkbox} onPress={() => setTermsAccepted(!termsAccepted)}>
           {termsAccepted && <Feather name="check" size={14} color={colors.green} />}
         </TouchableOpacity>
         <Text style={styles.termsText}>
-          I agree to the{' '}
+          {t('onboarding.agree')}{' '}
           <Text style={styles.termsLink} onPress={() => setShowTerms(true)}>Terms of Service</Text>
-          {' '}and{' '}
+          {' '}{t('onboarding.and')}{' '}
           <Text style={styles.termsLink} onPress={() => setShowPrivacy(true)}>Privacy Policy</Text>
         </Text>
       </View>
-      <Button title="Continue" variant="primary" size="lg" onPress={handleStep0Next} disabled={!termsAccepted} />
+      <Button title={t('onboarding.continue')} variant="primary" size="lg" onPress={handleStep0Next} disabled={!termsAccepted} />
       <Text style={styles.footerText}>
-        Already have an account?{' '}
-        <Text style={styles.linkText} onPress={() => router.push('/(auth)/login')}>Sign in</Text>
+        {t('onboarding.alreadyAccount')}{' '}
+        <Text style={styles.linkText} onPress={() => router.push('/(auth)/login')}>{t('onboarding.signIn')}</Text>
       </Text>
     </>
   );
@@ -148,21 +151,21 @@ export default function OnboardingScreen() {
     <>
       <View style={styles.gridRow}>
         <View style={styles.gridHalf}>
-          <Input label="Age" placeholder="e.g. 47" keyboardType="number-pad" value={age} onChangeText={setAge} />
+          <Input label={t('onboarding.age')} placeholder={t('onboarding.placeAge')} keyboardType="number-pad" value={age} onChangeText={setAge} />
         </View>
         <View style={styles.gridHalf}>
-          <Input label="Sex" placeholder="Male / Female" value={sex} onChangeText={setSex} />
+          <Input label={t('onboarding.sex')} placeholder={t('onboarding.maleFemale')} value={sex} onChangeText={setSex} />
         </View>
       </View>
       <View style={styles.gridRow}>
         <View style={styles.gridHalf}>
-          <Input label="Weight (kg)" placeholder="78" keyboardType="number-pad" value={weight} onChangeText={setWeight} />
+          <Input label={t('onboarding.weight')} placeholder={t('onboarding.placeWeight')} keyboardType="number-pad" value={weight} onChangeText={setWeight} />
         </View>
         <View style={styles.gridHalf}>
-          <Input label="Height (cm)" placeholder="169" keyboardType="number-pad" value={height} onChangeText={setHeight} />
+          <Input label={t('onboarding.height')} placeholder={t('onboarding.placeHeight')} keyboardType="number-pad" value={height} onChangeText={setHeight} />
         </View>
       </View>
-      <Text style={styles.sectionLabel}>Family history of diabetes?</Text>
+      <Text style={styles.sectionLabel}>{t('onboarding.familyHistory')}</Text>
       <View style={styles.familyRow}>
         <TouchableOpacity
           style={[styles.familyCard, familyHistory === 'yes' && styles.familyCardSelected]}
@@ -170,7 +173,7 @@ export default function OnboardingScreen() {
         >
           <View style={styles.familyIcon}><MaterialCommunityIcons name="dna" size={22} color={colors.green} /></View>
           <Text style={[styles.familyTitle, familyHistory === 'yes' && styles.familyTitleSelected]}>Yes</Text>
-          <Text style={styles.familySub}>Parent or sibling</Text>
+          <Text style={styles.familySub}>{t('onboarding.yesParentSibling')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.familyCard, familyHistory === 'no' && styles.familyCardSelected]}
@@ -178,21 +181,21 @@ export default function OnboardingScreen() {
         >
           <View style={styles.familyIcon}><Feather name="check-circle" size={22} color={colors.green} /></View>
           <Text style={[styles.familyTitle, familyHistory === 'no' && styles.familyTitleSelected]}>No</Text>
-          <Text style={styles.familySub}>Not that I know</Text>
+          <Text style={styles.familySub}>{t('onboarding.noNotThatIKnow')}</Text>
         </TouchableOpacity>
       </View>
-      <Input label="Current medication" placeholder="e.g. Metformin 500mg" value={medication} onChangeText={setMedication} />
-      <Input label="Other conditions or allergies" placeholder="e.g. Hypertension, none" value={conditions} onChangeText={setConditions} />
-      <Button title="Continue" variant="primary" size="lg" onPress={() => setStep(2)} />
+      <Input label={t('onboarding.currentMed')} placeholder={t('onboarding.placeMed')} value={medication} onChangeText={setMedication} />
+      <Input label={t('onboarding.otherConditions')} placeholder={t('onboarding.placeOther')} value={conditions} onChangeText={setConditions} />
+      <Button title={t('onboarding.continue')} variant="primary" size="lg" onPress={() => setStep(2)} />
       <TouchableOpacity onPress={() => setStep(2)}>
-        <Text style={styles.skipText}>Skip for now</Text>
+        <Text style={styles.skipText}>{t('onboarding.skipForNow')}</Text>
       </TouchableOpacity>
     </>
   );
 
   const renderStep2 = () => (
     <>
-      <Text style={styles.sectionLabel}>Do you exercise?</Text>
+      <Text style={styles.sectionLabel}>{t('onboarding.doYouExercise')}</Text>
       <View style={styles.pillRow}>
         {exercises.map((e) => (
           <TouchableOpacity
@@ -204,7 +207,7 @@ export default function OnboardingScreen() {
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.sectionLabel}>Staple diet</Text>
+      <Text style={styles.sectionLabel}>{t('onboarding.stapleDiet')}</Text>
       <View style={styles.pillRow}>
         {diets.map((d) => (
           <TouchableOpacity
@@ -216,7 +219,7 @@ export default function OnboardingScreen() {
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.sectionLabel}>How much do you know about diabetes?</Text>
+      <Text style={styles.sectionLabel}>{t('onboarding.diabetesKnowledge')}</Text>
       {knowledgeLevels.map((k, i) => (
         <TouchableOpacity
           key={i}
@@ -237,7 +240,7 @@ export default function OnboardingScreen() {
           )}
         </TouchableOpacity>
       ))}
-      <Button title="Start tracking" variant="primary" size="lg" onPress={handleSubmit} loading={submitting} />
+      <Button title={t('onboarding.startTracking')} variant="primary" size="lg" onPress={handleSubmit} loading={submitting} />
     </>
   );
 
@@ -253,11 +256,11 @@ export default function OnboardingScreen() {
           <Text style={styles.headerTitle}>{headers[step].title}</Text>
           <Text style={styles.headerSub}>{headers[step].sub}</Text>
         </LinearGradient>
-        <View style={styles.formScroll}>
+        <ScrollView style={styles.formScroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           {step === 0 && renderStep0()}
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
-        </View>
+        </ScrollView>
       </View>
       </TouchableWithoutFeedback>
 
@@ -302,7 +305,7 @@ export default function OnboardingScreen() {
               )}
             </ScrollView>
             <TouchableOpacity style={styles.modalAcceptBtn} onPress={() => { setShowTerms(false); setShowPrivacy(false); }}>
-              <Text style={styles.modalAcceptText}>I understand</Text>
+              <Text style={styles.modalAcceptText}>{t('onboarding.iUnderstand')}</Text>
             </TouchableOpacity>
           </View>
         </View>

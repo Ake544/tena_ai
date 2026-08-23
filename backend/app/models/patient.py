@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, Boolean, Text, DateTime
+from sqlalchemy import Column, String, Integer, Float, Boolean, Text, DateTime, Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 import uuid
@@ -20,6 +20,10 @@ class Patient(Base):
     education_level = Column(String, nullable=True)
     family_history = Column(Boolean, default=False)
     family_history_details = Column(Text, nullable=True)
+    diagnosis_date = Column(Date, nullable=True)
+    diabetes_type = Column(Integer, nullable=True)
+    other_conditions = Column(Text, nullable=True)
+    hba1c = Column(Float, nullable=True)
     exercise_habit = Column(String, nullable=True)
     staple_diet = Column(Text, nullable=True)
     timezone = Column(String, default="Africa/Addis_Ababa")

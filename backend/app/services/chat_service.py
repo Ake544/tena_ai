@@ -1,5 +1,6 @@
 import json
 import hashlib
+import re
 import logging
 from datetime import datetime, timedelta, timezone
 from groq import Groq
@@ -12,6 +13,16 @@ from app.models.medication import Medication, Appointment
 from app.models.symptom import SymptomLog
 
 logger = logging.getLogger(__name__)
+
+
+def clean_response(text: str) -> str:
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
+    text = re.sub(r'<think>.*', '', text, flags=re.DOTALL).strip()
+    text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)
+    text = re.sub(r'\*(.+?)\*', r'\1', text)
+    text = re.sub(r'^#{1,3}\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
 
 GREETING_KEYWORDS = {"hi", "hello", "hey", "你好", "ሰላም", "helo", "good morning", "good evening"}
 CACHED_GREETING = "Hi there! I'm Tena AI, your diabetes care assistant. How can I help you today? You can ask me about your glucose readings, medications, diet tips, or anything diabetes-related."
@@ -121,12 +132,12 @@ def generate_chat_response(patient: Patient, db, user_message: str) -> str:
 
     try:
         completion = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="qwen/qwen3.6-27b",
             messages=messages,
             temperature=0.7,
-            max_tokens=300,
+            max_tokens=1024,
         )
-        response_text = completion.choices[0].message.content or ""
+        response_text = clean_response(completion.choices[0].message.content or "")
         if response_text:
             assistant_msg = ChatMessage(patient_id=patient.id, role="assistant", content=response_text)
             db.add(assistant_msg)

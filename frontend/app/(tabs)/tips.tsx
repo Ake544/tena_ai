@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
@@ -22,7 +23,7 @@ const CATEGORY_COLORS: Record<string, [string, string]> = {
 
 const CATEGORY_ICONS: Record<string, string> = {
   medication: 'pill',
-  glucose: 'bar-chart-2',
+  glucose: 'chart-bar',
   diet: 'food',
   exercise: 'walk',
   adherence: 'shield-check',
@@ -40,6 +41,7 @@ function getCategoryIcon(category: string): string {
 }
 
 export default function TipsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [tips, setTips] = useState<Tip[]>([]);
   const [history, setHistory] = useState<Tip[]>([]);
@@ -65,23 +67,23 @@ export default function TipsScreen() {
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <View>
-          <Text style={styles.title}>Daily tips</Text>
-          <Text style={styles.titleSub}>{tips.length > 0 ? `${tips.length} tip${tips.length > 1 ? 's' : ''} today` : 'Loading...'}</Text>
+          <Text style={styles.title}>{t('tips.title')}</Text>
+          <Text style={styles.titleSub}>{tips.length > 0 ? t('tips.dailyTip', { count: tips.length }) : t('tips.loading')}</Text>
         </View>
         {tips.length > 0 && (
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{tips.length} new</Text>
+            <Text style={styles.badgeText}>{tips.length} {t('tips.new')}</Text>
           </View>
         )}
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {loading ? (
-          <Text style={{ textAlign: 'center', color: colors.t3, marginTop: 40 }}>Loading tips...</Text>
+          <Text style={{ textAlign: 'center', color: colors.t3, marginTop: 40 }}>{t('tips.loading')}</Text>
         ) : tips.length === 0 ? (
           <View style={{ alignItems: 'center', marginTop: 40 }}>
             <Feather name="info" size={40} color={colors.t4} />
-            <Text style={{ fontSize: 14, color: colors.t3, marginTop: 12 }}>No tips yet today. Log a glucose reading to get started.</Text>
+            <Text style={{ fontSize: 14, color: colors.t3, marginTop: 12 }}>{t('tips.noTips')}</Text>
           </View>
         ) : (
           tips.map((tip) => {
@@ -108,7 +110,7 @@ export default function TipsScreen() {
 
         {history.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>Previous tips</Text>
+            <Text style={styles.sectionTitle}>{t('tips.previous')}</Text>
             {history.slice(0, 5).map((tip) => (
               <Card key={tip.id} style={styles.historyCard}>
                 <Text style={styles.historyCategory}>{tip.category}</Text>

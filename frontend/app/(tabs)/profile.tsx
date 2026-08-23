@@ -1,11 +1,26 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
+import Spinner from '../../components/Spinner';
 import { colors, typography, shadows } from '../../constants/theme';
 import { authService } from '../../services/auth';
 import { patientService, PatientProfile } from '../../services/patient';
+import { storageService } from '../../services/storage';
+import { pushService } from '../../services/push';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../locales/i18n';
+
+const COMMON_TIMEZONES = [
+  'Africa/Addis_Ababa', 'Africa/Nairobi', 'Africa/Cairo',
+  'Africa/Lagos', 'Africa/Johannesburg', 'Africa/Casablanca',
+  'America/New_York', 'America/Chicago', 'America/Denver',
+  'America/Los_Angeles', 'America/Sao_Paulo',
+  'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Moscow',
+  'Asia/Dubai', 'Asia/Kolkata', 'Asia/Bangkok', 'Asia/Tokyo',
+  'Australia/Sydney', 'Pacific/Auckland',
+];
 
 const RELATIONS = ['Mother', 'Father', 'Sibling', 'Grandparent', 'Aunt', 'Uncle', 'Child', 'Other'];
 const CONDITIONS = ['Type 2 Diabetes', 'Type 1 Diabetes', 'Gestational Diabetes', 'Prediabetes', 'Other'];
@@ -31,6 +46,7 @@ function formatFamilyDetails(entries: FamilyEntry[]): string {
 }
 
 export default function ProfileScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [showEdit, setShowEdit] = useState<'medical' | 'exercise' | 'diet' | null>(null);
@@ -38,6 +54,10 @@ export default function ProfileScreen() {
   const [saving, setSaving] = useState(false);
   const [familyEntries, setFamilyEntries] = useState<FamilyEntry[]>([]);
   const [exerciseEntries, setExerciseEntries] = useState<{ name: string; frequency: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const [showTimezonePicker, setShowTimezonePicker] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -47,8 +67,12 @@ export default function ProfileScreen() {
     try {
       const p = await patientService.getProfile();
       setProfile(p);
+      const pref = await storageService.getNotificationsEnabled();
+      setNotificationsEnabled(pref);
     } catch (err) {
       console.log('Failed to load profile', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,21 +93,21 @@ export default function ProfileScreen() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete account?',
-      'This will permanently delete all your data including glucose logs, medications, appointments, and history. This cannot be undone.',
+      t('profile.deleteTitle'),
+      t('profile.deleteBody'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => {
             Alert.alert(
-              'Are you sure?',
-              'Your glucose readings, medications, appointments, symptoms, alerts, and all personal data will be permanently removed. You will not be able to recover any of this information.',
+              t('profile.deleteConfirm'),
+              t('profile.deleteConfirmBody'),
               [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                  text: 'Delete everything',
+                  text: t('profile.deleteEverything'),
                   style: 'destructive',
                   onPress: async () => {
                     try {
@@ -91,7 +115,7 @@ export default function ProfileScreen() {
                       await authService.logout();
                       router.replace('/(auth)/splash');
                     } catch (err) {
-                      Alert.alert('Error', 'Failed to delete account. Please try again.');
+                      Alert.alert(t('common.error'), t('profile.errorDelete'));
                     }
                   },
                 },
@@ -101,6 +125,47 @@ export default function ProfileScreen() {
         },
       ]
     );
+  };
+
+  const toggleNotifications = async (value: boolean) => {
+    setNotificationsEnabled(value);
+    await storageService.setNotificationsEnabled(value);
+    if (value) {
+      const result = await pushService.register();
+      if (result) {
+        await pushService.sendTokenToBackend(result.token, result.deviceId);
+      }
+    }
+  };
+
+  const handleLanguageChange = async (lang: string) => {
+    try {
+      await patientService.updateProfile({ language: lang });
+      await storageService.setLanguage(lang);
+      await i18n.changeLanguage(lang);
+      await loadProfile();
+    } catch (err) {
+      console.log('Failed to update language', err);
+    }
+    setShowLanguagePicker(false);
+  };
+
+  const handleTimezoneChange = async (tz: string) => {
+    try {
+      await patientService.updateProfile({ timezone: tz });
+      await loadProfile();
+    } catch (err) {
+      console.log('Failed to update timezone', err);
+    }
+    setShowTimezonePicker(false);
+  };
+
+  const detectDeviceTimezone = () => {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      return 'Africa/Addis_Ababa';
+    }
   };
 
   const openEdit = (section: 'medical' | 'exercise' | 'diet') => {
@@ -114,6 +179,9 @@ export default function ProfileScreen() {
         bmi: profile.bmi ?? '',
         family_history: profile.family_history,
         family_history_details: profile.family_history_details ?? '',
+        diagnosis_date: profile.diagnosis_date ?? '',
+        diabetes_type: profile.diabetes_type ?? '',
+        hba1c: profile.hba1c ?? '',
       });
     } else if (section === 'exercise') {
       setExerciseEntries(parseExercises(profile.exercise_habit));
@@ -136,7 +204,7 @@ export default function ProfileScreen() {
           continue;
         } else if (value === '' || value === null) {
           payload[key] = null;
-        } else if (key === 'age' || key === 'bmi') {
+        } else if (key === 'age' || key === 'bmi' || key === 'diabetes_type' || key === 'hba1c') {
           payload[key] = Number(value);
         } else {
           payload[key] = value;
@@ -164,9 +232,9 @@ export default function ProfileScreen() {
       if (editedFamilyHistory) {
         setTimeout(() => {
           Alert.alert(
-            'Family history updated',
-            'Your family history information has been saved. This helps your care team provide better recommendations.',
-            [{ text: 'OK' }]
+            t('profile.familyUpdated'),
+            t('profile.familyUpdatedBody'),
+            [{ text: t('common.ok') }]
           );
         }, 300);
       }
@@ -190,9 +258,9 @@ export default function ProfileScreen() {
   };
 
   const familyHistorySummary = () => {
-    if (!profile?.family_history) return 'None reported';
+    if (!profile?.family_history) return t('profile.noneReported');
     const entries = parseFamilyDetails(profile.family_history_details);
-    if (entries.length === 0) return 'Yes';
+    if (entries.length === 0) return t('profile.yes');
     return entries.map(e => `${e.relation}: ${e.condition}`).join(', ');
   };
 
@@ -213,56 +281,59 @@ export default function ProfileScreen() {
   };
 
   const exerciseSummary = () => {
-    if (!profile?.exercise_habit) return 'Not specified';
+    if (!profile?.exercise_habit) return t('profile.notSpecified');
     const entries = parseExercises(profile.exercise_habit);
-    if (entries.length === 0) return 'Not specified';
+    if (entries.length === 0) return t('profile.notSpecified');
     return entries.map(e => e.frequency ? `${e.name} · ${e.frequency}` : e.name).join(', ');
   };
 
-  return (
+  return loading ? (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
+      <Spinner />
+    </View>
+  ) : (
     <View style={styles.container}>
-      <View style={styles.greenHeader}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initials}</Text>
-        </View>
-        <Text style={styles.name}>{profile?.full_name || 'Loading...'}</Text>
-        <Text style={styles.subtitle}>{memberYear ? `Member since ${memberYear}` : 'Managing diabetes'}</Text>
-        <View style={styles.badgeRow}>
-          <View style={styles.badgePill}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Feather name="flag" size={14} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.badgePillText}>{profile?.language === 'am' ? 'Amharic' : 'English'}</Text>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.greenHeader}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initials}</Text>
+          </View>
+          <Text style={styles.name}>{profile?.full_name || t('common.loading')}</Text>
+          <Text style={styles.subtitle}>{memberYear ? t('profile.memberSince', { year: memberYear }) : t('profile.managingDiabetes')}</Text>
+          <View style={styles.badgeRow}>
+            <View style={styles.badgePill}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Feather name="flag" size={14} color="rgba(255,255,255,0.8)" />
+                <Text style={styles.badgePillText}>{profile?.language === 'am' ? t('profile.amharic') : t('profile.english')}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.statsGrid}>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={styles.statLabel}>Age</Text>
-            <Text style={styles.statValue}>{profile?.age ?? '—'} <Text style={styles.statUnit}>yrs</Text></Text>
+            <Text style={styles.statLabel}>{t('onboarding.age')}</Text>
+            <Text style={styles.statValue}>{profile?.age ?? '—'} <Text style={styles.statUnit}>{t('profile.yrs')}</Text></Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
             <Text style={styles.statLabel}>BMI</Text>
             <Text style={styles.statValue}>{profile?.bmi ?? '—'}</Text>
           </Card>
           <Card variant="sm" style={styles.statCard}>
-            <Text style={styles.statLabel}>Sex</Text>
+            <Text style={styles.statLabel}>{t('onboarding.sex')}</Text>
             <Text style={styles.statValue}>{profile?.sex ?? '—'}</Text>
           </Card>
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Medical info</Text>
+          <Text style={styles.sectionTitle}>{t('profile.medicalInfo')}</Text>
         </View>
         <Card style={styles.sectionCard}>
           <TouchableOpacity onPress={() => openEdit('medical')}>
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}><MaterialCommunityIcons name="account" size={20} color={colors.green} /></View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Profile</Text>
-                <Text style={styles.infoSub}>Manage your personal and family health information</Text>
+                <Text style={styles.infoLabel}>{t('profile.profileCard')}</Text>
+                <Text style={styles.infoSub}>{t('profile.profileSub')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -272,8 +343,8 @@ export default function ProfileScreen() {
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}><MaterialCommunityIcons name="pill" size={20} color={colors.green} /></View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Medications</Text>
-                <Text style={styles.infoSub}>Manage prescriptions and track adherence</Text>
+                <Text style={styles.infoLabel}>{t('medications.title')}</Text>
+                <Text style={styles.infoSub}>{t('profile.medicationsSub')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -283,8 +354,8 @@ export default function ProfileScreen() {
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}><MaterialCommunityIcons name="hospital-building" size={20} color={colors.green} /></View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Appointments</Text>
-                <Text style={styles.infoSub}>Upcoming visits and past records</Text>
+                <Text style={styles.infoLabel}>{t('appointments.title')}</Text>
+                <Text style={styles.infoSub}>{t('profile.appointmentsSub')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -292,14 +363,14 @@ export default function ProfileScreen() {
         </Card>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Lifestyle</Text>
+          <Text style={styles.sectionTitle}>{t('profile.lifestyle')}</Text>
         </View>
         <Card style={styles.sectionCard}>
           <TouchableOpacity onPress={() => openEdit('exercise')}>
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}><MaterialCommunityIcons name="walk" size={20} color={colors.green} /></View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Exercise</Text>
+                <Text style={styles.infoLabel}>{t('profile.exercise')}</Text>
                 <Text style={styles.infoSub}>{exerciseSummary()}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
@@ -310,7 +381,7 @@ export default function ProfileScreen() {
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}><MaterialCommunityIcons name="food" size={20} color={colors.green} /></View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Staple diet</Text>
+                <Text style={styles.infoLabel}>{t('profile.stapleDiet')}</Text>
                 <Text style={styles.infoSub}>{profile?.staple_diet || 'Not specified'}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
@@ -319,22 +390,44 @@ export default function ProfileScreen() {
         </Card>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Settings</Text>
+          <Text style={styles.sectionTitle}>{t('profile.settings')}</Text>
         </View>
         <Card style={styles.sectionCard}>
-          <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Feather name="globe" size={20} color={colors.t1} /></View>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingLabel}>Language</Text>
-              <Text style={styles.settingSub}>{profile?.language === 'am' ? 'አማርኛ (Amharic)' : 'English'}</Text>
+          <TouchableOpacity onPress={() => setShowLanguagePicker(true)}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingIcon}><Feather name="globe" size={20} color={colors.t1} /></View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingLabel}>{t('profile.language')}</Text>
+                <Text style={styles.settingSub}>English · Amharic (Coming soon)</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
             </View>
-          </View>
+          </TouchableOpacity>
+          <View style={styles.infoDivider} />
+          <TouchableOpacity onPress={() => setShowTimezonePicker(true)}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingIcon}><Feather name="clock" size={20} color={colors.t1} /></View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingLabel}>{t('profile.timezone')}</Text>
+                <Text style={styles.settingSub}>{profile?.timezone || 'Africa/Addis_Ababa'}</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </View>
+          </TouchableOpacity>
           <View style={styles.infoDivider} />
           <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Feather name="clock" size={20} color={colors.t1} /></View>
+            <View style={styles.settingIcon}><Feather name="bell" size={20} color={colors.t1} /></View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingLabel}>Timezone</Text>
-              <Text style={styles.settingSub}>{profile?.timezone || 'Africa/Addis_Ababa'}</Text>
+                <Text style={styles.settingLabel}>{t('profile.notifications')}</Text>
+                <Text style={styles.settingSub}>{notificationsEnabled ? t('profile.notificationsEnabled') : t('profile.notificationsDisabled')}</Text>
+            </View>
+            <View style={{ transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }], marginLeft: -8 }}>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={toggleNotifications}
+                trackColor={{ false: colors.bg2, true: colors.greenLight }}
+                thumbColor={notificationsEnabled ? colors.green : colors.t4}
+              />
             </View>
           </View>
           <View style={styles.infoDivider} />
@@ -342,8 +435,8 @@ export default function ProfileScreen() {
             <View style={styles.settingRow}>
               <View style={styles.settingIcon}><Feather name="shield" size={20} color={colors.t1} /></View>
               <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Privacy Policy</Text>
-                <Text style={styles.settingSub}>How we handle your data</Text>
+                <Text style={styles.settingLabel}>{t('profile.privacyPolicy')}</Text>
+                <Text style={styles.settingSub}>{t('profile.privacySub')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -353,8 +446,8 @@ export default function ProfileScreen() {
             <View style={styles.settingRow}>
               <View style={styles.settingIcon}><Feather name="file-text" size={20} color={colors.t1} /></View>
               <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Terms of Service</Text>
-                <Text style={styles.settingSub}>Rules and guidelines</Text>
+                <Text style={styles.settingLabel}>{t('profile.termsOfService')}</Text>
+                <Text style={styles.settingSub}>{t('profile.termsSub')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -364,8 +457,8 @@ export default function ProfileScreen() {
             <View style={styles.settingRow}>
               <View style={styles.settingIcon}><Feather name="log-out" size={20} color={colors.t1} /></View>
               <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, { color: colors.t1 }]}>Sign out</Text>
-                <Text style={styles.settingSub}>You'll need to sign back in</Text>
+                <Text style={[styles.settingLabel, { color: colors.t1 }]}>{t('profile.signOut')}</Text>
+                <Text style={styles.settingSub}>{t('profile.signOutSub')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -375,8 +468,8 @@ export default function ProfileScreen() {
             <View style={styles.settingRow}>
               <View style={styles.settingIcon}><Feather name="trash-2" size={20} color={colors.red} /></View>
               <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, { color: colors.red }]}>Delete account</Text>
-                <Text style={styles.settingSub}>Permanently remove all data</Text>
+                <Text style={[styles.settingLabel, { color: colors.red }]}>{t('profile.deleteAccount')}</Text>
+                <Text style={styles.settingSub}>{t('profile.deleteAccountSub')}</Text>
               </View>
               <Text style={[styles.chevron, { color: colors.red }]}>›</Text>
             </View>
@@ -391,7 +484,7 @@ export default function ProfileScreen() {
             <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40, maxHeight: '85%', ...shadows.md }} onStartShouldSetResponder={() => true}>
               <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
               <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 20 }}>
-                {showEdit === 'medical' ? 'Medical info' : showEdit === 'exercise' ? 'Exercise' : 'Staple diet'}
+                {showEdit === 'medical' ? t('profile.medicalInfo') : showEdit === 'exercise' ? t('profile.exercise') : t('profile.stapleDiet')}
               </Text>
               <ScrollView>
                 {showEdit === 'medical' && (
@@ -410,7 +503,7 @@ export default function ProfileScreen() {
                     <View>
                       <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 6 }}>Sex</Text>
                       <View style={{ flexDirection: 'row', gap: 8 }}>
-                        {['Male', 'Female', 'Other'].map(opt => (
+                        {['Male', 'Female'].map(opt => (
                           <TouchableOpacity
                             key={opt}
                             onPress={() => setEditForm(f => ({ ...f, sex: f.sex === opt ? '' : opt }))}
@@ -427,6 +520,42 @@ export default function ProfileScreen() {
                         value={String(editForm.bmi ?? '')}
                         onChangeText={(t) => setEditForm(f => ({ ...f, bmi: t }))}
                         placeholder="Enter BMI"
+                        placeholderTextColor={colors.t4}
+                        keyboardType="decimal-pad"
+                        style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1 }}
+                      />
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 6 }}>Diabetes type</Text>
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        {['1', '2'].map(opt => (
+                          <TouchableOpacity
+                            key={opt}
+                            onPress={() => setEditForm(f => ({ ...f, diabetes_type: String(f.diabetes_type) === opt ? '' : opt }))}
+                            style={{ paddingVertical: 10, paddingHorizontal: 20, borderRadius: 50, backgroundColor: String(editForm.diabetes_type) === opt ? colors.green : colors.bg2 }}
+                          >
+                            <Text style={{ fontSize: 13, fontWeight: '700', color: String(editForm.diabetes_type) === opt ? colors.white : colors.t2 }}>Type {opt}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 6 }}>Diagnosis date (YYYY-MM-DD)</Text>
+                      <TextInput
+                        value={String(editForm.diagnosis_date ?? '')}
+                        onChangeText={(t) => setEditForm(f => ({ ...f, diagnosis_date: t }))}
+                        placeholder="e.g. 2024-04-01"
+                        placeholderTextColor={colors.t4}
+                        autoCapitalize="none"
+                        style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1 }}
+                      />
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 6 }}>HbA1c (%)</Text>
+                      <TextInput
+                        value={String(editForm.hba1c ?? '')}
+                        onChangeText={(t) => setEditForm(f => ({ ...f, hba1c: t }))}
+                        placeholder="e.g. 6.5"
                         placeholderTextColor={colors.t4}
                         keyboardType="decimal-pad"
                         style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1 }}
@@ -559,6 +688,67 @@ export default function ProfileScreen() {
           </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal visible={showLanguagePicker} animationType="slide" transparent>
+        <TouchableWithoutFeedback onPress={() => setShowLanguagePicker(false)}>
+          <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40, ...shadows.md }} onStartShouldSetResponder={() => true}>
+              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
+              <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 20 }}>{t('profile.language')}</Text>
+              <TouchableOpacity
+                onPress={() => handleLanguageChange('en')}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 4 }}
+              >
+                <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: (profile?.language || 'en') === 'en' ? colors.green : colors.t4, alignItems: 'center', justifyContent: 'center' }}>
+                  {(profile?.language || 'en') === 'en' && <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colors.green }} />}
+                </View>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.t1 }}>{t('profile.english')}</Text>
+              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 4, opacity: 0.4 }}>
+                <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.t4, alignItems: 'center', justifyContent: 'center' }}>
+                </View>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.t3 }}>አማርኛ (Amharic) — Coming soon</Text>
+              </View>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      <Modal visible={showTimezonePicker} animationType="slide" transparent>
+        <TouchableWithoutFeedback onPress={() => setShowTimezonePicker(false)}>
+          <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 24, paddingHorizontal: 24, paddingBottom: 40, maxHeight: '85%', ...shadows.md }} onStartShouldSetResponder={() => true}>
+              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.bg2, alignSelf: 'center', marginBottom: 20 }} />
+              <Text style={{ fontSize: 18, fontWeight: '800', color: colors.t1, marginBottom: 20 }}>{t('profile.timezone')}</Text>
+              <ScrollView style={{ maxHeight: 400 }}>
+                <TouchableOpacity
+                  onPress={() => handleTimezoneChange(detectDeviceTimezone())}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 4 }}
+                >
+                  <Feather name="smartphone" size={20} color={colors.green} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: colors.t1 }}>{t('profile.useDeviceTz')}</Text>
+                    <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>{detectDeviceTimezone()}</Text>
+                  </View>
+                </TouchableOpacity>
+                <View style={{ height: 1, backgroundColor: colors.bg2, marginVertical: 4 }} />
+                {COMMON_TIMEZONES.map(tz => (
+                  <TouchableOpacity
+                    key={tz}
+                    onPress={() => handleTimezoneChange(tz)}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 4 }}
+                  >
+                    <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: (profile?.timezone || 'Africa/Addis_Ababa') === tz ? colors.green : colors.t4, alignItems: 'center', justifyContent: 'center' }}>
+                      {(profile?.timezone || 'Africa/Addis_Ababa') === tz && <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colors.green }} />}
+                    </View>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: colors.t1 }}>{tz}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
