@@ -161,6 +161,8 @@ export default function HomeScreen() {
 
   const bedtimeSlot = todaySlots.find(s => s.reading_type === 'Bedtime');
   const bedtimeLogged = bedtimeSlot?.value != null;
+  const hourNow = new Date().getHours();
+  const showBedtimeReminder = !bedtimeLogged && hourNow >= 18;
 
   const handleSend = async () => {
     const text = chatInput.trim();
@@ -333,14 +335,14 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        {(pendingMeds.length > 0 || medications.length === 0 || nextAppt || !bedtimeLogged) && (
+        {(pendingMeds.length > 0 || medications.length === 0 || nextAppt || showBedtimeReminder) && (
         <>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: colors.t3 }}>{t('home.reminders')}</Text>
         </View>
         <View style={{ marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.surface, borderRadius: 24, padding: 20, ...shadows.sm, borderWidth: 1, borderColor: 'rgba(11,77,59,0.06)' }}>
           {pendingMeds.length > 0 ? pendingMeds.map(({ med, nearest }, idx) => (
-            <TouchableOpacity key={med.id} onPress={() => router.push('/medications')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: (idx < pendingMeds.length - 1 || nextAppt || !bedtimeLogged) ? 1 : 0, borderBottomColor: colors.bg2 }}>
+            <TouchableOpacity key={med.id} onPress={() => router.push('/medications')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: (idx < pendingMeds.length - 1 || nextAppt || showBedtimeReminder) ? 1 : 0, borderBottomColor: colors.bg2 }}>
               <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.greenLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <MaterialCommunityIcons name="pill" size={20} color={colors.green} />
               </View>
@@ -364,7 +366,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
           {nextAppt ? (
-            <TouchableOpacity onPress={() => router.push('/appointments')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: nextAppt && !bedtimeLogged ? 1 : 0, borderBottomColor: colors.bg2 }}>
+            <TouchableOpacity onPress={() => router.push('/appointments')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: nextAppt && showBedtimeReminder ? 1 : 0, borderBottomColor: colors.bg2 }}>
               <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.blueLight, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <MaterialCommunityIcons name="hospital-building" size={20} color="#3B82F6" />
               </View>
@@ -377,7 +379,7 @@ export default function HomeScreen() {
               </View>
             </TouchableOpacity>
           ) : null}
-          {!bedtimeLogged && (
+          {showBedtimeReminder && (
             <TouchableOpacity onPress={() => router.push('/(tabs)/log')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 }}>
               <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.bg2, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <MaterialCommunityIcons name="water" size={20} color={colors.t3} />

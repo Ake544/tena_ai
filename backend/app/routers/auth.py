@@ -67,7 +67,7 @@ def signup(request: Request, payload: PatientCreate, db: Session = Depends(get_d
     store_otp(r, payload.email, otp)
     can_request_otp(r, payload.email)
     set_cooldown(r, payload.email)
-    send_verification_otp(payload.email, otp)
+    send_verification_otp(payload.email, otp, payload.full_name)
 
     return {"message": "Account created. Check your email for the verification code."}
 
