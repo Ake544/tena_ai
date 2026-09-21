@@ -1,4 +1,5 @@
 import api from './api';
+import { dbService } from './db';
 
 export interface PatientProfile {
   id: string;
@@ -71,8 +72,53 @@ export const patientService = {
   },
 
   async getTodayReadings(): Promise<GlucoseTodayResponse> {
-    const res = await api.get('/glucose/today');
-    return res.data;
+    const today = new Date().toISOString().split('T')[0];
+    const cacheKey = `today_readings_${today}`;
+    try {
+      const res = await api.get('/glucose/today');
+      const data: GlucoseTodayResponse = res.data;
+      await dbService.cacheSet(cacheKey, JSON.stringify(data));
+      const localReadings = await dbService.getTodayLocalReadings();
+      const unsynced = localReadings.filter(r => !r.synced);
+      if (unsynced.length === 0) return data;
+      for (const log of unsynced) {
+        const slot = data.slots.find(s => s.reading_type === log.reading_type);
+        if (slot && slot.value === null) {
+          slot.value = log.value;
+          slot.timestamp = log.timestamp;
+          slot.id = String(log.id);
+        }
+      }
+      return data;
+    } catch {
+      const cached = await dbService.cacheGet(cacheKey);
+      const localReadings = await dbService.getTodayLocalReadings();
+      const slotTypes = ['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Post-Dinner', 'Bedtime'];
+      if (cached) {
+        try {
+          const data: GlucoseTodayResponse = JSON.parse(cached);
+          for (const log of localReadings) {
+            const slot = data.slots.find(s => s.reading_type === log.reading_type);
+            if (slot && slot.value === null) {
+              slot.value = log.value;
+              slot.timestamp = log.timestamp;
+              slot.id = String(log.id);
+            }
+          }
+          return data;
+        } catch {}
+      }
+      const slots: GlucoseTodaySlot[] = slotTypes.map(type => {
+        const match = localReadings.find(r => r.reading_type === type);
+        return {
+          reading_type: type,
+          value: match?.value ?? null,
+          timestamp: match?.timestamp ?? null,
+          id: match?.id ? String(match.id) : null,
+        };
+      });
+      return { date: today, slots };
+    }
   },
 
   async logReading(data: {

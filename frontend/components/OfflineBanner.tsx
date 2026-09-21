@@ -1,29 +1,52 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StatusBar, Animated } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { syncService } from '../services/sync';
 import { colors } from '../constants/theme';
+
+const CHECK_INTERVAL = 15000;
 
 export default function OfflineBanner() {
   const [offline, setOffline] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const checkTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const wasOffline = useRef(false);
+
+  const checkConnectivity = useCallback(async () => {
+    const online = await syncService.isOnline();
+    setOffline(!online);
+    if (online && wasOffline.current) {
+      wasOffline.current = false;
+      setExpanded(false);
+      syncService.syncPending().catch(() => {});
+    }
+    if (!online) {
+      wasOffline.current = true;
+    }
+  }, []);
 
   useEffect(() => {
-    syncService.isOnline().then((online) => setOffline(!online));
+    checkConnectivity();
     const unsubscribe = syncService.listen((online) => {
       setOffline(!online);
       if (online) {
         setExpanded(false);
         if (dismissTimer.current) clearTimeout(dismissTimer.current);
+        syncService.syncPending().catch(() => {});
+        wasOffline.current = false;
+      } else {
+        wasOffline.current = true;
       }
     });
+    checkTimer.current = setInterval(checkConnectivity, CHECK_INTERVAL);
     return () => {
       unsubscribe();
       if (dismissTimer.current) clearTimeout(dismissTimer.current);
+      if (checkTimer.current) clearInterval(checkTimer.current);
     };
-  }, []);
+  }, [checkConnectivity]);
 
   useEffect(() => {
     if (!offline) return;

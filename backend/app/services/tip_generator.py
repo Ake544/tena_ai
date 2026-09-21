@@ -179,11 +179,10 @@ def _generate_via_groq(context: dict, state: str, language: str) -> dict | None:
             model="qwen/qwen3.6-27b",
             messages=[
                 {"role": "system", "content": system},
-                {"role": "user", "content": "Generate a personalized tip for today."},
+                {"role": "user", "content": "Generate a personalized tip for today. Return ONLY a valid JSON object with keys: title, body, category, fact. No markdown, no explanation."},
             ],
             temperature=0.7,
             max_tokens=500,
-            response_format={"type": "json_object"},
         )
         content = resp.choices[0].message.content
         content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()

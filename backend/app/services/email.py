@@ -45,39 +45,20 @@ VERIFICATION_HTML = """<!DOCTYPE html>
     <td class="email-outer" style="padding:40px 16px;">
       <table role="presentation" class="email-card" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width:560px;margin:0 auto;background-color:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 6px 32px rgba(11,77,59,0.12);">
         <tr>
-          <td class="header-pad" style="background-color:#0B4D3B;padding:28px 32px 24px;">
+          <td class="header-pad" style="background-color:#01533d;padding:28px 32px 24px;">
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
                 <td style="width:40px;vertical-align:middle;">
-                  <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-                    <tr>
-                      <td style="background-color:#0F5C47;border-radius:11px;width:40px;height:40px;text-align:center;vertical-align:middle;font-size:0;line-height:0;">
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="40" height="40" style="margin:0 auto;">
-                          <tr>
-                            <td width="13" height="40" style="font-size:0;"></td>
-                            <td width="14" height="40" style="background-color:#ffffff;border-radius:7px;font-size:0;"></td>
-                            <td width="13" height="40" style="font-size:0;"></td>
-                          </tr>
-                        </table>
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="40" height="14" style="margin:-27px auto 0;position:relative;">
-                          <tr>
-                            <td width="40" height="14" style="background-color:#ffffff;border-radius:7px;font-size:0;"></td>
-                          </tr>
-                        </table>
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="12" height="12" style="margin:-38px 2px 0 auto;position:relative;">
-                          <tr>
-                            <td width="12" height="12" style="background-color:#E8A020;border-radius:50%;font-size:0;"></td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+                    <rect width="40" height="40" rx="10" fill="#0B4D3B"/>
+                    <rect x="14" y="10" width="8" height="28" rx="6" fill="#ffffff"/>
+                    <rect x="4" y="19" width="28" height="8" rx="6" fill="#ffffff"/>
+                    <circle cx="30" cy="10" r="6" fill="#E8A020"/>
+                    <circle cx="30" cy="10" r="2.5" fill="#ffffff"/>
+                  </svg>
                 </td>
-                <td style="padding-left:12px;vertical-align:middle;">
+                <td style="padding-left:8px;vertical-align:middle;">
                   <span style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Tena&nbsp;<span style="color:#E8A020;">AI</span></span>
-                </td>
-                <td style="text-align:right;vertical-align:middle;">
-                  <span style="font-family:'Noto Sans Ethiopic',Arial,sans-serif;font-size:13px;color:rgba(255,255,255,0.35);">&#4768;&#4635;&#4748; AI</span>
                 </td>
               </tr>
             </table>
@@ -102,7 +83,7 @@ VERIFICATION_HTML = """<!DOCTYPE html>
               </tr>
             </table>
             <p class="h1-text" style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:24px;font-weight:700;color:#0B4D3B;text-align:center;line-height:1.2;">Verify your account</p>
-            <p class="sub-text" style="margin:0 0 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#7A9E90;text-align:center;line-height:1.55;">Hello <strong style="color:#1C2B25;">__NAME__</strong> &mdash; enter this code in the Tena&nbsp;AI app to complete your sign-up.</p>
+            <p class="sub-text" style="margin:0 0 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#7A9E90;text-align:center;line-height:1.55;">Hello <strong style="color:#1C2B25;">__NAME__</strong>, enter this code in the Tena&nbsp;AI app to complete your sign-up.</p>
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:16px;">
               <tr>
                 <td class="otp-pad" style="background-color:#F0F8F4;border-radius:14px;border:1.5px solid #D0E8DC;padding:26px 20px;text-align:center;">

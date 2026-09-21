@@ -25,7 +25,12 @@ export default function LoginScreen() {
       await authService.login({ email, password });
       router.replace('/(tabs)/home');
     } catch (err: any) {
-      Alert.alert(t('common.error'), err?.response?.data?.detail || t('common.error'));
+      const detail = err?.response?.data?.detail || '';
+      if (detail === 'Email not verified') {
+        router.push({ pathname: '/(auth)/verify-email', params: { email, password } });
+      } else {
+        Alert.alert(t('common.error'), detail || t('common.error'));
+      }
     } finally {
       setLoading(false);
     }

@@ -34,7 +34,7 @@ def can_request_otp(r: redis.Redis, email: str) -> bool:
     r.incr(key)
     r.expire(key, ATTEMPTS_WINDOW_SECONDS)
     return True
-
+    
 
 def is_on_cooldown(r: redis.Redis, email: str) -> bool:
     return r.exists(f"otp_cooldown:{email}")
@@ -68,3 +68,5 @@ def clear_attempts(r: redis.Redis, email: str) -> None:
 
 def clear_cooldown(r: redis.Redis, email: str) -> None:
     r.delete(f"otp_cooldown:{email}")
+
+

@@ -168,18 +168,18 @@ export default function LogScreen() {
       symptoms: symptomsStr ?? null,
     };
 
-    try {
-      await dbService.saveLog(logData);
-    } catch (err) {
-      console.log('Failed to save locally', err);
-    }
-
     const online = await syncService.isOnline();
+
     if (online) {
       try {
         await patientService.logReading({ value, reading_type: selectedType, timestamp: logData.timestamp, symptoms: symptomsStr });
       } catch {
-        console.log('Online save failed, will sync later');
+        console.log('Online save failed, saving locally');
+        try {
+          await dbService.saveLog(logData);
+        } catch (err) {
+          console.log('Failed to save locally', err);
+        }
       }
       try {
         for (const s of allSymptoms) {
@@ -188,7 +188,19 @@ export default function LogScreen() {
       } catch {
         console.log('Failed to log symptoms, will retry');
       }
+    } else {
+      try {
+        await dbService.saveLog(logData);
+      } catch (err) {
+        console.log('Failed to save locally', err);
+      }
     }
+
+    setTodaySlots(prev => prev.map(s =>
+      s.reading_type === selectedType && s.value === null
+        ? { ...s, value, timestamp: logData.timestamp, id: 'local' }
+        : s
+    ));
 
     setSubmitting(false);
     router.push(`/log-success?value=${value}&reading_type=${encodeURIComponent(selectedType)}`);
@@ -260,7 +272,7 @@ export default function LogScreen() {
             </View>
           </View>
 
-          {todaySlots.every(s => s.value != null) ? (
+          {todaySlots.length > 0 && todaySlots.every(s => s.value != null) ? (
             <View style={{ paddingVertical: 14, borderRadius: 9999, backgroundColor: colors.bg2, alignItems: 'center' }}>
               <Text style={{ fontSize: 13, fontWeight: '700', color: colors.t3 }}>{t('log.allLogged')}</Text>
             </View>

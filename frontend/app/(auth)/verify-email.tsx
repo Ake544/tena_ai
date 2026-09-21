@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,12 @@ export default function VerifyEmailScreen() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  useEffect(() => {
+    if (email) {
+      authService.forgotPassword(email).catch(() => {});
+    }
+  }, [email]);
 
   const handleOtpChange = (text: string, index: number) => {
     const digit = text.replace(/[^0-9]/g, '');

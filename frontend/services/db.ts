@@ -94,4 +94,21 @@ export const dbService = {
       synced: !!r.synced,
     }));
   },
+
+  async getTodayLocalReadings(): Promise<LocalLog[]> {
+    const database = await getDb();
+    const today = new Date().toISOString().split('T')[0];
+    const rows = await database.getAllAsync<any>(
+      "SELECT * FROM pending_logs WHERE timestamp LIKE ? ORDER BY id ASC",
+      [`${today}%`]
+    );
+    return rows.map((r: any) => ({
+      id: r.id,
+      value: r.value,
+      reading_type: r.reading_type,
+      timestamp: r.timestamp,
+      symptoms: r.symptoms,
+      synced: !!r.synced,
+    }));
+  },
 };
