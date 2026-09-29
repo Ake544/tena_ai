@@ -4,7 +4,7 @@ let db: SQLite.SQLiteDatabase | null = null;
 
 async function getDb(): Promise<SQLite.SQLiteDatabase> {
   if (!db) {
-    db = await SQLite.openDatabaseAsync('tena.db');
+    db = await SQLite.openDatabaseAsync('tenachin.db');
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS pending_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

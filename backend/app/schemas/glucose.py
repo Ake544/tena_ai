@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -8,7 +8,7 @@ class GlucoseLogCreate(BaseModel):
     value: float
     reading_type: str
     timestamp: datetime
-    symptoms: Optional[str] = None
+    symptoms: Optional[str] = Field(default=None, max_length=500)
     synced: bool = True
     client_id: Optional[str] = None
 
@@ -43,9 +43,9 @@ class GlucoseSyncItem(BaseModel):
     value: float
     reading_type: str
     timestamp: datetime
-    symptoms: Optional[str] = None
+    symptoms: Optional[str] = Field(default=None, max_length=500)
     client_id: Optional[str] = None
 
 
 class GlucoseSyncRequest(BaseModel):
-    logs: list[GlucoseSyncItem]
+    logs: list[GlucoseSyncItem] = Field(max_length=100)

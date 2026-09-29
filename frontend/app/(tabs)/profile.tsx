@@ -212,6 +212,30 @@ export default function ProfileScreen() {
       }
 
       if (showEdit === 'medical') {
+        if (editForm.age !== '' && editForm.age !== null && editForm.age !== undefined) {
+          const ageNum = Number(editForm.age);
+          if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+            Alert.alert(t('common.error'), 'Age must be between 1 and 120');
+            setSaving(false);
+            return;
+          }
+        }
+        if (editForm.bmi !== '' && editForm.bmi !== null && editForm.bmi !== undefined) {
+          const bmiNum = Number(editForm.bmi);
+          if (isNaN(bmiNum) || bmiNum < 5 || bmiNum > 80) {
+            Alert.alert(t('common.error'), 'BMI must be between 5 and 80');
+            setSaving(false);
+            return;
+          }
+        }
+        if (editForm.hba1c !== '' && editForm.hba1c !== null && editForm.hba1c !== undefined) {
+          const hba1cNum = Number(editForm.hba1c);
+          if (isNaN(hba1cNum) || hba1cNum < 2 || hba1cNum > 20) {
+            Alert.alert(t('common.error'), 'HbA1c must be between 2 and 20');
+            setSaving(false);
+            return;
+          }
+        }
         payload.family_history = editForm.family_history;
         payload.family_history_details = editForm.family_history
           ? formatFamilyDetails(familyEntries)

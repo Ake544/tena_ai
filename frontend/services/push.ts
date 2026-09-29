@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import api from './api';
 
-const DEVICE_ID_KEY = 'tena_device_id';
+const DEVICE_ID_KEY = 'tenachin_device_id';
 
 async function getDeviceId(): Promise<string> {
   let id = await SecureStore.getItemAsync(DEVICE_ID_KEY);
@@ -54,7 +54,7 @@ export const pushService = {
       if (existing !== 'granted') {
         await new Promise<void>((resolve) => {
           Alert.alert(
-            'Stay on track with Tena AI',
+            'Stay on track with Tenachin AI',
             'We\'ll send you gentle reminders for medications, glucose checks, and appointments. You can change this anytime in Settings.',
             [
               { text: 'Not now', style: 'cancel', onPress: () => resolve() },

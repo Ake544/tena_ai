@@ -67,7 +67,7 @@ api.interceptors.response.use(
 
       try {
         const baseUrl = getBaseUrl();
-        const res = await axios.post(`${baseUrl}/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`);
+        const res = await axios.post(`${baseUrl}/auth/refresh`, { refresh_token: refreshToken });
         const { access_token } = res.data;
         await SecureStore.setItemAsync('access_token', access_token);
         refreshQueue.forEach(({ resolve }) => resolve(access_token));

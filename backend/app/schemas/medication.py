@@ -1,23 +1,23 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 import uuid
 
 
 class MedicationCreate(BaseModel):
-    name: str
-    dose: str
-    frequency: str
-    times: str
-    notes: Optional[str] = None
+    name: str = Field(max_length=100)
+    dose: str = Field(max_length=50)
+    frequency: str = Field(max_length=50)
+    times: str = Field(max_length=200)
+    notes: Optional[str] = Field(default=None, max_length=500)
 
 
 class MedicationUpdate(BaseModel):
-    name: Optional[str] = None
-    dose: Optional[str] = None
-    frequency: Optional[str] = None
-    times: Optional[str] = None
-    notes: Optional[str] = None
+    name: Optional[str] = Field(default=None, max_length=100)
+    dose: Optional[str] = Field(default=None, max_length=50)
+    frequency: Optional[str] = Field(default=None, max_length=50)
+    times: Optional[str] = Field(default=None, max_length=200)
+    notes: Optional[str] = Field(default=None, max_length=500)
 
 
 class MedicationResponse(BaseModel):
@@ -37,19 +37,19 @@ class MedicationResponse(BaseModel):
 
 
 class AppointmentCreate(BaseModel):
-    title: str
-    hospital: str
-    appointment_type: Optional[str] = None
+    title: str = Field(max_length=100)
+    hospital: str = Field(max_length=100)
+    appointment_type: Optional[str] = Field(default=None, max_length=50)
     date: datetime
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(default=None, max_length=500)
 
 
 class AppointmentUpdate(BaseModel):
-    title: Optional[str] = None
-    hospital: Optional[str] = None
-    appointment_type: Optional[str] = None
+    title: Optional[str] = Field(default=None, max_length=100)
+    hospital: Optional[str] = Field(default=None, max_length=100)
+    appointment_type: Optional[str] = Field(default=None, max_length=50)
     date: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: Optional[str] = Field(default=None, max_length=500)
 
 
 class AppointmentResponse(BaseModel):

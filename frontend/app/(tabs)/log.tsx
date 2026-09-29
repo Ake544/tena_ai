@@ -263,10 +263,10 @@ export default function LogScreen() {
               <Text style={{ fontSize: 12, color: colors.t3, marginTop: 4 }}>{t('log.normalRange')}</Text>
             </View>
             <View style={{ gap: 10 }}>
-              <TouchableOpacity onPress={() => setValue((v) => v + 1)} style={{ width: 48, height: 48, backgroundColor: colors.green, borderRadius: 12, alignItems: 'center', justifyContent: 'center', ...shadows.md }}>
+              <TouchableOpacity onPress={() => setValue((v) => Math.min(600, v + 1))} style={{ width: 48, height: 48, backgroundColor: colors.green, borderRadius: 12, alignItems: 'center', justifyContent: 'center', ...shadows.md }}>
                 <Text style={{ fontSize: 24, color: colors.white }}>+</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setValue((v) => Math.max(0, v - 1))} style={{ width: 48, height: 48, backgroundColor: colors.bg2, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
+              <TouchableOpacity onPress={() => setValue((v) => Math.max(20, v - 1))} style={{ width: 48, height: 48, backgroundColor: colors.bg2, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 24, color: colors.t2 }}>-</Text>
               </TouchableOpacity>
             </View>
@@ -343,6 +343,7 @@ export default function LogScreen() {
                   placeholder={t('log.typeSymptom')}
                   placeholderTextColor={colors.t4}
                   style={{ backgroundColor: colors.bg2, borderRadius: 14, padding: 14, fontSize: 15, color: colors.t1, marginBottom: 16 }}
+                  maxLength={100}
                   autoFocus
                 />
                 <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3, marginBottom: 8 }}>{t('log.severity')}</Text>

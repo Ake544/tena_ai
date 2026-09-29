@@ -39,7 +39,7 @@ export default function PdfPreviewScreen() {
     setDownloading(true);
 try {
         const FileSystem = await import('expo-file-system/legacy');
-        const fileUri = FileSystem.documentDirectory + 'tena-report.pdf';
+        const fileUri = FileSystem.documentDirectory + 'tenachin-report.pdf';
         await FileSystem.downloadAsync(url, fileUri);
       Alert.alert(t('export.downloaded'), `${t('export.downloadedTo')} ${fileUri}`);
     } catch (err) {
@@ -59,7 +59,7 @@ try {
         return;
       }
       const FileSystem = await import('expo-file-system/legacy');
-      const fileUri = FileSystem.documentDirectory + 'tena-report.pdf';
+      const fileUri = FileSystem.documentDirectory + 'tenachin-report.pdf';
       const fileInfo = await FileSystem.getInfoAsync(fileUri);
       if (!fileInfo.exists) {
         setDownloading(true);

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 from app.core.database import get_db
@@ -8,6 +8,7 @@ from app.schemas.tip import TipResponse, TipListResponse
 from app.routers.patient import get_current_patient
 from app.services.tip_generator import generate_tip
 from app.core.redis import get_redis
+from app.core.limiter import limiter
 import json
 
 router = APIRouter(prefix="/tips", tags=["tips"])
@@ -40,6 +41,7 @@ def get_tip_history(current_patient: Patient = Depends(get_current_patient), db:
 
 
 @router.post("/generate")
-def force_generate(current_patient: Patient = Depends(get_current_patient), db: Session = Depends(get_db)):
+@limiter.limit("10/hour")
+def force_generate(request: Request, current_patient: Patient = Depends(get_current_patient), db: Session = Depends(get_db)):
     result = generate_tip(current_patient, db, force=True)
     return result

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Tena AI",
+    "appName": "Tenachin AI",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
@@ -121,7 +121,7 @@
     "passwordUpdated": "Password updated successfully",
     "welcomeBack": "Welcome back",
     "signInToContinue": "Sign in to continue",
-    "newToApp": "New to Tena AI?",
+    "newToApp": "New to Tenachin AI?",
     "createAccount": "Create account",
     "placeEmail": "you@gmail.com",
     "placePassword": "Enter your password",
@@ -169,10 +169,10 @@
     "overdue": "Overdue",
     "notYetTaken": "Not yet taken",
     "pending": "Pending",
-    "chatTitle": "Tena AI Chat",
+    "chatTitle": "Tenachin AI Chat",
     "chatSub": "Diabetes assistant",
     "chatWelcome": "I can help with your diabetes care...",
-    "chatPlaceholder": "Ask Tena AI...",
+    "chatPlaceholder": "Ask Tenachin AI...",
     "chatError": "I'm sorry, I'm having trouble connecting right now.",
     "sunday": "Sunday",
     "monday": "Monday",
@@ -478,7 +478,7 @@
   "export": {
     "title": "PDF Report",
     "subtitle": "Preview and download your diabetes report",
-    "reportTitle": "Tena AI Report",
+    "reportTitle": "Tenachin AI Report",
     "summary": "Last 90 days summary",
     "patientInfo": "Patient Info",
     "age": "Age:",

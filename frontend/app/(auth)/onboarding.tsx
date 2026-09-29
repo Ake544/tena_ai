@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { colors, borderRadius } from '../../constants/theme';
@@ -61,12 +62,28 @@ export default function OnboardingScreen() {
       Alert.alert(t('common.error'), t('onboarding.errorFields'));
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert(t('common.error'), 'Please enter a valid email address');
+      return;
+    }
     if (password !== confirmPassword) {
       Alert.alert(t('common.error'), t('onboarding.errorPasswords'));
       return;
     }
     if (password.length < 8) {
       Alert.alert(t('common.error'), t('onboarding.errorPasswordLength'));
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      Alert.alert(t('common.error'), 'Password must contain at least one uppercase letter');
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      Alert.alert(t('common.error'), 'Password must contain at least one lowercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      Alert.alert(t('common.error'), 'Password must contain at least one number');
       return;
     }
     setStep(1);
@@ -89,7 +106,8 @@ export default function OnboardingScreen() {
         exercise_habit: selectedExercise,
         staple_diet: selectedDiet,
       });
-      router.push({ pathname: '/(auth)/verify-email', params: { email, password } });
+      await SecureStore.setItemAsync('_pending_password', password);
+      router.push({ pathname: '/(auth)/verify-email', params: { email } });
     } catch (err: any) {
       console.log('[signup] error:', err.message, err.code, err.response?.status, JSON.stringify(err.response?.data));
       Alert.alert(t('common.error'), err.response?.data?.detail || err.message || t('onboarding.errorSignup'));
@@ -124,7 +142,7 @@ export default function OnboardingScreen() {
           <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.english')}</Text>
         </TouchableOpacity>
       </View>
-      <Input label={t('onboarding.fullName')} placeholder={t('onboarding.placeName')} value={fullName} onChangeText={setFullName} />
+      <Input label={t('onboarding.fullName')} placeholder={t('onboarding.placeName')} value={fullName} onChangeText={setFullName} maxLength={100} />
       <Input label={t('onboarding.email')} placeholder={t('onboarding.placeEmail')} keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
       <Input label={t('onboarding.password')} placeholder={t('onboarding.placePassword')} secureTextEntry={!showPassword} value={password} onChangeText={setPassword} rightIcon={<Feather name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowPassword(!showPassword)} />
       <Input label={t('onboarding.confirmPassword')} placeholder={t('onboarding.placeConfirmPassword')} secureTextEntry={!showConfirm} value={confirmPassword} onChangeText={setConfirmPassword} rightIcon={<Feather name={showConfirm ? 'eye-off' : 'eye'} size={20} color={colors.t3} />} onRightIconPress={() => setShowConfirm(!showConfirm)} />
@@ -277,11 +295,11 @@ export default function OnboardingScreen() {
               {showTerms ? (
                 <>
                   <Text style={styles.modalSectionTitle}>1. Acceptance of Terms</Text>
-                  <Text style={styles.modalText}>By creating an account and using Tena AI, you agree to be bound by these Terms of Service. If you do not agree, do not use the service.</Text>
+                  <Text style={styles.modalText}>By creating an account and using Tenachin AI, you agree to be bound by these Terms of Service. If you do not agree, do not use the service.</Text>
                   <Text style={styles.modalSectionTitle}>2. Health Data</Text>
-                  <Text style={styles.modalText}>Tena AI stores your health data securely using encryption. Your glucose readings, medication logs, and personal information are never shared with third parties without your explicit consent. You retain full ownership of your data.</Text>
+                  <Text style={styles.modalText}>Tenachin AI stores your health data securely using encryption. Your glucose readings, medication logs, and personal information are never shared with third parties without your explicit consent. You retain full ownership of your data.</Text>
                   <Text style={styles.modalSectionTitle}>3. Not Medical Advice</Text>
-                  <Text style={styles.modalText}>Tena AI is a companion tool for diabetes management. It does not replace professional medical advice, diagnosis, or treatment. Always consult your healthcare provider for medical decisions.</Text>
+                  <Text style={styles.modalText}>Tenachin AI is a companion tool for diabetes management. It does not replace professional medical advice, diagnosis, or treatment. Always consult your healthcare provider for medical decisions.</Text>
                   <Text style={styles.modalSectionTitle}>4. User Responsibilities</Text>
                   <Text style={styles.modalText}>You are responsible for the accuracy of the data you enter. You must keep your login credentials secure. Notify us immediately if you suspect unauthorized access.</Text>
                   <Text style={styles.modalSectionTitle}>5. Service Availability</Text>
@@ -300,7 +318,7 @@ export default function OnboardingScreen() {
                   <Text style={styles.modalSectionTitle}>5. Your Rights</Text>
                   <Text style={styles.modalText}>You may request access to, correction of, or deletion of your data at any time. You can export your data or delete your account from the profile settings.</Text>
                   <Text style={styles.modalSectionTitle}>6. Contact</Text>
-                  <Text style={styles.modalText}>For privacy-related inquiries, contact us at privacy@tenaai.com. We will respond within 30 days.</Text>
+                  <Text style={styles.modalText}>For privacy-related inquiries, contact us at privacy@tenachinai.site. We will respond within 30 days.</Text>
                 </>
               )}
             </ScrollView>

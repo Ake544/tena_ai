@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     cloudflare_r2_bucket_name: str
     cloudflare_r2_endpoint_url: str
     frontend_url: str
+    enable_docs: bool = False
 
     class Config:
         env_file = ".env"

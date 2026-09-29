@@ -22,13 +22,17 @@ yarn.lock
 .expo/
 dist/
 
+# Databases
+*.db
+*.sqlite3
+
 # Local project files
-.env
 architecture.md
 build_milestones.md
 diabetrack_ui.html
-tena_ai_verification_email.html
+tenachin_ai_verification_email.html
 email_test.html
+server_setup.md
 akewassie_test_report.pdf
 report_v2_test.pdf
 new.py
@@ -41,3 +45,6 @@ backfill_hba1c.py
 # OS files
 Thumbs.db
 Desktop.ini
+
+# Deployment artifacts
+certbot/

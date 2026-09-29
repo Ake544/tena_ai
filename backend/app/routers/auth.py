@@ -11,6 +11,7 @@ from app.schemas.patient import (
     LoginRequest,
     VerifyOTP,
     ResetPasswordOTP,
+    RefreshRequest,
 )
 from app.services.email import send_verification_otp, send_password_reset_otp
 from app.services.otp import (
@@ -40,6 +41,12 @@ def signup(request: Request, payload: PatientCreate, db: Session = Depends(get_d
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    r = get_redis()
+    if is_on_cooldown(r, payload.email):
+        raise HTTPException(status_code=429, detail="Please wait 60 seconds before requesting another code")
+    if not can_request_otp(r, payload.email):
+        raise HTTPException(status_code=429, detail="Too many requests. Try again in 1 hour.")
+
     patient = Patient(
         full_name=payload.full_name,
         email=payload.email,
@@ -62,10 +69,8 @@ def signup(request: Request, payload: PatientCreate, db: Session = Depends(get_d
     db.commit()
     db.refresh(patient)
 
-    r = get_redis()
     otp = generate_otp()
     store_otp(r, payload.email, otp)
-    can_request_otp(r, payload.email)
     set_cooldown(r, payload.email)
     send_verification_otp(payload.email, otp, payload.full_name)
 
@@ -101,7 +106,8 @@ def verify_email(request: Request, payload: VerifyOTP, db: Session = Depends(get
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     patient = db.query(Patient).filter(Patient.email == payload.email).first()
     if not patient or not verify_password(payload.password, patient.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -166,12 +172,12 @@ def reset_password(request: Request, payload: ResetPasswordOTP, db: Session = De
 
 
 @router.post("/refresh", response_model=TokenResponse)
-def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
-    payload = decode_token(refresh_token)
-    if not payload or payload.get("type") != "refresh":
+def refresh_token(payload: RefreshRequest, db: Session = Depends(get_db)):
+    payload_data = decode_token(payload.refresh_token)
+    if not payload_data or payload_data.get("type") != "refresh":
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
-    patient_id = payload.get("sub")
+    patient_id = payload_data.get("sub")
     patient = db.query(Patient).filter(Patient.id == uuid.UUID(patient_id)).first()
     if not patient:
         raise HTTPException(status_code=401, detail="Patient not found")

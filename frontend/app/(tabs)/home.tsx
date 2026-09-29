@@ -14,7 +14,7 @@ import { tipService, Tip } from '../../services/tips';
 import { alertService, Alert } from '../../services/alerts';
 import { chatService } from '../../services/chat';
 
-const HOME_CACHE_KEY = 'tena_ai_home_cache';
+const HOME_CACHE_KEY = 'tenachin_ai_home_cache';
 
 export default function HomeScreen() {
   const { t } = useTranslation();

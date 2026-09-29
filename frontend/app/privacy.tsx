@@ -35,7 +35,7 @@ export default function PrivacyScreen() {
         <Text style={styles.text}>You may request access to, correction of, or deletion of your data at any time. You can export your data or delete your account from the profile settings.</Text>
 
         <Text style={styles.sectionTitle}>6. Contact</Text>
-        <Text style={styles.text}>For privacy-related inquiries, contact us at privacy@tenaai.com. We will respond within 30 days.</Text>
+        <Text style={styles.text}>For privacy-related inquiries, contact us at privacy@tenachinai.site. We will respond within 30 days.</Text>
       </ScrollView>
     </View>
   );

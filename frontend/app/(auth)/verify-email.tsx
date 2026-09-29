@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Aler
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as SecureStore from 'expo-secure-store';
 import Button from '../../components/Button';
 import { colors } from '../../constants/theme';
 import { authService } from '../../services/auth';
@@ -11,7 +12,7 @@ import { pushService } from '../../services/push';
 export default function VerifyEmailScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { email: paramEmail, password: paramPassword } = useLocalSearchParams<{ email?: string; password?: string }>();
+  const { email: paramEmail } = useLocalSearchParams<{ email?: string }>();
   const [email] = useState(paramEmail || '');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
@@ -53,8 +54,10 @@ export default function VerifyEmailScreen() {
     setLoading(true);
     try {
       await authService.verifyEmail(email, code);
-      if (paramPassword) {
-        await authService.login({ email, password: paramPassword });
+      const pendingPassword = await SecureStore.getItemAsync('_pending_password');
+      if (pendingPassword) {
+        await SecureStore.deleteItemAsync('_pending_password');
+        await authService.login({ email, password: pendingPassword });
       }
       pushService.register().then(r => {
         if (r) pushService.sendTokenToBackend(r.token, r.deviceId);

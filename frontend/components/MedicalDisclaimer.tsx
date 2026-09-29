@@ -8,13 +8,13 @@ export default function MedicalDisclaimer() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    SecureStore.getItemAsync('tena_ai_disclaimer_accepted').then((val) => {
+    SecureStore.getItemAsync('tenachin_ai_disclaimer_accepted').then((val) => {
       if (!val) setVisible(true);
     });
   }, []);
 
   const accept = async () => {
-    await SecureStore.setItemAsync('tena_ai_disclaimer_accepted', 'true');
+    await SecureStore.setItemAsync('tenachin_ai_disclaimer_accepted', 'true');
     setVisible(false);
   };
 
@@ -37,7 +37,7 @@ export default function MedicalDisclaimer() {
 
           <ScrollView style={{ marginBottom: spacing.r20 }} showsVerticalScrollIndicator={false}>
             <Text style={{ fontSize: 14, fontWeight: '500', color: colors.t2, lineHeight: 22, marginBottom: spacing.r12 }}>
-              Tena AI is designed for informational and self-management purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment.
+              Tenachin AI is designed for informational and self-management purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment.
             </Text>
             <Text style={{ fontSize: 14, fontWeight: '500', color: colors.t2, lineHeight: 22, marginBottom: spacing.r12 }}>
               • Always consult a qualified healthcare provider with any questions about your health.

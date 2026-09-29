@@ -44,6 +44,22 @@ export default function ResetPasswordScreen() {
   const handleReset = async () => {
     const code = otp.join('');
     if (code.length !== 6 || !email || !newPassword) return;
+    if (newPassword.length < 8) {
+      Alert.alert(t('common.error'), 'Password must be at least 8 characters');
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      Alert.alert(t('common.error'), 'Password must contain at least one uppercase letter');
+      return;
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      Alert.alert(t('common.error'), 'Password must contain at least one lowercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      Alert.alert(t('common.error'), 'Password must contain at least one number');
+      return;
+    }
     setLoading(true);
     try {
       await authService.resetPassword(email, code, newPassword);

@@ -424,7 +424,7 @@ def generate_pdf(data: Dict[str, Any]) -> bytes:
             text_x = logo_x + logo_size + 5 * mm
             c.setFillColor(white)
             c.setFont("Helvetica-Bold", 18)
-            c.drawString(text_x, logo_y + logo_size - 6 * mm, "Tena AI")
+            c.drawString(text_x, logo_y + logo_size - 6 * mm, "Tenachin AI")
             c.setFont("Helvetica", 9)
             c.setFillColor(HexColor('#A8CFC3'))
             c.drawString(text_x, logo_y + logo_size - 11 * mm, "Health Report")

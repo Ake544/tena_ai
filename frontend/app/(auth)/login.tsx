@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { colors } from '../../constants/theme';
@@ -20,6 +21,10 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert(t('common.error'), 'Please enter a valid email address');
+      return;
+    }
     setLoading(true);
     try {
       await authService.login({ email, password });
@@ -27,7 +32,8 @@ export default function LoginScreen() {
     } catch (err: any) {
       const detail = err?.response?.data?.detail || '';
       if (detail === 'Email not verified') {
-        router.push({ pathname: '/(auth)/verify-email', params: { email, password } });
+        await SecureStore.setItemAsync('_pending_password', password);
+        router.push({ pathname: '/(auth)/verify-email', params: { email } });
       } else {
         Alert.alert(t('common.error'), detail || t('common.error'));
       }

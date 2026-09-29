@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.patient import Patient
@@ -7,12 +7,15 @@ from app.models.chat import ChatMessage
 from app.schemas.chat import ChatRequest, ChatHistoryResponse
 from app.routers.patient import get_current_patient
 from app.services.chat_service import generate_chat_response
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.post("/message")
+@limiter.limit("20/minute")
 def chat_message(
+    request: Request,
     payload: ChatRequest,
     current_patient: Patient = Depends(get_current_patient),
     db: Session = Depends(get_db),

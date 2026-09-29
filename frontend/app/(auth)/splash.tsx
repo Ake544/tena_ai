@@ -18,7 +18,7 @@ export default function SplashScreen() {
           <View style={styles.crossH} />
         </View>
         <Text style={styles.title}>
-          Tena <Text style={styles.titleGold}>AI</Text>
+          Tenachin <Text style={styles.titleGold}>AI</Text>
         </Text>
         <Text style={styles.subEthiopic}>{t('splash.taglineAm')}</Text>
         <Text style={styles.subEnglish}>{t('splash.tagline')}</Text>

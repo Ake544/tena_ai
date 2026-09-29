@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 import uuid
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(max_length=2000)
 
 
 class ChatMessageResponse(BaseModel):

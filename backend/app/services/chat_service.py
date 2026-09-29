@@ -25,7 +25,7 @@ def clean_response(text: str) -> str:
     return text.strip()
 
 GREETING_KEYWORDS = {"hi", "hello", "hey", "你好", "ሰላም", "helo", "good morning", "good evening"}
-CACHED_GREETING = "Hi there! I'm Tena AI, your diabetes care assistant. How can I help you today? You can ask me about your glucose readings, medications, diet tips, or anything diabetes-related."
+CACHED_GREETING = "Hi there! I'm Tenachin AI, your diabetes care assistant. How can I help you today? You can ask me about your glucose readings, medications, diet tips, or anything diabetes-related."
 
 
 def _cache_key(patient_id, text: str) -> str:
@@ -119,7 +119,7 @@ def generate_chat_response(patient: Patient, db, user_message: str) -> str:
     context = _build_context(patient, db)
     history = _get_history(patient.id, db)
 
-    system = f"You are Tena AI, a diabetes assistant. Be warm, concise (2-4 sentences). Do not diagnose. Current: {context}"
+    system = f"You are Tenachin AI, a diabetes assistant. Be warm, concise (2-4 sentences). Do not diagnose. Current: {context}"
 
     messages = [{"role": "system", "content": system}]
     for msg in history:
@@ -132,7 +132,7 @@ def generate_chat_response(patient: Patient, db, user_message: str) -> str:
 
     try:
         completion = client.chat.completions.create(
-            model="qwen/qwen3.6-27b",
+            model="qwen/qwen3.8-27b",
             messages=messages,
             temperature=0.7,
             max_tokens=1024,

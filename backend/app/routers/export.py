@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 from datetime import datetime
 from app.core.database import get_db
@@ -6,13 +6,16 @@ from app.routers.patient import get_current_patient
 from app.models.patient import Patient
 from app.services.pdf_generator import build_report_data, generate_pdf
 from app.core.r2 import upload_to_r2
+from app.core.limiter import limiter
 import uuid
 
 router = APIRouter(prefix="/export", tags=["export"])
 
 
 @router.post("/pdf")
+@limiter.limit("5/hour")
 def export_pdf(
+    request: Request,
     days: int = Query(90, ge=1, le=365),
     current_patient: Patient = Depends(get_current_patient),
     db: Session = Depends(get_db),

@@ -159,7 +159,7 @@ def _build_system_prompt(context: dict, state: str, language: str) -> str:
     chunks = retrieve_semantic(query, top_k=1)
     fact_text = chunks[0]["text"] if chunks else ""
 
-    return f"""You are Tena AI. Generate one short practical tip for a type 2 diabetes patient.
+    return f"""You are Tenachin AI. Generate one short practical tip for a type 2 diabetes patient.
 
 State: {state}
 {logs_summary}{meds_summary}{symptom_summary}{compact_summary}
@@ -176,7 +176,7 @@ def _generate_via_groq(context: dict, state: str, language: str) -> dict | None:
         client = Groq(api_key=settings.groq_api_key)
         system = _build_system_prompt(context, state, language)
         resp = client.chat.completions.create(
-            model="qwen/qwen3.6-27b",
+            model="qwen/qwen3.8-27b",
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": "Generate a personalized tip for today. Return ONLY a valid JSON object with keys: title, body, category, fact. No markdown, no explanation."},
@@ -196,7 +196,7 @@ def _generate_via_groq(context: dict, state: str, language: str) -> dict | None:
 def _fallback_tip(state: str) -> dict:
     fallbacks = {
         "new_user": {
-            "title": "Welcome to Tena AI",
+            "title": "Welcome to Tenachin AI",
             "body": "Tracking your glucose daily helps you understand how food, activity, and medication affect your body. Start by logging your first reading.",
             "category": "education",
             "fact": "Self-monitoring of blood glucose is recommended for all people with diabetes to guide treatment decisions."

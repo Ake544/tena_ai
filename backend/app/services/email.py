@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 resend.api_key = settings.resend_api_key
 
-FROM_ADDRESS = "Tena AI <onboarding@resend.dev>"
+FROM_ADDRESS = "Tenachin AI <no-reply@mail.tenachinai.site>"
 
 VERIFICATION_HTML = """<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -16,9 +16,9 @@ VERIFICATION_HTML = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="format-detection" content="telephone=no"/>
-  <title>Verify your Tena AI account</title>
+  <title>Verify your Tenachin AI account</title>
   <span style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-    Your Tena AI verification code: __OTP__. Expires in 10 minutes.
+    Your Tenachin AI verification code: __OTP__. Expires in 10 minutes.
     &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </span>
   <style type="text/css">
@@ -58,7 +58,7 @@ VERIFICATION_HTML = """<!DOCTYPE html>
                   </svg>
                 </td>
                 <td style="padding-left:8px;vertical-align:middle;">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Tena&nbsp;<span style="color:#E8A020;">AI</span></span>
+                  <span style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Tenachin&nbsp;<span style="color:#E8A020;">AI</span></span>
                 </td>
               </tr>
             </table>
@@ -83,7 +83,7 @@ VERIFICATION_HTML = """<!DOCTYPE html>
               </tr>
             </table>
             <p class="h1-text" style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:24px;font-weight:700;color:#0B4D3B;text-align:center;line-height:1.2;">Verify your account</p>
-            <p class="sub-text" style="margin:0 0 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#7A9E90;text-align:center;line-height:1.55;">Hello <strong style="color:#1C2B25;">__NAME__</strong>, enter this code in the Tena&nbsp;AI app to complete your sign-up.</p>
+            <p class="sub-text" style="margin:0 0 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#7A9E90;text-align:center;line-height:1.55;">Hello <strong style="color:#1C2B25;">__NAME__</strong>, enter this code in the Tenachin&nbsp;AI app to complete your sign-up.</p>
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:16px;">
               <tr>
                 <td class="otp-pad" style="background-color:#F0F8F4;border-radius:14px;border:1.5px solid #D0E8DC;padding:26px 20px;text-align:center;">
@@ -106,7 +106,7 @@ VERIFICATION_HTML = """<!DOCTYPE html>
                 <td class="note-text" style="background-color:#FEF3DC;border-radius:10px;border:1px solid #F5D98A;padding:14px 16px;">
                   <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#7A4F00;line-height:1.55;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A4F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:2px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <strong>Didn't create a Tena AI account?</strong> You can safely ignore this email. Someone may have entered your email address by mistake. Your account remains secure.
+                    <strong>Didn't create a Tenachin AI account?</strong> You can safely ignore this email. Someone may have entered your email address by mistake. Your account remains secure.
                   </p>
                 </td>
               </tr>
@@ -115,11 +115,11 @@ VERIFICATION_HTML = """<!DOCTYPE html>
         </tr>
         <tr>
           <td class="footer-pad" style="background-color:#F7FAF8;border-top:1px solid #E3F0EB;padding:20px 32px;text-align:center;">
-            <p style="margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:600;color:#0B4D3B;">Tena AI</p>
+            <p style="margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:600;color:#0B4D3B;">Tenachin AI</p>
             <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#7A9E90;">Addis Ababa, Ethiopia</p>
             <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#B2CEC5;">&mdash;</p>
             <p style="margin:0 0 6px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#B2CEC5;line-height:1.5;">This is an automated message. Please do not reply to this email.</p>
-            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#C8DDD7;">&copy; 2026 Tena AI. All rights reserved.</p>
+            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#C8DDD7;">&copy; 2026 Tenachin AI. All rights reserved.</p>
           </td>
         </tr>
       </table>
@@ -131,13 +131,13 @@ VERIFICATION_HTML = """<!DOCTYPE html>
 
 
 def send_verification_otp(to_email: str, otp: str, patient_name: str = "there"):
-    logger.info(f"Verification OTP for {to_email}: {otp}")
+    logger.info(f"Sending verification OTP to {to_email}")
     try:
         html = VERIFICATION_HTML.replace("__OTP__", otp).replace("__NAME__", patient_name)
         resend.Emails.send({
             "from": FROM_ADDRESS,
             "to": to_email,
-            "subject": "Verify your Tena AI account",
+            "subject": "Verify your Tenachin AI account",
             "html": html,
         })
     except Exception as e:
@@ -145,16 +145,16 @@ def send_verification_otp(to_email: str, otp: str, patient_name: str = "there"):
 
 
 def send_password_reset_otp(to_email: str, otp: str):
-    logger.info(f"Password reset OTP for {to_email}: {otp}")
+    logger.info(f"Sending password reset OTP to {to_email}")
     try:
         html = VERIFICATION_HTML.replace("__OTP__", otp).replace("__NAME__", "there")
         html = html.replace("Verify your account", "Reset your password")
-        html = html.replace("enter this code in the Tena&nbsp;AI app to complete your sign-up.",
-                            "enter this code to reset your Tena AI password.")
+        html = html.replace("enter this code in the Tenachin&nbsp;AI app to complete your sign-up.",
+                            "enter this code to reset your Tenachin AI password.")
         resend.Emails.send({
             "from": FROM_ADDRESS,
             "to": to_email,
-            "subject": "Reset your Tena AI password",
+            "subject": "Reset your Tenachin AI password",
             "html": html,
         })
     except Exception as e:
