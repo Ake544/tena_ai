@@ -305,7 +305,7 @@ All infrastructure configuration and credentials are managed outside the public 
 ## 11. Development Setup
 
 Prerequisites: Node 20+, Python 3.11+, Docker, an Expo account token, and API keys (Resend, Groq, Cloudflare R2).
-Secrets are read from `backend/.env` (see `server_setup.md`).
+Secrets are read from `backend/.env` (see `server_setup.md`(private)).
 
 ### Backend (local)
 
@@ -357,10 +357,8 @@ npm test
 ## 13. Roadmap
 
 - Launch the landing site on the root domain (in progress, DNS + SSL finalization).
-- Submit Google Play and App Store listings.
 - Full Amharic experience across all screens.
-- Post-launch secret rotation and refresh-token rotation hardening.
-- Live glucose-meter integrations and clinician dashboards.
+- Submit Google Play and App Store listings.
 
 ---
 
@@ -369,6 +367,6 @@ npm test
 | Purpose | Address |
 |---|---|
 | General, bugs, feedback | `hello@tenachinai.site` |
-| Privacy / data requests | `hello@tenachinai.site` |
+| Privacy / data requests | `privacy@tenachinai.site` |
 
 Web: `https://tenachinai.site` (landing), `https://api.tenachinai.site` (API).
