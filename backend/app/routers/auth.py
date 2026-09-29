@@ -62,6 +62,7 @@ def signup(request: Request, payload: PatientCreate, db: Session = Depends(get_d
         diabetes_type=payload.diabetes_type,
         other_conditions=payload.other_conditions,
         hba1c=payload.hba1c,
+        bmi=payload.bmi,
         exercise_habit=payload.exercise_habit,
         staple_diet=payload.staple_diet,
     )

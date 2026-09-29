@@ -16,6 +16,7 @@ interface SignupData {
   diabetes_type?: number;
   other_conditions?: string;
   hba1c?: number;
+  bmi?: number;
   exercise_habit?: string;
   staple_diet?: string;
 }

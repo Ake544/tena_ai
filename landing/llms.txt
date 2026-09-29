@@ -1,0 +1,18 @@
+# Tenachin AI
+
+> Tenachin AI is a free, AI-powered Type 2 diabetes companion app built for Ethiopian patients and their doctors. Log blood glucose, receive personalized daily tips grounded in WHO, IDF, and Ethiopian Ministry of Health guidance, track medications and appointments, and export a PDF report to share with your clinician. Available in English and Amharic.
+
+Optional:
+- 2.6M+ Ethiopians live with Type 2 diabetes and 24-40% regularly miss medication doses; Tenachin AI is designed to close that gap.
+- The app is free, private, and built by an Ethiopian developer in Addis Ababa. Data is never sold; no ads.
+- Tenachin AI is not a medical device. It does not diagnose, prescribe, or replace a doctor. In an emergency, call 911 or go to the nearest health facility.
+
+## Tenachin AI pages
+- [Home](https://tenachinai.site/): Product landing page with features, screenshots, FAQ, and download links.
+- [Contact](https://tenachinai.site/contact.html): Reach the Tenachin AI team; hello@tenachinai.site, replies within 24 hours.
+- [Privacy Policy](https://tenachinai.site/privacy.html): How Tenachin AI collects, uses, and protects your health data, processors, and your rights.
+- [Terms of Service](https://tenachinai.site/terms.html): Terms for using Tenachin AI, including liability limits and governing law of Ethiopia.
+- [Cookie Policy](https://tenachinai.site/cookies.html): What little tracking Tenachin AI itself does (effectively none; Google Fonts note).
+- [Features](https://tenachinai.site/#features): Glucose+log, 24-40% medication-reminder coverage, 1-in-8 personalized support, appt tracking, PDF reports.
+- [FAQ](https://tenachinai.site/#faq): Cost, data privacy, Ethiopian availability, Amharic support, and how it compares to tracked diabetes care.
+- [Download](https://tenachinai.site/#cta): App Store and Google Play links (coming soon).

@@ -19,6 +19,7 @@ class PatientCreate(BaseModel):
     diabetes_type: Optional[int] = None
     other_conditions: Optional[str] = None
     hba1c: Optional[float] = None
+    bmi: Optional[float] = None
     exercise_habit: Optional[str] = None
     staple_diet: Optional[str] = None
 
@@ -27,6 +28,13 @@ class PatientCreate(BaseModel):
     def validate_full_name(cls, v: str) -> str:
         if len(v) < 2 or len(v) > 100:
             raise ValueError("Full name must be 2-100 characters")
+        return v
+
+    @field_validator("bmi")
+    @classmethod
+    def validate_bmi(cls, v: float) -> float:
+        if v is not None and (v < 5 or v > 80):
+            raise ValueError("BMI must be between 5 and 80")
         return v
 
     @field_validator("password")

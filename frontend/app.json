@@ -18,6 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0B4D3B"
       },
       "package": "com.tenachinai.app"
@@ -25,16 +26,18 @@
     "web": {
       "favicon": "./assets/icon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "ce9b0c15-702e-4a4b-bb67-9978855df2ce"
-      }
-    },
     "plugins": [
       "expo-router",
       "expo-secure-store",
       "expo-sqlite",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7b6b8efd-fcdb-4c35-8bcb-d166b0bb5b5a"
+      }
+    },
+    "owner": "aklilwassies-team"
   }
 }

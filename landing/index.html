@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tenachin AI | Diabetes Companion App for Ethiopia | ጤና AI</title>
+<meta name="description" content="Tenachin AI is an AI-powered Type 2 diabetes management app built for Ethiopian patients. Log glucose, get personalized tips, track medications in Amharic and English."/>
+<meta name="keywords" content="diabetes app Ethiopia, ye'sikuar beshita app, blood glucose tracker, Amharic diabetes app, Type 2 diabetes Ethiopia, ጤና AI"/>
+<meta property="og:title" content="Tenachin AI | Diabetes Companion for Ethiopia"/>
+<meta property="og:description" content="AI-powered diabetes management in Amharic and English. Built for Ethiopian patients."/>
+<meta property="og:type" content="website"/>
+<meta property="og:image" content="https://tenachinai.site/og-image.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="canonical" href="https://tenachinai.site/"/>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<link rel="icon" href="favicon.ico" sizes="32x32"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "Tenachin AI",
+  "description": "AI-powered Type 2 diabetes management app for Ethiopian patients. Available in Amharic and English.",
+  "operatingSystem": "iOS, Android",
+  "applicationCategory": "HealthApplication",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ETB" },
+  "inLanguage": ["am", "en"]
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1A18;line-height:1.6;overflow-x:hidden;}
+img{max-width:100%;display:block;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+ul{list-style:none;}
+
+/* ── TOKENS ── */
+:root{
+  --green:#0B4D3B;
+  --green2:#1A6B52;
+  --green3:#2E8B6A;
+  --green-light:#E3F0EB;
+  --green-xlight:#F0F8F4;
+  --gold:#E8A020;
+  --gold2:#F5C04A;
+  --gold-light:#FEF3DC;
+  --red:#D94F3D;
+  --sage:#7A9E90;
+  --sage-light:#B2CEC5;
+  --off-white:#F7F9F7;
+  --near-black:#1A1A18;
+  --body-text:#2D3A35;
+  --border:#D8E8E2;
+  --r4:4px;--r8:8px;--r12:12px;--r16:16px;--r24:24px;--r32:32px;--r-pill:999px;
+  --shadow-sm:0 2px 8px rgba(11,77,59,0.08);
+  --shadow-md:0 8px 32px rgba(11,77,59,0.12);
+  --shadow-lg:0 20px 60px rgba(11,77,59,0.18);
+}
+
+/* ── TYPOGRAPHY ── */
+.font-display{font-family:'Sora',sans-serif;}
+.font-ethiopic{font-family:'Noto Sans Ethiopic',sans-serif;}
+
+/* ── LAYOUT ── */
+.container{max-width:1140px;margin:0 auto;padding:0 24px;}
+.container-wide{max-width:1280px;margin:0 auto;padding:0 24px;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:var(--r-pill);font-size:15px;font-weight:700;font-family:'Sora',sans-serif;transition:all 0.2s;cursor:pointer;}
+.btn-primary{background:var(--gold);color:var(--near-black);box-shadow:0 4px 20px rgba(232,160,32,0.35);}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 8px 28px rgba(232,160,32,0.45);}
+.btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.3);}
+.btn-outline:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.5);}
+.btn-green{background:var(--green);color:#fff;box-shadow:var(--shadow-md);}
+.btn-green:hover{background:var(--green2);transform:translateY(-1px);}
+.btn-ghost{background:var(--green-light);color:var(--green);border:none;}
+.btn-ghost:hover{background:var(--green-xlight);}
+.btn-sm{padding:10px 20px;font-size:13px;}
+.btn-lg{padding:16px 36px;font-size:16px;}
+
+/* ── DOWNLOAD BUTTONS ── */
+.download-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:var(--r12);font-family:'Sora',sans-serif;transition:all 0.2s;font-size:13px;}
+.download-btn .store-icon{width:22px;height:22px;flex-shrink:0;}
+.download-btn .store-text{display:flex;flex-direction:column;text-align:left;}
+.download-btn .store-text small{font-size:10px;font-weight:400;opacity:0.75;line-height:1;}
+.download-btn .store-text strong{font-size:15px;font-weight:700;line-height:1.2;}
+.download-btn-dark{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);}
+.download-btn-dark:hover{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.35);transform:translateY(-1px);}
+.download-btn-apk{background:var(--gold);color:var(--near-black);}
+.download-btn-apk:hover{background:var(--gold2);transform:translateY(-1px);}
+
+/* ────────────────────────────
+   NAV
+──────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:all 0.3s;}
+nav.scrolled{background:rgba(11,77,59,0.96);backdrop-filter:blur(12px);padding:12px 0;box-shadow:0 4px 24px rgba(0,0,0,0.2);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo-mark{width:36px;height:36px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-logo-name{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff;}
+.nav-logo-name span{color:var(--gold);}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{color:rgba(255,255,255,0.75);font-size:14px;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover{color:#fff;}
+.nav-cta{display:flex;align-items:center;gap:12px;}
+.nav-lang{color:rgba(255,255,255,0.6);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,0.2);transition:all 0.2s;}
+.nav-lang:hover{background:rgba(255,255,255,0.1);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{width:22px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;}
+
+/* ────────────────────────────
+   HERO
+──────────────────────────── */
+#hero{position:relative;min-height:100vh;background:linear-gradient(150deg,#0F5C47 0%,#0B4D3B 40%,#071F18 100%);display:flex;align-items:center;overflow:hidden;padding-top:80px;}
+
+/* ጤና watermark signature element */
+.hero-watermark{position:absolute;right:-60px;top:50%;transform:translateY(-50%);font-family:'Noto Sans Ethiopic',sans-serif;font-size:520px;font-weight:700;color:rgba(255,255,255,0.04);line-height:1;pointer-events:none;animation:watermark-spin 90s linear infinite;user-select:none;}
+@keyframes watermark-spin{from{transform:translateY(-50%) rotate(0deg);}to{transform:translateY(-50%) rotate(360deg);}}
+
+/* radial glow behind phone */
+.hero-glow{position:absolute;right:15%;top:50%;transform:translateY(-50%);width:480px;height:480px;background:radial-gradient(circle,rgba(232,160,32,0.12) 0%,transparent 70%);pointer-events:none;}
+
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:2;width:100%;}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(232,160,32,0.15);border:1px solid rgba(232,160,32,0.3);color:var(--gold2);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:var(--r-pill);margin-bottom:20px;}
+.hero-eyebrow-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.hero-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(38px,5vw,64px);line-height:1.1;color:#fff;margin-bottom:8px;letter-spacing:-1.5px;}
+.hero-title-amharic{font-family:'Noto Sans Ethiopic',sans-serif;font-weight:700;font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,0.5);margin-bottom:24px;letter-spacing:0;}
+.hero-title em{font-style:normal;color:var(--gold);}
+
+.hero-desc{font-size:17px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:36px;max-width:480px;}
+.hero-desc strong{color:rgba(255,255,255,0.9);font-weight:600;}
+
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:44px;}
+
+.hero-trust{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.hero-trust-item{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.45);font-size:12px;font-weight:500;}
+.hero-trust-icon{color:var(--gold);font-size:14px;}
+
+/* phone mockup */
+.hero-mockup{display:flex;justify-content:center;align-items:center;position:relative;}
+.phone-frame{width:260px;height:520px;background:#0A0A0A;border-radius:40px;padding:10px;box-shadow:0 40px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1) inset;position:relative;}
+.phone-screen{width:100%;height:100%;border-radius:32px;overflow:hidden;background:#0B4D3B;}
+.phone-notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:80px;height:24px;background:#0A0A0A;border-radius:20px;z-index:10;}
+
+/* floating stat cards beside phone */
+.phone-float-card{position:absolute;background:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 12px 40px rgba(0,0,0,0.25);min-width:140px;}
+.phone-float-card.left{left:-80px;top:25%;}
+.phone-float-card.right{right:-80px;bottom:28%;}
+.pfc-label{font-size:10px;font-weight:600;color:var(--sage);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.pfc-value{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:var(--green);}
+.pfc-value.high{color:var(--red);}
+.pfc-value.gold{color:var(--gold);}
+.pfc-sub{font-size:10px;color:var(--sage);margin-top:2px;}
+
+/* ────────────────────────────
+   STATS STRIP
+──────────────────────────── */
+#stats{background:var(--gold);padding:56px 0;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.stat-item{text-align:center;}
+.stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(36px,4vw,52px);color:var(--near-black);line-height:1;margin-bottom:8px;letter-spacing:-1px;}
+.stat-label{font-size:14px;font-weight:600;color:rgba(26,26,24,0.65);line-height:1.4;max-width:160px;margin:0 auto;}
+.stat-divider{width:1px;background:rgba(26,26,24,0.15);align-self:stretch;}
+
+/* ────────────────────────────
+   FEATURES
+──────────────────────────── */
+#features{padding:100px 0;background:#fff;}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-eyebrow::before{content:'';width:24px;height:2px;background:var(--gold);flex-shrink:0;}
+.section-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(28px,4vw,44px);color:var(--near-black);line-height:1.15;letter-spacing:-0.8px;margin-bottom:16px;}
+.section-sub{font-size:17px;color:var(--sage);line-height:1.6;max-width:540px;}
+
+.features-header{margin-bottom:60px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.feature-card{background:var(--off-white);border-radius:var(--r24);padding:32px;border:1px solid var(--border);transition:all 0.25s;position:relative;overflow:hidden;}
+.feature-card::after{content:'';position:absolute;inset:0;border-radius:var(--r24);border:1.5px solid transparent;transition:border-color 0.25s;}
+.feature-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.feature-card:hover::after{border-color:var(--green-light);}
+.feature-icon{width:52px;height:52px;border-radius:var(--r16);display:flex;align-items:center;justify-content:center;margin-bottom:20px;flex-shrink:0;}
+.feature-icon svg{width:24px;height:24px;}
+.feature-title{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--near-black);margin-bottom:10px;}
+.feature-desc{font-size:14px;color:var(--sage);line-height:1.65;}
+
+/* ────────────────────────────
+   HOW IT WORKS
+──────────────────────────── */
+#how{padding:100px 0;background:var(--green-xlight);}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:60px;}
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:24px;padding:24px 0;border-bottom:1px solid var(--border);position:relative;}
+.step:last-child{border-bottom:none;}
+.step-num{width:44px;height:44px;border-radius:50%;background:var(--green);color:#fff;font-family:'Sora',sans-serif;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;}
+.step-connector{position:absolute;left:22px;top:68px;bottom:-1px;width:1.5px;background:var(--green-light);}
+.step:last-child .step-connector{display:none;}
+.step-body{}
+.step-title{font-family:'Sora',sans-serif;font-weight:700;font-size:17px;color:var(--near-black);margin-bottom:6px;}
+.step-desc{font-size:14px;color:var(--sage);line-height:1.6;}
+.step-tag{display:inline-block;background:var(--gold-light);color:#8B5E00;font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-pill);margin-top:8px;}
+
+.how-visual{position:relative;display:flex;justify-content:center;}
+.how-phone{width:230px;height:460px;background:#0A0A0A;border-radius:36px;padding:9px;box-shadow:var(--shadow-lg),0 0 0 1px rgba(255,255,255,0.08) inset;}
+.how-phone-screen{width:100%;height:100%;border-radius:29px;overflow:hidden;}
+
+/* ────────────────────────────
+   SCREENSHOTS
+──────────────────────────── */
+#screenshots{padding:100px 0;background:var(--near-black);overflow:hidden;}
+#screenshots .section-eyebrow{color:var(--gold2);}
+#screenshots .section-title{color:#fff;}
+#screenshots .section-sub{color:rgba(255,255,255,0.45);}
+.screenshots-header{margin-bottom:60px;}
+.screenshots-track{display:flex;gap:24px;justify-content:center;align-items:flex-end;flex-wrap:wrap;}
+.screenshot-item{flex-shrink:0;}
+.screenshot-item .phone-frame{width:200px;height:400px;}
+.screenshot-item:nth-child(2) .phone-frame{width:220px;height:440px;margin-bottom:0;}
+.screenshot-item .phone-frame{border-radius:32px;padding:8px;}
+.screenshot-label{text-align:center;margin-top:16px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.4);font-family:'Sora',sans-serif;}
+
+/* ────────────────────────────
+   WHO IT'S FOR
+──────────────────────────── */
+#who{padding:100px 0;background:#fff;}
+.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:60px;}
+.who-card{border-radius:var(--r24);padding:44px;position:relative;overflow:hidden;}
+.who-card-patients{background:var(--green);color:#fff;}
+.who-card-providers{background:var(--off-white);border:1px solid var(--border);}
+.who-card-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:0.6;margin-bottom:16px;}
+.who-card-title{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;line-height:1.2;margin-bottom:16px;}
+.who-card-patients .who-card-title{color:#fff;}
+.who-card-providers .who-card-title{color:var(--near-black);}
+.who-list{display:flex;flex-direction:column;gap:12px;margin-top:20px;}
+.who-list-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.5;}
+.who-card-patients .who-list-item{color:rgba(255,255,255,0.75);}
+.who-card-providers .who-list-item{color:var(--sage);}
+.who-check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.who-card-patients .who-check{background:rgba(255,255,255,0.15);color:#fff;}
+.who-card-providers .who-check{background:var(--green-light);color:var(--green);}
+.who-amharic{font-family:'Noto Sans Ethiopic',sans-serif;font-size:13px;opacity:0.5;margin-top:20px;}
+.who-card-bg-text{position:absolute;bottom:-20px;right:-10px;font-family:'Noto Sans Ethiopic',sans-serif;font-size:140px;font-weight:700;opacity:0.06;line-height:1;pointer-events:none;}
+
+/* ────────────────────────────
+   AI EXPLAINED
+──────────────────────────── */
+#ai-explained{padding:100px 0;background:var(--green-xlight);}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:60px;}
+.ai-visual{background:var(--green);border-radius:var(--r24);padding:32px;box-shadow:var(--shadow-lg);}
+.ai-tip-card{background:rgba(255,255,255,0.06);border-radius:var(--r16);padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1);}
+.ai-tip-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px;}
+.ai-tip-text{font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;}
+.ai-tip-fact{background:rgba(255,255,255,0.08);border-radius:var(--r8);padding:10px 12px;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.65);line-height:1.5;}
+.ai-data-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);}
+.ai-data-row:last-child{border-bottom:none;}
+.ai-data-label{font-size:12px;color:rgba(255,255,255,0.4);}
+.ai-data-val{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;}
+.ai-data-val.ok{color:#6EE7B7;}
+.ai-data-val.warn{color:var(--gold2);}
+.ai-features{display:flex;flex-direction:column;gap:24px;}
+.ai-feature-item{display:flex;gap:16px;align-items:flex-start;}
+.ai-feature-icon{width:40px;height:40px;border-radius:var(--r12);background:var(--green-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ai-feature-icon svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ai-feature-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--near-black);margin-bottom:4px;}
+.ai-feature-desc{font-size:14px;color:var(--sage);line-height:1.6;}
+
+/* ────────────────────────────
+   PRIVACY
+──────────────────────────── */
+#privacy{padding:80px 0;background:#fff;border-top:1px solid var(--border);}
+.privacy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px;}
+.privacy-card{text-align:center;padding:36px 24px;}
+.privacy-icon{width:56px;height:56px;border-radius:var(--r16);background:var(--green-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.privacy-icon svg{width:24px;height:24px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.privacy-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--near-black);margin-bottom:8px;}
+.privacy-desc{font-size:14px;color:var(--sage);line-height:1.6;}
+
+/* ────────────────────────────
+   FAQ
+──────────────────────────── */
+#faq{padding:100px 0;background:var(--off-white);}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:60px;}
+.faq-intro .section-sub{margin-top:16px;}
+.faq-contact{margin-top:32px;padding:24px;background:var(--green-light);border-radius:var(--r16);}
+.faq-contact-title{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--green);margin-bottom:6px;}
+.faq-contact-text{font-size:13px;color:var(--sage);margin-bottom:12px;}
+.faq-list{display:flex;flex-direction:column;gap:4px;}
+.faq-item{background:#fff;border-radius:var(--r16);border:1px solid var(--border);overflow:hidden;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;font-size:15px;color:var(--near-black);transition:background 0.2s;gap:12px;}
+.faq-q:hover{background:var(--off-white);}
+.faq-chevron{width:20px;height:20px;flex-shrink:0;transition:transform 0.3s;stroke:var(--sage);}
+.faq-item.open .faq-chevron{transform:rotate(180deg);stroke:var(--green);}
+.faq-item.open .faq-q{color:var(--green);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.2s;}
+.faq-a-inner{padding:0 24px 20px;font-size:14px;color:var(--sage);line-height:1.7;}
+.faq-item.open .faq-a{max-height:200px;}
+
+/* ────────────────────────────
+   CTA BANNER
+──────────────────────────── */
+#cta{padding:100px 0;background:var(--green);position:relative;overflow:hidden;}
+.cta-bg-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:'Noto Sans Ethiopic',sans-serif;font-size:400px;font-weight:700;color:rgba(255,255,255,0.03);white-space:nowrap;pointer-events:none;}
+.cta-inner{text-align:center;position:relative;z-index:1;}
+.cta-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(32px,5vw,52px);color:#fff;letter-spacing:-1px;margin-bottom:16px;}
+.cta-sub{font-size:17px;color:rgba(255,255,255,0.55);margin-bottom:44px;max-width:500px;margin-left:auto;margin-right:auto;}
+.cta-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.cta-amharic{font-family:'Noto Sans Ethiopic',sans-serif;font-size:15px;color:rgba(255,255,255,0.3);margin-top:24px;}
+
+/* ────────────────────────────
+   FOOTER
+──────────────────────────── */
+footer{background:var(--near-black);padding:64px 0 32px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:56px;}
+.footer-brand{}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.footer-logo-mark{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.footer-logo-name{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#fff;}
+.footer-logo-name span{color:var(--gold);}
+.footer-tagline{font-size:14px;color:rgba(255,255,255,0.35);line-height:1.6;max-width:240px;margin-bottom:20px;}
+.footer-socials{display:flex;gap:10px;}
+.footer-social{width:34px;height:34px;border-radius:var(--r8);background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);transition:all 0.2s;font-size:14px;}
+.footer-social:hover{background:rgba(255,255,255,0.12);color:#fff;}
+.footer-col-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-links a{font-size:14px;color:rgba(255,255,255,0.4);transition:color 0.2s;}
+.footer-links a:hover{color:#fff;}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;}
+.footer-copy{font-size:13px;color:rgba(255,255,255,0.25);}
+.footer-legal{display:flex;gap:20px;}
+.footer-legal a{font-size:13px;color:rgba(255,255,255,0.25);transition:color 0.2s;}
+.footer-legal a:hover{color:rgba(255,255,255,0.6);}
+.footer-amharic{font-family:'Noto Sans Ethiopic',sans-serif;font-size:12px;color:rgba(255,255,255,0.15);margin-top:4px;}
+
+/* ────────────────────────────
+   SCROLL ANIMATIONS
+──────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-delay-1{transition-delay:0.1s;}
+.reveal-delay-2{transition-delay:0.2s;}
+.reveal-delay-3{transition-delay:0.3s;}
+.reveal-delay-4{transition-delay:0.4s;}
+.reveal-delay-5{transition-delay:0.5s;}
+
+/* ────────────────────────────
+   RESPONSIVE
+──────────────────────────── */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;text-align:center;}
+  .hero-mockup{display:none;}
+  .hero-desc{margin:0 auto 36px;}
+  .hero-actions{justify-content:center;}
+  .hero-trust{justify-content:center;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .stat-divider{display:none;}
+  .features-grid{grid-template-columns:1fr 1fr;}
+  .how-grid,.ai-grid,.who-grid{grid-template-columns:1fr;}
+  .how-visual{display:none;}
+  .faq-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .nav-links,.nav-cta{display:none;}
+  .hamburger{display:flex;}
+}
+@media(max-width:600px){
+  .features-grid{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .screenshots-track .screenshot-item:nth-child(1),.screenshots-track .screenshot-item:nth-child(3){display:none;}
+  .privacy-grid{grid-template-columns:1fr;}
+  .who-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr;}
+  .footer-bottom{flex-direction:column;gap:12px;text-align:center;}
+  .phone-float-card{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero-watermark,.cta-bg-text{animation:none;}
+  .reveal{opacity:1;transform:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════ -->
+<nav id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="Tenachin AI Home">
+        <div class="nav-logo-mark">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="8.5" y="2" width="3" height="16" rx="1.5" fill="white"/>
+            <rect x="2" y="8.5" width="16" height="3" rx="1.5" fill="white"/>
+            <circle cx="16.5" cy="4.5" r="3" fill="#1A1A18"/>
+            <circle cx="16.5" cy="4.5" r="1.5" fill="white"/>
+          </svg>
+        </div>
+        <span class="nav-logo-name">Tenachin <span>AI</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#who">Who it's for</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-cta">
+        <span class="nav-lang" onclick="navLangComingSoon(this)">አማርኛ</span>
+        <a href="#cta" class="btn btn-primary btn-sm">Download App</a>
+      </div>
+      <div class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════ -->
+<section id="hero" aria-labelledby="hero-title">
+  <div class="hero-watermark" aria-hidden="true">ጤና</div>
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <p class="hero-title-amharic font-ethiopic">ጤናዎን በ AI ይቆጣጠሩ</p>
+        <h1 id="hero-title" class="hero-title font-display">
+          Your diabetes,<br/>
+          <em>finally understood.</em>
+        </h1>
+        <p class="hero-desc">
+          Tenachin AI tracks your glucose, learns your patterns, and delivers
+          <strong>personalized daily tips</strong> based on your actual data,
+          in Amharic or English. Built for Ethiopian patients, by an Ethiopian developer.
+        </p>
+        <div class="hero-actions">
+          <a href="#" class="download-btn download-btn-dark" aria-label="Download on the App Store" onclick="event.preventDefault(); downloadComingSoon(this)">
+            <svg class="store-icon" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <div class="store-text">
+              <small>Download on the</small>
+              <strong>App Store</strong>
+            </div>
+          </a>
+          <a href="#" class="download-btn download-btn-dark" aria-label="Get it on Google Play" onclick="event.preventDefault(); downloadComingSoon(this)">
+            <svg class="store-icon" viewBox="0 0 24 24" fill="white"><path d="M3.18 23.76c.3.17.65.19.97.07L14.76 12 3.18.17c-.32-.12-.67-.1-.97.07C1.78.48 1.5 1.01 1.5 1.6v20.8c0 .59.28 1.12.68 1.36zM17.54 15.27L5.3 22.07l9.97-9.97 2.27 3.17zm2.67-4.78c.45.27.79.76.79 1.51s-.34 1.24-.79 1.51L18 14.48l-2.42-2.42L18 9.63l2.21 .86zM5.3 1.93l12.24 6.8L15.27 12 5.3 1.93z"/></svg>
+            <div class="store-text">
+              <small>Get it on</small>
+              <strong>Google Play</strong>
+            </div>
+          </a>
+          <a href="tenachinai.apk" download="tenachinai.apk" class="download-btn download-btn-apk" aria-label="Download APK directly">
+            <svg class="store-icon" viewBox="0 0 24 24" fill="none" stroke="#1A1A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <div class="store-text">
+              <small>Android users</small>
+              <strong>Direct APK</strong>
+            </div>
+          </a>
+        </div>
+        <div class="hero-trust">
+          <div class="hero-trust-item">
+            <span class="hero-trust-icon">✦</span>
+            Free to use
+          </div>
+          <div class="hero-trust-item">
+            <span class="hero-trust-icon">✦</span>
+            Works offline
+          </div>
+          <div class="hero-trust-item">
+            <span class="hero-trust-icon">✦</span>
+            Amharic & English
+          </div>
+          <div class="hero-trust-item">
+            <span class="hero-trust-icon">✦</span>
+            No prescriptions
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-mockup" aria-hidden="true">
+        <!-- floating stat cards -->
+        <div class="phone-float-card left">
+          <div class="pfc-label">Today's fasting</div>
+          <div class="pfc-value">113 <span style="font-size:13px;color:var(--sage)">mg/dL</span></div>
+          <div class="pfc-sub">✓ In target range</div>
+        </div>
+
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <!-- Inline app screen SVG -->
+          <div class="phone-screen">
+            <svg width="100%" height="100%" viewBox="0 0 240 480" xmlns="http://www.w3.org/2000/svg">
+              <!-- header -->
+              <rect width="240" height="100" fill="#0B4D3B"/>
+              <text x="16" y="36" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">ሰላም 👋</text>
+              <text x="16" y="52" font-family="sans-serif" font-size="13" font-weight="bold" fill="white">Ayele Bekele</text>
+              <text x="16" y="65" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">Day 23 · Monday</text>
+              <!-- stats row -->
+              <rect x="10" y="74" width="68" height="22" rx="6" fill="rgba(255,255,255,0.1)"/>
+              <text x="44" y="88" font-family="sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">113</text>
+              <rect x="86" y="74" width="68" height="22" rx="6" fill="rgba(255,255,255,0.1)"/>
+              <text x="120" y="88" font-family="sans-serif" font-size="10" font-weight="bold" fill="#F5C04A" text-anchor="middle">12🔥</text>
+              <rect x="162" y="74" width="68" height="22" rx="6" fill="rgba(255,255,255,0.1)"/>
+              <text x="196" y="88" font-family="sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">86%</text>
+              <!-- body bg -->
+              <rect y="100" width="240" height="380" fill="#F0F8F4"/>
+              <!-- glucose card -->
+              <rect x="10" y="110" width="220" height="90" rx="12" fill="white"/>
+              <text x="20" y="128" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Today's glucose</text>
+              <!-- bars -->
+              <rect x="20" y="155" width="24" height="30" rx="3" fill="#D94F3D"/>
+              <rect x="50" y="145" width="24" height="40" rx="3" fill="#D94F3D"/>
+              <rect x="80" y="162" width="24" height="23" rx="3" fill="#1A6B52"/>
+              <rect x="110" y="158" width="24" height="27" rx="3" fill="#1A6B52"/>
+              <rect x="140" y="170" width="24" height="15" rx="3" fill="#E3F0EB"/>
+              <rect x="170" y="170" width="24" height="15" rx="3" fill="#E3F0EB"/>
+              <text x="20" y="196" font-family="sans-serif" font-size="6" fill="#7A9E90">Fasting</text>
+              <text x="50" y="196" font-family="sans-serif" font-size="6" fill="#7A9E90">Post-B</text>
+              <text x="80" y="196" font-family="sans-serif" font-size="6" fill="#7A9E90">Pre-L</text>
+              <text x="110" y="196" font-family="sans-serif" font-size="6" fill="#7A9E90">Post-L</text>
+              <!-- tip card -->
+              <rect x="10" y="210" width="220" height="80" rx="12" fill="#0B4D3B"/>
+              <text x="20" y="228" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.45)">💊 MEDICATION · STREAK BOOST</text>
+              <text x="20" y="243" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.88)" width="200">Your 12-day streak is working.</text>
+              <text x="20" y="255" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.88)">Metformin reduces liver glucose</text>
+              <text x="20" y="267" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.88)">by up to 30% with consistency.</text>
+              <rect x="12" y="276" width="216" height="10" rx="4" fill="rgba(255,255,255,0.08)"/>
+              <text x="20" y="284" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.5)">📌 Fact embedded from WHO guidelines</text>
+              <!-- reminders -->
+              <rect x="10" y="300" width="220" height="56" rx="12" fill="white"/>
+              <text x="20" y="316" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Reminders</text>
+              <rect x="20" y="322" width="32" height="24" rx="8" fill="#E3F0EB"/>
+              <text x="36" y="337" font-family="sans-serif" font-size="11" text-anchor="middle">💊</text>
+              <text x="60" y="333" font-family="sans-serif" font-size="8" font-weight="bold" fill="#1C2B25">Evening Metformin</text>
+              <text x="60" y="344" font-family="sans-serif" font-size="7" fill="#7A9E90">Due at 8:00 PM</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="phone-float-card right">
+          <div class="pfc-label">Medication streak</div>
+          <div class="pfc-value gold">12 days 🔥</div>
+          <div class="pfc-sub">Keep going!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS STRIP ═══════════════════════════ -->
+<section id="stats" aria-label="Key statistics">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num font-display">2.6M+</div>
+        <div class="stat-label">Ethiopians living with Type 2 diabetes</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-num font-display">24-40%</div>
+        <div class="stat-label">of patients miss medication doses regularly</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-num font-display">37%</div>
+        <div class="stat-label">fewer complications with consistent glucose tracking</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-num font-display">1 in 8</div>
+        <div class="stat-label">Ethiopian patients receive any personalized diabetes support</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══════════════════════════════ -->
+<section id="features" aria-labelledby="features-title">
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-eyebrow">Everything you need</div>
+      <h2 id="features-title" class="section-title font-display">Not an app. A companion.</h2>
+      <p class="section-sub">Six features built around the real daily life of an Ethiopian patient, not a Silicon Valley health metric.</p>
+    </div>
+    <div class="features-grid">
+
+      <article class="feature-card reveal">
+        <div class="feature-icon" style="background:#E3F0EB;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0B4D3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="feature-title">Glucose logging</h3>
+        <p class="feature-desc">Log up to 6 readings a day for fasting, post-meal, and bedtime. Know exactly what your injera and shiro does to your blood sugar, in numbers.</p>
+      </article>
+
+      <article class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon" style="background:#FEF3DC;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#E8A020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <h3 class="feature-title">AI daily tips</h3>
+        <p class="feature-desc">Not generic health advice. A story-driven tip every day, written by AI based on your actual readings, medication adherence, and habits. In Amharic or English.</p>
+      </article>
+
+      <article class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon" style="background:#E3F0EB;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0B4D3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <h3 class="feature-title">Medication reminders</h3>
+        <p class="feature-desc">Never miss a Metformin dose again, even when life gets busy. Set custom times and get gentle nudges with a nightly adherence check-in.</p>
+      </article>
+
+      <article class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon" style="background:#E8F0FB;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2A6DB5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3 class="feature-title">Appointment tracking</h3>
+        <p class="feature-desc">Add your follow-up dates and screening appointments. Get reminders 1 week before and 1 day before, so you never miss a check-up.</p>
+      </article>
+
+      <article class="feature-card reveal reveal-delay-4">
+        <div class="feature-icon" style="background:#FDECEA;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#D94F3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l3 3L12 9l4.5 6L20 11"/></svg>
+        </div>
+        <h3 class="feature-title">Symptom monitoring</h3>
+        <p class="feature-desc">Log thirst, fatigue, headaches, vision changes, and more. The app watches for patterns and alerts you when your symptoms correlate with your glucose readings.</p>
+      </article>
+
+      <article class="feature-card reveal reveal-delay-5">
+        <div class="feature-icon" style="background:#F0F8F4;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0B4D3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h3 class="feature-title">Doctor report</h3>
+        <p class="feature-desc">One tap generates a clean PDF with 90 days of data, including glucose trends, medication adherence, and symptoms. Hand it to your doctor and cut the guesswork out of every visit.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ═══════════════════════════ -->
+<section id="how" aria-labelledby="how-title">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Simple to start</div>
+      <h2 id="how-title" class="section-title font-display">Three steps to<br/>taking control.</h2>
+    </div>
+    <div class="how-grid">
+      <div class="steps">
+
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <div class="step-connector"></div>
+          <div class="step-body">
+            <h3 class="step-title">Create your profile</h3>
+            <p class="step-desc">Answer a few questions about your diagnosis, current medications, and lifestyle. Available in Amharic or English. Takes about 4 minutes. We ask only what we need.</p>
+            <span class="step-tag">Amharic & English</span>
+          </div>
+        </div>
+
+        <div class="step reveal reveal-delay-1">
+          <div class="step-num">2</div>
+          <div class="step-connector"></div>
+          <div class="step-body">
+            <h3 class="step-title">Log your daily readings</h3>
+            <p class="step-desc">Check your glucose, take your medication, log any symptoms. The app works offline. Readings sync to your history when you reconnect. No data is ever lost.</p>
+            <span class="step-tag">Works offline</span>
+          </div>
+        </div>
+
+        <div class="step reveal reveal-delay-2">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3 class="step-title">Get tips. Share with your doctor.</h3>
+            <p class="step-desc">Receive a personalized AI tip each morning. When your appointment comes, export your full history as a PDF report. No typing, no summarizing, no guessing what to tell the doctor.</p>
+            <span class="step-tag">AI-powered</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="how-visual reveal">
+        <div class="how-phone">
+          <div class="how-phone-screen">
+            <svg width="100%" height="100%" viewBox="0 0 212 422" xmlns="http://www.w3.org/2000/svg">
+              <!-- log screen -->
+              <rect width="212" height="422" fill="#0B4D3B"/>
+              <text x="16" y="32" font-family="sans-serif" font-size="14" font-weight="bold" fill="white">Log glucose</text>
+              <text x="16" y="46" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.5)">Monday · All in mg/dL</text>
+              <!-- mini summary pills -->
+              <rect x="10" y="56" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)"/>
+              <text x="24" y="73" font-family="sans-serif" font-size="10" font-weight="bold" fill="#f87171" text-anchor="middle">234</text>
+              <rect x="43" y="56" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)"/>
+              <text x="57" y="73" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6ee7b7" text-anchor="middle">142</text>
+              <rect x="76" y="56" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)"/>
+              <text x="90" y="73" font-family="sans-serif" font-size="10" font-weight="bold" fill="rgba(255,255,255,0.25)" text-anchor="middle">·</text>
+              <!-- body -->
+              <rect y="94" width="212" height="328" fill="#F0F8F4"/>
+              <!-- value picker card -->
+              <rect x="10" y="104" width="192" height="120" rx="14" fill="white"/>
+              <text x="20" y="122" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Add a reading</text>
+              <text x="20" y="138" font-family="sans-serif" font-size="7" fill="#7A9E90">VALUE (mg/dL)</text>
+              <!-- big number input -->
+              <rect x="20" y="144" width="128" height="56" rx="12" fill="#F0F8F4" stroke="#E3F0EB" stroke-width="1.5"/>
+              <text x="84" y="178" font-family="sans-serif" font-size="34" font-weight="800" fill="#0B4D3B" text-anchor="middle">118</text>
+              <!-- up/down -->
+              <rect x="158" y="144" width="36" height="26" rx="8" fill="#0B4D3B"/>
+              <text x="176" y="160" font-family="sans-serif" font-size="14" fill="white" text-anchor="middle">▲</text>
+              <rect x="158" y="174" width="36" height="26" rx="8" fill="#E3F0EB"/>
+              <text x="176" y="190" font-family="sans-serif" font-size="14" fill="#0B4D3B" text-anchor="middle">▼</text>
+              <!-- type pills -->
+              <rect x="20" y="206" width="68" height="14" rx="7" fill="#0B4D3B"/>
+              <text x="54" y="216" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">🌙 Pre-dinner</text>
+              <rect x="94" y="206" width="60" height="14" rx="7" fill="#E3F0EB"/>
+              <text x="124" y="216" font-family="sans-serif" font-size="7" fill="#7A9E90" text-anchor="middle">😴 Bedtime</text>
+              <!-- save btn -->
+              <rect x="20" y="206" width="0" height="0"/>
+              <rect x="20" y="232" width="192" height="0" rx="10" fill="#0B4D3B"/>
+              <!-- medication check -->
+              <rect x="10" y="236" width="192" height="50" rx="14" fill="white"/>
+              <text x="20" y="252" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Medication today</text>
+              <text x="20" y="265" font-family="sans-serif" font-size="8" fill="#7A9E90">Metformin 500mg</text>
+              <rect x="150" y="256" width="40" height="14" rx="7" fill="#E3F0EB"/>
+              <text x="170" y="265" font-family="sans-serif" font-size="7" fill="#0B4D3B" text-anchor="middle">AM ✓</text>
+              <text x="20" y="278" font-family="sans-serif" font-size="8" fill="#7A9E90">8AM · 8PM doses</text>
+              <!-- symptoms -->
+              <rect x="10" y="296" width="192" height="50" rx="14" fill="white"/>
+              <text x="20" y="312" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Any symptoms?</text>
+              <rect x="20" y="318" width="40" height="14" rx="7" fill="#FEF3DC"/>
+              <text x="40" y="328" font-family="sans-serif" font-size="7" fill="#8B5E00" text-anchor="middle">😵 Head</text>
+              <rect x="66" y="318" width="38" height="14" rx="7" fill="#E3F0EB"/>
+              <text x="85" y="328" font-family="sans-serif" font-size="7" fill="#7A9E90" text-anchor="middle">💧 Thirst</text>
+              <rect x="110" y="318" width="38" height="14" rx="7" fill="#E3F0EB"/>
+              <text x="129" y="328" font-family="sans-serif" font-size="7" fill="#7A9E90" text-anchor="middle">😴 Fatigue</text>
+              <!-- save btn -->
+              <rect x="10" y="356" width="192" height="36" rx="18" fill="#0B4D3B"/>
+              <text x="106" y="378" font-family="sans-serif" font-size="11" font-weight="bold" fill="white" text-anchor="middle">Save reading</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREENSHOTS ════════════════════════════ -->
+<section id="screenshots" aria-labelledby="screenshots-title">
+  <div class="container">
+    <div class="screenshots-header reveal">
+      <div class="section-eyebrow" style="color:var(--gold2);">See it in action</div>
+      <h2 id="screenshots-title" class="section-title font-display" style="color:#fff;">Every screen, designed<br/>for how you actually live.</h2>
+      <p class="section-sub">Clean, fast, and comfortable for daily use, whether you're logging before breakfast or sharing with your doctor.</p>
+    </div>
+    <div class="screenshots-track">
+      <!-- Screen 1: Tips -->
+      <div class="screenshot-item reveal">
+        <div class="phone-frame" style="width:200px;height:400px;border-radius:32px;padding:8px;">
+          <div class="phone-screen" style="border-radius:26px;">
+            <svg width="100%" height="100%" viewBox="0 0 184 384" xmlns="http://www.w3.org/2000/svg">
+              <rect width="184" height="384" fill="#F0F8F4"/>
+              <rect width="184" height="76" fill="#0B4D3B"/>
+              <text x="16" y="34" font-family="sans-serif" font-size="13" font-weight="bold" fill="white">Daily Tips</text>
+              <text x="16" y="48" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.5)">3 tips today · Low awareness</text>
+              <rect x="140" y="26" width="32" height="16" rx="8" fill="rgba(232,160,32,0.3)"/>
+              <text x="156" y="37" font-family="sans-serif" font-size="8" font-weight="bold" fill="#F5C04A" text-anchor="middle">3 new</text>
+              <!-- tip 1 -->
+              <rect x="10" y="86" width="164" height="84" rx="12" fill="#0B4D3B"/>
+              <text x="18" y="100" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.4)">💊 MEDICATION · STREAK</text>
+              <text x="18" y="115" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">Your 12-day streak is doing</text>
+              <text x="18" y="127" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">more than you think. Every</text>
+              <text x="18" y="139" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">dose fights for you quietly.</text>
+              <rect x="14" y="148" width="156" height="16" rx="6" fill="rgba(255,255,255,0.08)"/>
+              <text x="18" y="159" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.5)">📌 Metformin cuts liver glucose 30%</text>
+              <!-- tip 2 -->
+              <rect x="10" y="180" width="164" height="80" rx="12" fill="#7A3200"/>
+              <text x="18" y="194" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.4)">📈 GLUCOSE · PATTERN</text>
+              <text x="18" y="208" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">3 mornings in a row above</text>
+              <text x="18" y="220" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">230. Your arteries notice</text>
+              <text x="18" y="232" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">before you feel anything.</text>
+              <rect x="14" y="244" width="156" height="12" rx="5" fill="rgba(255,255,255,0.08)"/>
+              <text x="18" y="253" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.5)">📌 Endothelial damage begins early</text>
+              <!-- tip 3 -->
+              <rect x="10" y="270" width="164" height="80" rx="12" fill="#1A3D6B"/>
+              <text x="18" y="284" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.4)">🫓 DIET · ETHIOPIAN</text>
+              <text x="18" y="298" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">Injera with shiro spikes less</text>
+              <text x="18" y="310" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">than injera alone. Protein</text>
+              <text x="18" y="322" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">slows everything down.</text>
+              <rect x="14" y="334" width="156" height="12" rx="5" fill="rgba(255,255,255,0.08)"/>
+              <text x="18" y="343" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.5)">📌 Teff GI: 65–74, protein cuts 40%</text>
+            </svg>
+          </div>
+        </div>
+        <div class="screenshot-label">AI Daily Tips</div>
+      </div>
+
+      <!-- Screen 2: Home (center, larger) -->
+      <div class="screenshot-item reveal reveal-delay-1">
+        <div class="phone-frame" style="width:224px;height:450px;border-radius:36px;padding:9px;">
+          <div class="phone-screen" style="border-radius:29px;">
+            <svg width="100%" height="100%" viewBox="0 0 206 432" xmlns="http://www.w3.org/2000/svg">
+              <rect width="206" height="432" fill="#F0F8F4"/>
+              <rect width="206" height="104" fill="#0B4D3B"/>
+              <text x="16" y="32" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">ሰላም 👋</text>
+              <text x="16" y="47" font-family="sans-serif" font-size="14" font-weight="bold" fill="white">Ayele Bekele</text>
+              <text x="16" y="60" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">Day 23 · Jul 4, 2026</text>
+              <rect x="10" y="70" width="56" height="28" rx="8" fill="rgba(255,255,255,0.1)"/>
+              <text x="38" y="86" font-family="sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">113</text>
+              <rect x="74" y="70" width="56" height="28" rx="8" fill="rgba(255,255,255,0.1)"/>
+              <text x="102" y="86" font-family="sans-serif" font-size="12" font-weight="bold" fill="#F5C04A" text-anchor="middle">12🔥</text>
+              <rect x="138" y="70" width="58" height="28" rx="8" fill="rgba(255,255,255,0.1)"/>
+              <text x="167" y="86" font-family="sans-serif" font-size="13" font-weight="bold" fill="white" text-anchor="middle">86%</text>
+              <!-- alert -->
+              <rect x="10" y="114" width="186" height="36" rx="10" fill="#FDECEA" stroke="rgba(217,79,61,0.2)" stroke-width="1"/>
+              <circle cx="28" cy="132" r="10" fill="#D94F3D"/>
+              <text x="28" y="136" font-family="sans-serif" font-size="10" fill="white" text-anchor="middle">!</text>
+              <text x="44" y="128" font-family="sans-serif" font-size="8" font-weight="bold" fill="#D94F3D">High glucose streak detected</text>
+              <text x="44" y="140" font-family="sans-serif" font-size="7" fill="#7A9E90">Fasting above 230 for 3 days</text>
+              <!-- glucose card -->
+              <rect x="10" y="160" width="186" height="90" rx="12" fill="white"/>
+              <text x="20" y="176" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Today's glucose</text>
+              <rect x="157" y="168" width="30" height="12" rx="6" fill="#FDECEA"/>
+              <text x="172" y="177" font-family="sans-serif" font-size="7" fill="#D94F3D" text-anchor="middle">3 high</text>
+              <rect x="20" y="192" width="24" height="38" rx="3" fill="#D94F3D"/>
+              <rect x="50" y="184" width="24" height="46" rx="3" fill="#D94F3D"/>
+              <rect x="80" y="198" width="24" height="32" rx="3" fill="#1A6B52"/>
+              <rect x="110" y="202" width="24" height="28" rx="3" fill="#1A6B52"/>
+              <rect x="140" y="216" width="24" height="14" rx="3" fill="#E3F0EB"/>
+              <rect x="170" y="216" width="16" height="14" rx="3" fill="#E3F0EB"/>
+              <!-- tip preview -->
+              <rect x="10" y="260" width="186" height="72" rx="12" fill="#0B4D3B"/>
+              <text x="18" y="274" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.4)">TODAY'S TIP</text>
+              <text x="18" y="288" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">Your streak is doing more than</text>
+              <text x="18" y="300" font-family="sans-serif" font-size="8.5" fill="rgba(255,255,255,0.9)">you think. Keep going →</text>
+              <text x="18" y="318" font-family="sans-serif" font-size="7" fill="rgba(255,255,255,0.3)">2 more tips today</text>
+              <!-- reminders -->
+              <rect x="10" y="342" width="186" height="70" rx="12" fill="white"/>
+              <text x="20" y="358" font-family="sans-serif" font-size="9" font-weight="bold" fill="#1C2B25">Reminders</text>
+              <rect x="20" y="364" width="28" height="28" rx="8" fill="#E3F0EB"/>
+              <text x="34" y="381" font-family="sans-serif" font-size="13" text-anchor="middle">💊</text>
+              <text x="56" y="375" font-family="sans-serif" font-size="8" font-weight="bold" fill="#1C2B25">Evening Metformin</text>
+              <text x="56" y="387" font-family="sans-serif" font-size="7" fill="#7A9E90">Due at 8:00 PM</text>
+              <rect x="20" y="396" width="28" height="12" rx="6" fill="#E3F0EB"/>
+              <text x="34" y="405" font-family="sans-serif" font-size="7" fill="#0B4D3B" text-anchor="middle">🏥</text>
+              <text x="56" y="405" font-family="sans-serif" font-size="7" fill="#7A9E90">Follow-up in 6 days</text>
+            </svg>
+          </div>
+        </div>
+        <div class="screenshot-label" style="color:rgba(255,255,255,0.6);">Home Dashboard</div>
+      </div>
+
+      <!-- Screen 3: History -->
+      <div class="screenshot-item reveal reveal-delay-2">
+        <div class="phone-frame" style="width:200px;height:400px;border-radius:32px;padding:8px;">
+          <div class="phone-screen" style="border-radius:26px;">
+            <svg width="100%" height="100%" viewBox="0 0 184 384" xmlns="http://www.w3.org/2000/svg">
+              <rect width="184" height="384" fill="#F0F8F4"/>
+              <rect width="184" height="60" fill="#0B4D3B"/>
+              <text x="16" y="30" font-family="sans-serif" font-size="13" font-weight="bold" fill="white">History</text>
+              <text x="16" y="46" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.5)">Last 30 days</text>
+              <!-- stat cards -->
+              <rect x="10" y="70" width="52" height="44" rx="10" fill="white"/>
+              <text x="36" y="88" font-family="sans-serif" font-size="16" font-weight="800" fill="#D94F3D" text-anchor="middle">198</text>
+              <text x="36" y="104" font-family="sans-serif" font-size="7" fill="#7A9E90" text-anchor="middle">Avg fast.</text>
+              <rect x="68" y="70" width="52" height="44" rx="10" fill="white"/>
+              <text x="94" y="88" font-family="sans-serif" font-size="16" font-weight="800" fill="#1A6B52" text-anchor="middle">86%</text>
+              <text x="94" y="104" font-family="sans-serif" font-size="7" fill="#7A9E90" text-anchor="middle">Med adh.</text>
+              <rect x="126" y="70" width="50" height="44" rx="10" fill="white"/>
+              <text x="151" y="88" font-family="sans-serif" font-size="16" font-weight="800" fill="#1A6B52" text-anchor="middle">23</text>
+              <text x="151" y="104" font-family="sans-serif" font-size="7" fill="#7A9E90" text-anchor="middle">Days logged</text>
+              <!-- chart -->
+              <rect x="10" y="124" width="164" height="80" rx="12" fill="white"/>
+              <text x="18" y="138" font-family="sans-serif" font-size="8" font-weight="bold" fill="#1C2B25">30-day fasting trend</text>
+              <rect x="18" y="148" width="10" height="40" rx="2" fill="#FDECEA"/>
+              <rect x="32" y="142" width="10" height="46" rx="2" fill="#D94F3D"/>
+              <rect x="46" y="152" width="10" height="36" rx="2" fill="#E3F0EB"/>
+              <rect x="60" y="156" width="10" height="32" rx="2" fill="#1A6B52"/>
+              <rect x="74" y="148" width="10" height="40" rx="2" fill="#FDECEA"/>
+              <rect x="88" y="144" width="10" height="44" rx="2" fill="#D94F3D"/>
+              <rect x="102" y="152" width="10" height="36" rx="2" fill="#E3F0EB"/>
+              <rect x="116" y="154" width="10" height="34" rx="2" fill="#1A6B52"/>
+              <rect x="130" y="148" width="10" height="40" rx="2" fill="#FDECEA"/>
+              <rect x="144" y="156" width="10" height="32" rx="2" fill="#E3F0EB"/>
+              <rect x="158" y="150" width="10" height="38" rx="2" fill="#FDECEA"/>
+              <!-- medication grid -->
+              <rect x="10" y="214" width="164" height="84" rx="12" fill="white"/>
+              <text x="18" y="228" font-family="sans-serif" font-size="8" font-weight="bold" fill="#1C2B25">Medication adherence</text>
+              <text x="130" y="228" font-family="sans-serif" font-size="8" fill="#1A6B52">86%</text>
+              <!-- dots grid -->
+              <rect x="18" y="234" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="32" y="234" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="46" y="234" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="60" y="234" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="74" y="234" width="11" height="11" rx="3" fill="#FDECEA"/>
+              <rect x="88" y="234" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="102" y="234" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="18" y="249" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="32" y="249" width="11" height="11" rx="3" fill="#FDECEA"/>
+              <rect x="46" y="249" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="60" y="249" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="74" y="249" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="88" y="249" width="11" height="11" rx="3" fill="#1A6B52"/>
+              <rect x="102" y="249" width="11" height="11" rx="3" fill="#FDECEA"/>
+              <!-- export button -->
+              <rect x="10" y="308" width="164" height="34" rx="17" fill="#0B4D3B"/>
+              <text x="92" y="329" font-family="sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">📄 Export PDF</text>
+              <!-- alerts -->
+              <rect x="10" y="352" width="164" height="26" rx="8" fill="#FDECEA" stroke="rgba(217,79,61,0.2)" stroke-width="1"/>
+              <text x="20" y="368" font-family="sans-serif" font-size="8" fill="#D94F3D">⚠ High glucose 3+ days</text>
+            </svg>
+          </div>
+        </div>
+        <div class="screenshot-label">History & PDF</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHO IT'S FOR ════════════════════════════ -->
+<section id="who" aria-labelledby="who-title">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Made for you</div>
+      <h2 id="who-title" class="section-title font-display">Built for Ethiopia,<br/>not adapted for it.</h2>
+    </div>
+    <div class="who-grid">
+      <div class="who-card who-card-patients reveal">
+        <div class="who-card-bg-text" aria-hidden="true">ጤና</div>
+        <div class="who-card-tag">For patients</div>
+        <h3 class="who-card-title">You're managing Type 2 diabetes every single day.</h3>
+        <p class="who-amharic font-ethiopic">ለኢትዮጵያ ታካሚዎች</p>
+        <ul class="who-list">
+          <li class="who-list-item">
+            <span class="who-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            You take Metformin but sometimes forget which dose you took
+          </li>
+          <li class="who-list-item">
+            <span class="who-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            Your doctor asks how you've been, and you can't quite remember
+          </li>
+          <li class="who-list-item">
+            <span class="who-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            You eat injera daily and wonder what it does to your readings
+          </li>
+          <li class="who-list-item">
+            <span class="who-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            You want guidance in Amharic, not translated English advice
+          </li>
+        </ul>
+      </div>
+      <div class="who-card who-card-providers reveal reveal-delay-1">
+        <div class="who-card-bg-text" style="color:rgba(11,77,59,0.04);" aria-hidden="true">Dr</div>
+        <div class="who-card-tag" style="color:var(--sage);">For healthcare providers</div>
+        <h3 class="who-card-title" style="color:var(--near-black);">Your patients arrive with three months of history, organized.</h3>
+        <ul class="who-list">
+          <li class="who-list-item">
+            <span class="who-check" style="background:var(--green-light);color:var(--green);"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            A clean PDF report with glucose trends, medication adherence, and symptoms
+          </li>
+          <li class="who-list-item">
+            <span class="who-check" style="background:var(--green-light);color:var(--green);"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            No app access needed. Patients bring the report to the appointment
+          </li>
+          <li class="who-list-item">
+            <span class="who-check" style="background:var(--green-light);color:var(--green);"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            The app does not diagnose or prescribe. It supports your clinical judgment
+          </li>
+          <li class="who-list-item">
+            <span class="who-check" style="background:var(--green-light);color:var(--green);"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            Recommend it to patients who struggle with recall between appointments
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ AI EXPLAINED ════════════════════════════ -->
+<section id="ai-explained" aria-labelledby="ai-title">
+  <div class="container">
+    <div class="ai-grid">
+      <div class="ai-visual reveal">
+        <div style="margin-bottom:12px;">
+          <div class="ai-data-row">
+            <span class="ai-data-label">Today's fasting</span>
+            <span class="ai-data-val ok">113 mg/dL</span>
+          </div>
+          <div class="ai-data-row">
+            <span class="ai-data-label">Post-breakfast</span>
+            <span class="ai-data-val warn">178 mg/dL</span>
+          </div>
+          <div class="ai-data-row">
+            <span class="ai-data-label">Metformin streak</span>
+            <span class="ai-data-val ok">12 days ✓</span>
+          </div>
+          <div class="ai-data-row">
+            <span class="ai-data-label">Awareness level</span>
+            <span class="ai-data-val" style="color:var(--gold2);">Medium</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin:16px 0 10px;padding:12px;background:rgba(255,255,255,0.06);border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">✦</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45);">AI generates tip using your data + WHO guidelines</div>
+        </div>
+        <div class="ai-tip-card">
+          <div class="ai-tip-label">💊 Medication · Streak reinforcement</div>
+          <div class="ai-tip-text">Your 12-day streak is doing more than you feel. Every consistent Metformin dose is quietly reducing how hard your liver works to flood your blood with glucose at night. Most people never see this invisible battle happening for them.</div>
+          <div class="ai-tip-fact">📌 Fact: Metformin reduces hepatic glucose production by up to 30% when taken consistently for 2+ weeks.</div>
+        </div>
+      </div>
+      <div class="ai-features reveal reveal-delay-1">
+        <div class="section-eyebrow">Honest AI</div>
+        <h2 id="ai-title" class="section-title font-display">Tips that know<br/>your body.</h2>
+        <p class="section-sub" style="margin-bottom:36px;">Tenachin AI doesn't give generic advice. It reads your actual data and writes something specific to you, every day.</p>
+        <div class="ai-feature-item">
+          <div class="ai-feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </div>
+          <div>
+            <div class="ai-feature-title">Progress-aware stories</div>
+            <div class="ai-feature-desc">Missed a dose? Get a story about what happened inside your body. On a streak? Get a story about what's improving. The tip changes based on what you're actually doing.</div>
+          </div>
+        </div>
+        <div class="ai-feature-item">
+          <div class="ai-feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="ai-feature-title">Grounded in real guidelines</div>
+            <div class="ai-feature-desc">Every tip is generated with WHO, IDF, and Ethiopian Ministry of Health guidelines embedded. The AI writes the story around facts we know are correct.</div>
+          </div>
+        </div>
+        <div class="ai-feature-item">
+          <div class="ai-feature-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div>
+            <div class="ai-feature-title">Never a prescription</div>
+            <div class="ai-feature-desc">Tenachin AI gives information. It does not change your doses, diagnose conditions, or replace your doctor. That boundary is hard-coded, not just a disclaimer.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRIVACY ════════════════════════════════ -->
+<section id="privacy" aria-labelledby="privacy-title">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:0;">
+      <div class="section-eyebrow" style="justify-content:center;">Your data</div>
+      <h2 id="privacy-title" class="section-title font-display">Private by design.</h2>
+    </div>
+    <div class="privacy-grid">
+      <div class="privacy-card reveal">
+        <div class="privacy-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3 class="privacy-title">Encrypted storage</h3>
+        <p class="privacy-desc">All your glucose readings, medications, and health data are encrypted at rest and in transit. Nobody but you can read your data.</p>
+      </div>
+      <div class="privacy-card reveal reveal-delay-1">
+        <div class="privacy-icon">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        <h3 class="privacy-title">Never sold</h3>
+        <p class="privacy-desc">Your health data is not a product. Tenachin AI does not sell, share, or monetize your information to third parties. Ever.</p>
+      </div>
+      <div class="privacy-card reveal reveal-delay-2">
+        <div class="privacy-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 class="privacy-title">No prescriptions</h3>
+        <p class="privacy-desc">Tenachin AI provides information and reminders. It does not prescribe medication, change your doses, or act as a medical professional.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════ -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="container">
+    <div class="faq-grid">
+      <div class="faq-intro reveal">
+        <div class="section-eyebrow">Questions</div>
+        <h2 id="faq-title" class="section-title font-display">Common questions.</h2>
+        <p class="section-sub">Everything you need to know before downloading.</p>
+        <div class="faq-contact">
+          <div class="faq-contact-title">Still have questions?</div>
+          <div class="faq-contact-text">Our team responds within 24 hours.</div>
+          <a href="mailto:hello@tenachinai.site" class="btn btn-ghost btn-sm" style="width:fit-content;">Email us →</a>
+        </div>
+      </div>
+      <div class="faq-list reveal reveal-delay-1">
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" role="button" aria-expanded="false">
+            Is Tenachin AI free to use?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Yes, completely free. There are no paid tiers, no subscriptions, and no hidden fees. Tenachin AI is free to download and use for all Ethiopian patients.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" role="button" aria-expanded="false">
+            Does it work without internet?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Yes. The app saves all your readings locally first. When your internet connection returns, everything syncs automatically. You never lose a reading because of poor connectivity.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" role="button" aria-expanded="false">
+            Is it available in Amharic?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Yes. Amharic is a first-class language in Tenachin AI, not a translation. You can switch between Amharic and English any time in settings. AI tips are generated directly in your chosen language.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" role="button" aria-expanded="false">
+            Does it replace my doctor?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">No, and it's designed not to. Tenachin AI helps you track, learn, and remember. Your doctor makes the clinical decisions. The PDF report you generate is meant to make your doctor's time more productive, not to replace them.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" role="button" aria-expanded="false">
+            What phones does it work on?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Tenachin AI works on Android (5.0 and above) and iPhone (iOS 13 and above). For Android users without Google Play access, you can download the APK directly from this page.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" role="button" aria-expanded="false">
+            Who built this app?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Tenachin AI was built by an Ethiopian developer designed specifically for the Ethiopian healthcare reality including local diets and medications available in Ethiopia.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA BANNER ══════════════════════════════ -->
+<section id="cta" aria-label="Download Tenachin AI">
+  <div class="cta-bg-text" aria-hidden="true">ጤና</div>
+  <div class="container">
+    <div class="cta-inner reveal">
+      <h2 class="cta-title font-display">Start tracking today.<br/>It's free.</h2>
+      <p class="cta-sub">Join Ethiopian patients who are finally taking control of their Type 2 diabetes, one reading at a time.</p>
+      <div class="cta-buttons">
+        <a href="#" class="download-btn download-btn-dark" aria-label="Download on App Store" onclick="event.preventDefault(); downloadComingSoon(this)">
+          <svg class="store-icon" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          <div class="store-text"><small>Download on the</small><strong>App Store</strong></div>
+        </a>
+        <a href="#" class="download-btn download-btn-dark" aria-label="Get on Google Play" onclick="event.preventDefault(); downloadComingSoon(this)">
+          <svg class="store-icon" viewBox="0 0 24 24" fill="white"><path d="M3.18 23.76c.3.17.65.19.97.07L14.76 12 3.18.17c-.32-.12-.67-.1-.97.07C1.78.48 1.5 1.01 1.5 1.6v20.8c0 .59.28 1.12.68 1.36zM17.54 15.27L5.3 22.07l9.97-9.97 2.27 3.17zm2.67-4.78c.45.27.79.76.79 1.51s-.34 1.24-.79 1.51L18 14.48l-2.42-2.42L18 9.63l2.21 .86zM5.3 1.93l12.24 6.8L15.27 12 5.3 1.93z"/></svg>
+          <div class="store-text"><small>Get it on</small><strong>Google Play</strong></div>
+        </a>
+        <a href="tenachinai.apk" download="tenachinai.apk" class="download-btn download-btn-apk" aria-label="Download APK">
+          <svg class="store-icon" viewBox="0 0 24 24" fill="none" stroke="#1A1A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <div class="store-text"><small>Android APK</small><strong>Direct download</strong></div>
+        </a>
+      </div>
+      <div class="cta-amharic font-ethiopic">ይህ ጤናዎ ነው። ዛሬ ይጀምሩ።</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════ -->
+<footer aria-label="Site footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-mark">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="7.5" y="1.5" width="3" height="15" rx="1.5" fill="white"/>
+              <rect x="1.5" y="7.5" width="15" height="3" rx="1.5" fill="white"/>
+              <circle cx="14.5" cy="4" r="2.5" fill="#1A1A18"/>
+              <circle cx="14.5" cy="4" r="1.2" fill="white"/>
+            </svg>
+          </div>
+          <span class="footer-logo-name">Tenachin <span>AI</span></span>
+        </div>
+        <p class="footer-tagline">AI-powered diabetes companion for Ethiopian patients. Free. Private. Built in Addis Ababa.</p>
+        <p class="footer-amharic font-ethiopic">ጤናችን AI, ጤናዎን ይቆጣጠሩ</p>
+      </div>
+      <div>
+        <div class="footer-col-title">App</div>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#screenshots">Screenshots</a></li>
+          <li><a href="#cta">Download</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">About</div>
+        <ul class="footer-links">
+          <li><a href="#who">Who it's for</a></li>
+          <li><a href="#ai-explained">The AI</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="cookies.html">Cookie Policy</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>
+        <div class="footer-copy">© 2026 Tenachin AI. All rights reserved.</div>
+      </div>
+      <div class="footer-legal">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Navbar scroll effect ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ── Scroll reveal ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── FAQ accordion ── */
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+  el.setAttribute('aria-expanded', !isOpen);
+}
+
+/* ── Mobile menu ── */
+function toggleMobileMenu() {
+  const nav = document.querySelector('.nav-links');
+  const cta = document.querySelector('.nav-cta');
+  [nav, cta].forEach(el => {
+    if (el) el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+  });
+}
+
+/* ── Language toggle (coming soon) ── */
+function navLangComingSoon(el) {
+  if (el.dataset.busy) return;
+  el.dataset.busy = '1';
+  el.textContent = 'Coming soon';
+  setTimeout(() => {
+    el.textContent = 'አማርኛ';
+    delete el.dataset.busy;
+  }, 1200);
+}
+
+/* ── Store buttons (coming soon) ── */
+function downloadComingSoon(el) {
+  if (el.dataset.busy) return;
+  el.dataset.busy = '1';
+  const orig = el.innerHTML;
+  el.textContent = 'Coming soon';
+  setTimeout(() => {
+    el.innerHTML = orig;
+    delete el.dataset.busy;
+  }, 1200);
+}
+</script>
+</body>
+</html>

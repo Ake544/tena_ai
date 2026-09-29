@@ -34,8 +34,8 @@ export default function OnboardingScreen() {
   const [medication, setMedication] = useState('');
   const [conditions, setConditions] = useState('');
   const [familyHistory, setFamilyHistory] = useState<'yes' | 'no' | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState(t('onboarding.walking'));
-  const [selectedDiet, setSelectedDiet] = useState(t('onboarding.injera'));
+  const [exerciseInput, setExerciseInput] = useState('');
+  const [dietInput, setDietInput] = useState('');
   const [selectedKnowledge, setSelectedKnowledge] = useState(0);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -91,6 +91,12 @@ export default function OnboardingScreen() {
 
   const handleSubmit = async () => {
     if (!fullName || !email || !password) return;
+    const w = parseFloat(weight);
+    const h = parseFloat(height);
+    const bmi =
+      Number.isFinite(w) && Number.isFinite(h) && w >= 20 && w <= 300 && h >= 60 && h <= 250
+        ? Math.round((w / Math.pow(h / 100, 2)) * 10) / 10
+        : undefined;
     setSubmitting(true);
     try {
       await authService.signup({
@@ -103,8 +109,9 @@ export default function OnboardingScreen() {
         sex: sex || undefined,
         family_history: familyHistory === 'yes',
         other_conditions: conditions || undefined,
-        exercise_habit: selectedExercise,
-        staple_diet: selectedDiet,
+        bmi,
+        exercise_habit: exerciseInput.trim() || undefined,
+        staple_diet: dietInput.trim() || undefined,
       });
       await SecureStore.setItemAsync('_pending_password', password);
       router.push({ pathname: '/(auth)/verify-email', params: { email } });
@@ -214,29 +221,9 @@ export default function OnboardingScreen() {
   const renderStep2 = () => (
     <>
       <Text style={styles.sectionLabel}>{t('onboarding.doYouExercise')}</Text>
-      <View style={styles.pillRow}>
-        {exercises.map((e) => (
-          <TouchableOpacity
-            key={e}
-            style={[styles.pill, selectedExercise === e && styles.pillOn]}
-            onPress={() => setSelectedExercise(e)}
-          >
-            <Text style={[styles.pillText, selectedExercise === e && styles.pillTextOn]}>{e}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <Input label="" placeholder={exercises.join(', ')} value={exerciseInput} onChangeText={setExerciseInput} />
       <Text style={styles.sectionLabel}>{t('onboarding.stapleDiet')}</Text>
-      <View style={styles.pillRow}>
-        {diets.map((d) => (
-          <TouchableOpacity
-            key={d}
-            style={[styles.pill, selectedDiet === d && styles.pillOn]}
-            onPress={() => setSelectedDiet(d)}
-          >
-            <Text style={[styles.pillText, selectedDiet === d && styles.pillTextOn]}>{d}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <Input label="" placeholder={diets.join(', ')} value={dietInput} onChangeText={setDietInput} />
       <Text style={styles.sectionLabel}>{t('onboarding.diabetesKnowledge')}</Text>
       {knowledgeLevels.map((k, i) => (
         <TouchableOpacity
@@ -295,30 +282,30 @@ export default function OnboardingScreen() {
               {showTerms ? (
                 <>
                   <Text style={styles.modalSectionTitle}>1. Acceptance of Terms</Text>
-                  <Text style={styles.modalText}>By creating an account and using Tenachin AI, you agree to be bound by these Terms of Service. If you do not agree, do not use the service.</Text>
-                  <Text style={styles.modalSectionTitle}>2. Health Data</Text>
-                  <Text style={styles.modalText}>Tenachin AI stores your health data securely using encryption. Your glucose readings, medication logs, and personal information are never shared with third parties without your explicit consent. You retain full ownership of your data.</Text>
-                  <Text style={styles.modalSectionTitle}>3. Not Medical Advice</Text>
-                  <Text style={styles.modalText}>Tenachin AI is a companion tool for diabetes management. It does not replace professional medical advice, diagnosis, or treatment. Always consult your healthcare provider for medical decisions.</Text>
-                  <Text style={styles.modalSectionTitle}>4. User Responsibilities</Text>
-                  <Text style={styles.modalText}>You are responsible for the accuracy of the data you enter. You must keep your login credentials secure. Notify us immediately if you suspect unauthorized access.</Text>
-                  <Text style={styles.modalSectionTitle}>5. Service Availability</Text>
-                  <Text style={styles.modalText}>We strive for high availability but do not guarantee uninterrupted service. We reserve the right to modify or discontinue features with reasonable notice.</Text>
+                  <Text style={styles.modalText}>By creating an account and using Tenachin AI, you agree to these Terms of Service. If you do not agree, do not use the service.</Text>
+                  <Text style={styles.modalSectionTitle}>2. Not a Medical Device</Text>
+                  <Text style={styles.modalText}>Tenachin AI is a tracking and educational tool. It does not diagnose, prescribe, or change medication doses. Always follow your doctor's treatment plan, and contact a health facility immediately in an emergency.</Text>
+                  <Text style={styles.modalSectionTitle}>3. Your Data Belongs to You</Text>
+                  <Text style={styles.modalText}>You retain ownership of the health data you enter. We use it only to provide and improve the service and we never sell it.</Text>
+                  <Text style={styles.modalSectionTitle}>4. Your Responsibilities</Text>
+                  <Text style={styles.modalText}>Enter your data as accurately as you can, keep your login details safe, and do not misuse the service.</Text>
+                  <Text style={styles.modalSectionTitle}>5. Governing Law</Text>
+                  <Text style={styles.modalText}>These terms are governed by the laws of the Federal Democratic Republic of Ethiopia.</Text>
+                  <Text style={styles.modalSectionTitle}>6. Contact</Text>
+                  <Text style={styles.modalText}>Questions? Email hello@tenachinai.site. Full Terms of Service are available on our website.</Text>
                 </>
               ) : (
                 <>
-                  <Text style={styles.modalSectionTitle}>1. Information We Collect</Text>
-                  <Text style={styles.modalText}>We collect personal information you provide: name, email address, password, age, weight, height, medical history, glucose readings, medication logs, symptoms, and lifestyle data.</Text>
-                  <Text style={styles.modalSectionTitle}>2. How We Use Your Data</Text>
-                  <Text style={styles.modalText}>Your data is used to generate personalized insights, tips, and reports for your diabetes management. We analyze patterns to provide educational content tailored to your condition.</Text>
-                  <Text style={styles.modalSectionTitle}>3. Data Storage & Security</Text>
-                  <Text style={styles.modalText}>Data is encrypted at rest and in transit. We use industry-standard security practices. Your data is stored on secure servers and is never sold or rented.</Text>
-                  <Text style={styles.modalSectionTitle}>4. Data Sharing</Text>
-                  <Text style={styles.modalText}>We do not share your personal health information with advertisers, marketers, or third parties. De-identified, aggregated data may be used for research purposes.</Text>
+                  <Text style={styles.modalSectionTitle}>1. What We Collect</Text>
+                  <Text style={styles.modalText}>We collect the information you provide: your name and profile details, your diabetes information, and the glucose readings, symptoms, medication logs, and appointment dates you record in the app.</Text>
+                  <Text style={styles.modalSectionTitle}>2. How We Use It</Text>
+                  <Text style={styles.modalText}>To show you your glucose history and trends, to generate your personalized daily AI tip, to send reminders and one-time codes, and to create the PDF report for your doctor.</Text>
+                  <Text style={styles.modalSectionTitle}>3. AI Tips</Text>
+                  <Text style={styles.modalText}>Only the data needed to write a relevant tip (such as recent readings and adherence) is sent to our AI provider, processed transiently, and never used to train their models.</Text>
+                  <Text style={styles.modalSectionTitle}>4. Storage & Processors</Text>
+                  <Text style={styles.modalText}>Your data is encrypted in transit and at rest, and saved first on your device. Limited data passes through Resend (email), Groq (AI tips), and Cloudflare R2 (storage), each bound to use it only to run the service.</Text>
                   <Text style={styles.modalSectionTitle}>5. Your Rights</Text>
-                  <Text style={styles.modalText}>You may request access to, correction of, or deletion of your data at any time. You can export your data or delete your account from the profile settings.</Text>
-                  <Text style={styles.modalSectionTitle}>6. Contact</Text>
-                  <Text style={styles.modalText}>For privacy-related inquiries, contact us at privacy@tenachinai.site. We will respond within 30 days.</Text>
+                  <Text style={styles.modalText}>You can access, export, correct, or delete your data. Email hello@tenachinai.site and we respond within 30 days. You can also delete your account from profile settings.</Text>
                 </>
               )}
             </ScrollView>
@@ -620,30 +607,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 8,
     marginBottom: 32,
-  },
-  pillRow: {
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-    marginBottom: 20,
-  },
-  pill: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 50,
-    backgroundColor: colors.bg2,
-  },
-  pillOn: {
-    backgroundColor: colors.green,
-  },
-  pillText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.t2,
-  },
-  pillTextOn: {
-    color: colors.white,
-    fontWeight: '700',
   },
   knowCard: {
     flexDirection: 'row',
