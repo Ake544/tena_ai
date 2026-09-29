@@ -1,3 +1,0 @@
-delivery confirmation tracking
-timezone edge-case hardening
-observability dashboard/logging
