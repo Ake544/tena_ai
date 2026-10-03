@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from '../../components/Card';
 import { colors, typography } from '../../constants/theme';
-import { tipService, Tip } from '../../services/tips';
+import { tipService } from '../../services/tips';
 
 const { width } = Dimensions.get('window');
 
@@ -43,25 +43,12 @@ function getCategoryIcon(category: string): string {
 export default function TipsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [tips, setTips] = useState<Tip[]>([]);
-  const [history, setHistory] = useState<Tip[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadTips();
-  }, []);
-
-  const loadTips = async () => {
-    try {
-      const data = await tipService.getToday();
-      setTips(data.today);
-      setHistory(data.history);
-    } catch (err) {
-      console.log('Failed to load tips', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data,
+    isLoading,
+  } = useQuery({ queryKey: ['tips', 'today'], queryFn: tipService.getToday });
+  const tips = data?.today ?? [];
+  const history = data?.history ?? [];
 
   return (
     <View style={styles.container}>
@@ -78,7 +65,7 @@ export default function TipsScreen() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {loading ? (
+        {isLoading ? (
           <Text style={{ textAlign: 'center', color: colors.t3, marginTop: 40 }}>{t('tips.loading')}</Text>
         ) : tips.length === 0 ? (
           <View style={{ alignItems: 'center', marginTop: 40 }}>

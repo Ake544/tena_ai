@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { colors } from '../constants/theme';
 

@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, typography, shadows } from '../../constants/theme';
 import Card from '../../components/Card';
-import { historyService, GlucoseSummary, AlertItem } from '../../services/history';
+import { historyService } from '../../services/history';
 import { exportService } from '../../services/export';
-import { symptomService, SymptomLog } from '../../services/symptom';
+import { symptomService } from '../../services/symptom';
 
 const SLOT_ORDER = ['Fasting', 'Post-Breakfast', 'Pre-Lunch', 'Post-Lunch', 'Pre-Dinner', 'Post-Dinner', 'Bedtime'];
 
@@ -22,32 +23,16 @@ function slotColor(val: number | null) {
 export default function HistoryScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [summary, setSummary] = useState<GlucoseSummary | null>(null);
-  const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [symptoms, setSymptoms] = useState<SymptomLog[]>([]);
-  const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const summaryQ = useQuery({ queryKey: ['history', 'summary', 30], queryFn: () => historyService.getSummary(30), retry: false });
+  const alertsQ = useQuery({ queryKey: ['history', 'alerts', 30], queryFn: () => historyService.getAlerts(30), retry: false });
+  const symptomsQ = useQuery({ queryKey: ['history', 'symptoms', 30], queryFn: () => symptomService.history(30), retry: false });
 
-  const loadData = async () => {
-    try {
-      const [s, a, sy] = await Promise.allSettled([
-        historyService.getSummary(30),
-        historyService.getAlerts(30),
-        symptomService.history(30),
-      ]);
-      if (s.status === 'fulfilled') setSummary(s.value);
-      if (a.status === 'fulfilled') setAlerts(a.value);
-      if (sy.status === 'fulfilled') setSymptoms(sy.value);
-    } catch (err) {
-      console.log('Failed to load history', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const summary = summaryQ.data ?? null;
+  const alerts = alertsQ.data ?? [];
+  const symptoms = symptomsQ.data ?? [];
+  const loading = [summaryQ, alertsQ, symptomsQ].some(q => q.isPending);
 
   const handleExport = async () => {
     setExporting(true);

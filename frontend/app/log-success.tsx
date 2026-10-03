@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { View, Text, TouchableOpacity, BackHandler } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -11,11 +12,11 @@ export default function LogSuccessScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { value, reading_type } = useLocalSearchParams<{ value: string; reading_type: string }>();
-  const [streak, setStreak] = useState(0);
+  const statsQ = useQuery({ queryKey: ['glucose', 'stats'], queryFn: patientService.getStats, retry: false });
+  const streak = statsQ.data?.days_logged ?? 0;
 
   useEffect(() => {
-    loadStreak();
-    syncService.syncPending();
+    syncService.syncPending().catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -25,15 +26,6 @@ export default function LogSuccessScreen() {
     });
     return () => back.remove();
   }, []);
-
-  const loadStreak = async () => {
-    try {
-      const stats = await patientService.getStats();
-      setStreak(stats.days_logged || 0);
-    } catch {
-      setStreak(0);
-    }
-  };
 
   const numValue = parseInt(value || '0', 10);
   const isNormal = numValue >= 70 && numValue <= 180;

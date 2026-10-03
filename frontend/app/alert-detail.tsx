@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { colors, shadows } from '../constants/theme';
 import Spinner from '../components/Spinner';
-import { alertService, Alert } from '../services/alerts';
+import { alertService } from '../services/alerts';
 
 const SEVERITY_CONFIG: Record<string, { bg: string; border: string; icon: string; text: string; labelKey: string }> = {
   urgent: { bg: '#FEE2E2', border: '#FECACA', icon: 'alert-triangle', text: '#991B1B', labelKey: 'alerts.urgent' },
@@ -16,30 +17,27 @@ const SEVERITY_CONFIG: Record<string, { bg: string; border: string; icon: string
 export default function AlertDetailScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const alertsQ = useQuery({
+    queryKey: id ? ['alerts', 'one', String(id)] : ['alerts', 'viewed'],
+    queryFn: async () => {
+      if (id) return [await alertService.getOne(String(id))];
+      const data = await alertService.getActive();
+      alertService.acknowledgeAll().catch(() => {});
+      return data;
+    },
+    retry: false,
+  });
+  const alerts = alertsQ.data ?? [];
+  const loading = alertsQ.isPending;
 
   useEffect(() => {
-    loadAlerts();
-  }, []);
-
-  const loadAlerts = async () => {
-    try {
-      if (id) {
-        const alert = await alertService.getOne(id);
-        setAlerts([alert]);
-      } else {
-        const data = await alertService.getActive();
-        setAlerts(data);
-        alertService.acknowledgeAll();
-      }
-    } catch (err) {
-      console.log('Failed to load alerts', err);
-    } finally {
-      setLoading(false);
+    if (!id && alertsQ.isSuccess) {
+      queryClient.setQueryData(['alerts', 'active'], []);
     }
-  };
+  }, [id, alertsQ.isSuccess, queryClient]);
 
   return loading ? (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -19,7 +20,8 @@ const apptTypeLabels: Record<string, string> = {
 export default function AppointmentsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const queryClient = useQueryClient();
+  const { data: appointments = [] } = useQuery({ queryKey: ['appointments'], queryFn: medicationService.listAppointments, retry: false });
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Appointment | null>(null);
   const [title, setTitle] = useState('');
@@ -28,19 +30,6 @@ export default function AppointmentsScreen() {
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('');
   const [notes, setNotes] = useState('');
-
-  useEffect(() => {
-    loadAppts();
-  }, []);
-
-  const loadAppts = async () => {
-    try {
-      const data = await medicationService.listAppointments();
-      setAppointments(data);
-    } catch (err) {
-      console.log('Failed to load appointments', err);
-    }
-  };
 
   const formatDate = (iso: string) => {
     const d = new Date(iso);
@@ -99,7 +88,7 @@ export default function AppointmentsScreen() {
         await medicationService.createAppointment({ title, hospital, appointment_type: appointmentType, date, notes });
       }
       setShowModal(false);
-      loadAppts();
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('appointments.errorSave'));
     }
@@ -110,7 +99,7 @@ export default function AppointmentsScreen() {
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('common.delete'), style: 'destructive', onPress: async () => {
         await medicationService.deleteAppointment(apt.id);
-        loadAppts();
+        queryClient.invalidateQueries({ queryKey: ['appointments'] });
       }},
     ]);
   };

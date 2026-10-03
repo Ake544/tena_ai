@@ -1,102 +1,86 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import type { DimensionValue } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import Spinner from '../../components/Spinner';
 import { patientService, PatientProfile, GlucoseStats, GlucoseTodaySlot } from '../../services/patient';
 import { syncService } from '../../services/sync';
 import { dbService } from '../../services/db';
 import { medicationService, Medication, Appointment } from '../../services/medication';
-import { tipService, Tip } from '../../services/tips';
-import { alertService, Alert } from '../../services/alerts';
+import { tipService } from '../../services/tips';
+import { alertService } from '../../services/alerts';
 import { chatService } from '../../services/chat';
 
 const HOME_CACHE_KEY = 'tenachin_ai_home_cache';
 
+type HomeCache = {
+  profile: PatientProfile | null;
+  stats: GlucoseStats | null;
+  todaySlots: GlucoseTodaySlot[];
+  medications: Medication[];
+  appointments: Appointment[];
+};
+
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [profile, setProfile] = useState<PatientProfile | null>(null);
-  const [stats, setStats] = useState<GlucoseStats | null>(null);
-  const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
-  const [medications, setMedications] = useState<Medication[]>([]);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [tips, setTips] = useState<Tip[]>([]);
-  const [unreadAlerts, setUnreadAlerts] = useState<Alert[]>([]);
   const [chatVisible, setChatVisible] = useState(false);
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      alertService.getActive().then(d => setUnreadAlerts(d)).catch(() => {});
-    }, [])
-  );
-
-  const loadData = async () => {
+  const cached = async <T,>(fetch: () => Promise<T>, select: (c: HomeCache) => T | null): Promise<T> => {
     try {
-      syncService.syncPending().catch(() => {});
-      const [p, s, t, m, a] = await Promise.allSettled([
-        patientService.getProfile(),
-        patientService.getStats(),
-        patientService.getTodayReadings(),
-        medicationService.list(),
-        medicationService.listAppointments(),
-      ]);
-      if (p.status === 'fulfilled') setProfile(p.value);
-      if (s.status === 'fulfilled') setStats(s.value);
-      if (t.status === 'fulfilled') setTodaySlots(t.value.slots);
-      if (m.status === 'fulfilled') setMedications(m.value);
-      if (a.status === 'fulfilled') setAppointments(a.value);
-      await tipService.getToday().then(d => setTips(d.today)).catch(() => {});
-      await alertService.getActive().then(d => setUnreadAlerts(d)).catch(() => {});
-      const failed = [p, s, t, m, a].filter(r => r.status === 'rejected');
-      if (failed.length === 0) {
-        dbService.cacheSet(HOME_CACHE_KEY, JSON.stringify({
-          profile: p.status === 'fulfilled' ? p.value : null,
-          stats: s.status === 'fulfilled' ? s.value : null,
-          todaySlots: t.status === 'fulfilled' ? t.value.slots : [],
-          medications: m.status === 'fulfilled' ? m.value : [],
-          appointments: a.status === 'fulfilled' ? a.value : [],
-        })).catch(() => {});
-      } else {
-        const cached = await dbService.cacheGet(HOME_CACHE_KEY).catch(() => null);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (p.status === 'rejected') setProfile(parsed.profile);
-          if (s.status === 'rejected') setStats(parsed.stats);
-          if (t.status === 'rejected') setTodaySlots(parsed.todaySlots);
-          if (m.status === 'rejected') setMedications(parsed.medications);
-          if (a.status === 'rejected') setAppointments(parsed.appointments);
-        }
-      }
-    } catch (err) {
-      console.log('Failed to load home data', err);
-      const cached = await dbService.cacheGet(HOME_CACHE_KEY).catch(() => null);
-      if (cached) {
+      return await fetch();
+    } catch {
+      const raw = await dbService.cacheGet(HOME_CACHE_KEY).catch(() => null);
+      if (raw) {
         try {
-          const parsed = JSON.parse(cached);
-          if (parsed.profile) setProfile(parsed.profile);
-          if (parsed.stats) setStats(parsed.stats);
-          if (parsed.todaySlots) setTodaySlots(parsed.todaySlots);
-          if (parsed.medications) setMedications(parsed.medications);
-          if (parsed.appointments) setAppointments(parsed.appointments);
+          const val = select(JSON.parse(raw) as HomeCache);
+          if (val != null) return val;
         } catch {}
       }
-    } finally {
-      setLoading(false);
+      throw new Error('Offline');
     }
   };
+
+  const profileQ = useQuery({ queryKey: ['profile'], queryFn: () => cached(() => patientService.getProfile(), c => c.profile), retry: false });
+  const statsQ = useQuery({ queryKey: ['glucose', 'stats'], queryFn: () => cached(() => patientService.getStats(), c => c.stats), retry: false });
+  const todayQ = useQuery({ queryKey: ['glucose', 'today'], queryFn: patientService.getTodayReadings, retry: false });
+  const medsQ = useQuery({ queryKey: ['medications'], queryFn: () => cached(() => medicationService.list(), c => c.medications), retry: false });
+  const appsQ = useQuery({ queryKey: ['appointments'], queryFn: () => cached(() => medicationService.listAppointments(), c => c.appointments), retry: false });
+  const tipsQ = useQuery({ queryKey: ['tips', 'today'], queryFn: tipService.getToday, retry: false });
+  const alertsQ = useQuery({ queryKey: ['alerts', 'active'], queryFn: alertService.getActive, retry: false });
+
+  const profile = profileQ.data ?? null;
+  const stats = statsQ.data ?? null;
+  const todaySlots = todayQ.data?.slots ?? [];
+  const medications = medsQ.data ?? [];
+  const appointments = appsQ.data ?? [];
+  const tips = tipsQ.data?.today ?? [];
+  const unreadAlerts = alertsQ.data ?? [];
+  const loading = [profileQ, statsQ, todayQ, medsQ, appsQ].some(q => q.isPending);
+
+  useEffect(() => {
+    syncService.syncPending().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (![profileQ, statsQ, todayQ, medsQ, appsQ].every(q => q.isSuccess)) return;
+    dbService.cacheSet(HOME_CACHE_KEY, JSON.stringify({
+      profile: profileQ.data ?? null,
+      stats: statsQ.data ?? null,
+      todaySlots: todayQ.data?.slots ?? [],
+      medications: medsQ.data ?? [],
+      appointments: appsQ.data ?? [],
+    })).catch(() => {});
+  }, [profileQ.data, statsQ.data, todayQ.data, medsQ.data, appsQ.data]);
 
   const splitList = (s: string | null) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : [];
 
@@ -180,7 +164,7 @@ export default function HomeScreen() {
     }
   };
 
-  const maxBarHeight = (val: number | null) => {
+  const maxBarHeight = (val: number | null): DimensionValue => {
     if (val === null) return '10%';
     const pct = (val / 300) * 100;
     return `${Math.min(Math.max(pct, 10), 95)}%`;

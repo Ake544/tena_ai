@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -6,7 +7,7 @@ import Card from '../../components/Card';
 import Spinner from '../../components/Spinner';
 import { colors, typography, shadows } from '../../constants/theme';
 import { authService } from '../../services/auth';
-import { patientService, PatientProfile } from '../../services/patient';
+import { patientService } from '../../services/patient';
 import { storageService } from '../../services/storage';
 import { pushService } from '../../services/push';
 import { useTranslation } from 'react-i18next';
@@ -48,33 +49,23 @@ function formatFamilyDetails(entries: FamilyEntry[]): string {
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [profile, setProfile] = useState<PatientProfile | null>(null);
+  const queryClient = useQueryClient();
   const [showEdit, setShowEdit] = useState<'medical' | 'exercise' | 'diet' | null>(null);
   const [editForm, setEditForm] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [familyEntries, setFamilyEntries] = useState<FamilyEntry[]>([]);
   const [exerciseEntries, setExerciseEntries] = useState<{ name: string; frequency: string }[]>([]);
-  const [loading, setLoading] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showTimezonePicker, setShowTimezonePicker] = useState(false);
 
   useEffect(() => {
-    loadProfile();
+    storageService.getNotificationsEnabled().then(setNotificationsEnabled).catch(() => {});
   }, []);
 
-  const loadProfile = async () => {
-    try {
-      const p = await patientService.getProfile();
-      setProfile(p);
-      const pref = await storageService.getNotificationsEnabled();
-      setNotificationsEnabled(pref);
-    } catch (err) {
-      console.log('Failed to load profile', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const profileQ = useQuery({ queryKey: ['profile'], queryFn: patientService.getProfile, retry: false });
+  const profile = profileQ.data ?? null;
+  const loading = profileQ.isPending;
 
   const initials = profile?.full_name
     ?.split(' ')
@@ -88,6 +79,7 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     await authService.logout();
+    queryClient.clear();
     router.replace('/(auth)/splash');
   };
 
@@ -113,6 +105,7 @@ export default function ProfileScreen() {
                     try {
                       await patientService.deleteAccount();
                       await authService.logout();
+                      queryClient.clear();
                       router.replace('/(auth)/splash');
                     } catch (err) {
                       Alert.alert(t('common.error'), t('profile.errorDelete'));
@@ -143,7 +136,7 @@ export default function ProfileScreen() {
       await patientService.updateProfile({ language: lang });
       await storageService.setLanguage(lang);
       await i18n.changeLanguage(lang);
-      await loadProfile();
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
     } catch (err) {
       console.log('Failed to update language', err);
     }
@@ -153,7 +146,7 @@ export default function ProfileScreen() {
   const handleTimezoneChange = async (tz: string) => {
     try {
       await patientService.updateProfile({ timezone: tz });
-      await loadProfile();
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
     } catch (err) {
       console.log('Failed to update timezone', err);
     }
@@ -250,7 +243,7 @@ export default function ProfileScreen() {
       const editedFamilyHistory = payload.family_history !== profile?.family_history;
 
       await patientService.updateProfile(payload);
-      await loadProfile();
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
       setShowEdit(null);
 
       if (editedFamilyHistory) {

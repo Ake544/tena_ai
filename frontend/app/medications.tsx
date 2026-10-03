@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,7 +19,8 @@ const freqLabels: Record<string, string> = {
 export default function MedicationsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [medications, setMedications] = useState<Medication[]>([]);
+  const queryClient = useQueryClient();
+  const { data: medications = [] } = useQuery({ queryKey: ['medications'], queryFn: medicationService.list, retry: false });
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Medication | null>(null);
   const [name, setName] = useState('');
@@ -26,19 +28,6 @@ export default function MedicationsScreen() {
   const [frequency, setFrequency] = useState('Twice daily');
   const [times, setTimes] = useState('8:00 AM, 8:00 PM');
   const [notes, setNotes] = useState('');
-
-  useEffect(() => {
-    loadMeds();
-  }, []);
-
-  const loadMeds = async () => {
-    try {
-      const data = await medicationService.list();
-      setMedications(data);
-    } catch (err) {
-      console.log('Failed to load medications', err);
-    }
-  };
 
   const openAdd = () => {
     setEditing(null);
@@ -72,7 +61,7 @@ export default function MedicationsScreen() {
         await medicationService.create({ name, dose, frequency, times, notes });
       }
       setShowModal(false);
-      loadMeds();
+      queryClient.invalidateQueries({ queryKey: ['medications'] });
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('medications.errorSave'));
     }
@@ -83,7 +72,7 @@ export default function MedicationsScreen() {
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('common.delete'), style: 'destructive', onPress: async () => {
         await medicationService.delete(med.id);
-        loadMeds();
+        queryClient.invalidateQueries({ queryKey: ['medications'] });
       }},
     ]);
   };
@@ -134,7 +123,7 @@ export default function MedicationsScreen() {
     }
     try {
       await medicationService.markTaken(med.id, time);
-      loadMeds();
+      queryClient.invalidateQueries({ queryKey: ['medications'] });
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('medications.errorSave'));
     }
@@ -148,7 +137,7 @@ export default function MedicationsScreen() {
     }
     try {
       await medicationService.markSkip(med.id, time);
-      loadMeds();
+      queryClient.invalidateQueries({ queryKey: ['medications'] });
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('medications.errorSave'));
     }

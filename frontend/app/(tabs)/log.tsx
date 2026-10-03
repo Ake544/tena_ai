@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +7,7 @@ import { useRouter } from 'expo-router';
 import Button from '../../components/Button';
 import { colors, spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import Spinner from '../../components/Spinner';
-import { patientService, GlucoseTodaySlot } from '../../services/patient';
+import { patientService } from '../../services/patient';
 import { dbService } from '../../services/db';
 import { syncService } from '../../services/sync';
 import { medicationService, Medication } from '../../services/medication';
@@ -31,46 +32,34 @@ type SymptomEntry = { name: string; severity: number };
 export default function LogScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [value, setValue] = useState(118);
   const [selectedType, setSelectedType] = useState('Pre-Dinner');
   const [selectedSymptoms, setSelectedSymptoms] = useState<SymptomEntry[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [todaySlots, setTodaySlots] = useState<GlucoseTodaySlot[]>([]);
   const [customSymptoms, setCustomSymptoms] = useState<SymptomEntry[]>([]);
   const [showSymptomInput, setShowSymptomInput] = useState(false);
   const [symptomInput, setSymptomInput] = useState('');
   const [severityTarget, setSeverityTarget] = useState<string | null>(null);
   const [severityTempValue, setSeverityTempValue] = useState(5);
 
-  const [medications, setMedications] = useState<Medication[]>([]);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
   const [showMedModal, setShowMedModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+  const todayQ = useQuery({ queryKey: ['glucose', 'today'], queryFn: patientService.getTodayReadings, retry: false });
+  const medsQ = useQuery({ queryKey: ['medications'], queryFn: medicationService.list, retry: false });
+  const todaySlots = todayQ.data?.slots ?? [];
+  const medications = medsQ.data ?? [];
+  const loading = todayQ.isPending || medsQ.isPending;
 
   useEffect(() => {
-    Promise.all([loadToday(), loadMedications()]).finally(() => setLoading(false));
-    syncService.syncPending();
+    syncService.syncPending().catch(() => {});
   }, []);
 
-  const loadToday = async () => {
-    try {
-      const res = await patientService.getTodayReadings();
-      setTodaySlots(res.slots);
-      const firstUnlogged = res.slots.find(s => s.value == null);
-      if (firstUnlogged) setSelectedType(firstUnlogged.reading_type);
-    } catch (err) {
-      console.log('Failed to load today readings', err);
-    }
-  };
-
-  const loadMedications = async () => {
-    try {
-      const data = await medicationService.list();
-      setMedications(data);
-    } catch (err) {
-      console.log('Failed to load medications', err);
-    }
-  };
+  useEffect(() => {
+    const firstUnlogged = todayQ.data?.slots.find(s => s.value == null);
+    if (firstUnlogged) setSelectedType(firstUnlogged.reading_type);
+  }, [todayQ.data]);
 
   const splitList = (s: string | null) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : [];
 
@@ -116,10 +105,12 @@ export default function LogScreen() {
 
   const handleMedAction = async (med: Medication, time: string, action: 'taken' | 'skip') => {
     try {
-      const updated = action === 'taken'
-        ? await medicationService.markTaken(med.id, time)
-        : await medicationService.markSkip(med.id, time);
-      setMedications(prev => prev.map(m => m.id === updated.id ? updated : m));
+      if (action === 'taken') {
+        await medicationService.markTaken(med.id, time);
+      } else {
+        await medicationService.markSkip(med.id, time);
+      }
+      queryClient.invalidateQueries({ queryKey: ['medications'] });
     } catch (err) {
       console.log(`Failed to mark ${action}`, err);
     }
@@ -196,11 +187,9 @@ export default function LogScreen() {
       }
     }
 
-    setTodaySlots(prev => prev.map(s =>
-      s.reading_type === selectedType && s.value === null
-        ? { ...s, value, timestamp: logData.timestamp, id: 'local' }
-        : s
-    ));
+    queryClient.invalidateQueries({ queryKey: ['glucose', 'today'] });
+    queryClient.invalidateQueries({ queryKey: ['glucose', 'stats'] });
+    queryClient.invalidateQueries({ queryKey: ['history'] });
 
     setSubmitting(false);
     router.push(`/log-success?value=${value}&reading_type=${encodeURIComponent(selectedType)}`);

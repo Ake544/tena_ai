@@ -1,11 +1,16 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import '../locales/i18n';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
 
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { staleTime: 5 * 60 * 1000, retry: 1 } },
+});
+
 export default function RootLayout() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
       <MedicalDisclaimer />
       <Stack screenOptions={{ headerShown: false }}>
@@ -16,6 +21,6 @@ export default function RootLayout() {
         <Stack.Screen name="medications" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="appointments" options={{ animation: 'slide_from_right' }} />
       </Stack>
-    </>
+      </QueryClientProvider>
   );
 }

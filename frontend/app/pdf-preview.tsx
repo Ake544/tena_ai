@@ -1,38 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, shadows, borderRadius } from '../constants/theme';
-import { patientService, PatientProfile, GlucoseStats } from '../services/patient';
-import { medicationService, Medication } from '../services/medication';
+import { patientService } from '../services/patient';
+import { medicationService } from '../services/medication';
 
 export default function PdfPreviewScreen() {
   const { t } = useTranslation();
   const { url } = useLocalSearchParams<{ url: string }>();
   const router = useRouter();
-  const [profile, setProfile] = useState<PatientProfile | null>(null);
-  const [stats, setStats] = useState<GlucoseStats | null>(null);
-  const [medications, setMedications] = useState<Medication[]>([]);
   const [downloading, setDownloading] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const [p, s, m] = await Promise.allSettled([
-        patientService.getProfile(),
-        patientService.getStats(),
-        medicationService.list(),
-      ]);
-      if (p.status === 'fulfilled') setProfile(p.value);
-      if (s.status === 'fulfilled') setStats(s.value);
-      if (m.status === 'fulfilled') setMedications(m.value);
-    } catch {}
-  };
+  const profileQ = useQuery({ queryKey: ['profile'], queryFn: patientService.getProfile, retry: false });
+  const statsQ = useQuery({ queryKey: ['glucose', 'stats'], queryFn: patientService.getStats, retry: false });
+  const medsQ = useQuery({ queryKey: ['medications'], queryFn: medicationService.list, retry: false });
+  const profile = profileQ.data ?? null;
+  const stats = statsQ.data ?? null;
+  const medications = medsQ.data ?? [];
 
   const handleDownload = async () => {
     if (!url) return;
