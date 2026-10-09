@@ -45,6 +45,7 @@ export default function LogScreen() {
 
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
   const [showMedModal, setShowMedModal] = useState(false);
+  const [busyAction, setBusyAction] = useState<string | null>(null);
 
   const todayQ = useQuery({ queryKey: ['glucose', 'today'], queryFn: patientService.getTodayReadings, retry: false });
   const medsQ = useQuery({ queryKey: ['medications'], queryFn: medicationService.list, retry: false });
@@ -104,6 +105,9 @@ export default function LogScreen() {
   }, []);
 
   const handleMedAction = async (med: Medication, time: string, action: 'taken' | 'skip') => {
+    if (busyAction) return;
+    const key = `${time}:${action}`;
+    setBusyAction(key);
     try {
       if (action === 'taken') {
         await medicationService.markTaken(med.id, time);
@@ -111,11 +115,13 @@ export default function LogScreen() {
         await medicationService.markSkip(med.id, time);
       }
       queryClient.invalidateQueries({ queryKey: ['medications'] });
-    } catch (err) {
-      console.log(`Failed to mark ${action}`, err);
+      setShowMedModal(false);
+      setSelectedMed(null);
+    } catch (err: any) {
+      Alert.alert(t('common.error'), err.response?.data?.detail || t('medications.errorSave'));
+    } finally {
+      setBusyAction(null);
     }
-    setShowMedModal(false);
-    setSelectedMed(null);
   };
 
   const toggleSymptom = (label: string) => {
@@ -461,10 +467,14 @@ export default function LogScreen() {
                               </View>
                             ) : (
                               <>
-                                <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'taken')} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.green }}>
-                                  <Text style={{ fontSize: 12, fontWeight: '700', color: colors.white }}>{t('log.take')}</Text>
+                                <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'taken')} disabled={busyAction !== null} style={{ minWidth: 74, paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, alignItems: 'center', backgroundColor: colors.green }}>
+                                  {busyAction === `${time}:taken` ? (
+                                    <Spinner size={16} color={colors.white} />
+                                  ) : (
+                                    <Text style={{ fontSize: 12, fontWeight: '700', color: colors.white }}>{t('log.take')}</Text>
+                                  )}
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'skip')} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.t4 }}>
+                                <TouchableOpacity onPress={() => handleMedAction(selectedMed, time, 'skip')} disabled={busyAction !== null} style={{ minWidth: 74, paddingVertical: 6, paddingHorizontal: 14, borderRadius: 50, alignItems: 'center', backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.t4 }}>
                                   <Text style={{ fontSize: 12, fontWeight: '700', color: colors.t2 }}>{t('log.skip')}</Text>
                                 </TouchableOpacity>
                               </>

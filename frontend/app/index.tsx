@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Redirect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { colors } from '../constants/theme';
+import Spinner from '../components/Spinner';
 
 export default function Index() {
   const [token, setToken] = useState<string | null | undefined>(undefined);
@@ -14,7 +15,7 @@ export default function Index() {
   if (token === undefined) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <Spinner color={colors.primary} />
       </View>
     );
   }

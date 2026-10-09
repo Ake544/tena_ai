@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, typography, shadows } from '../../constants/theme';
 import Card from '../../components/Card';
+import Spinner from '../../components/Spinner';
 import { historyService } from '../../services/history';
 import { exportService } from '../../services/export';
 import { symptomService } from '../../services/symptom';
@@ -82,7 +83,7 @@ export default function HistoryScreen() {
         </View>
         <TouchableOpacity onPress={handleExport} disabled={exporting} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.greenLight, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 9999, opacity: exporting ? 0.6 : 1 }}>
           {exporting ? (
-            <ActivityIndicator size="small" color={colors.green} />
+            <Spinner size={16} color={colors.green} />
           ) : (
             <Feather name="download" size={16} color={colors.green} />
           )}
@@ -92,7 +93,7 @@ export default function HistoryScreen() {
 
       {loading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color={colors.green} />
+          <Spinner color={colors.green} />
         </View>
       ) : (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>

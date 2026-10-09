@@ -6,6 +6,7 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, shadows } from '../constants/theme';
 import { useTranslation } from 'react-i18next';
 import { medicationService, Medication } from '../services/medication';
+import Spinner from '../components/Spinner';
 
 const frequencies = ['Once daily', 'Twice daily', 'Three times daily', 'As needed'];
 
@@ -28,6 +29,7 @@ export default function MedicationsScreen() {
   const [frequency, setFrequency] = useState('Twice daily');
   const [times, setTimes] = useState('8:00 AM, 8:00 PM');
   const [notes, setNotes] = useState('');
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const openAdd = () => {
     setEditing(null);
@@ -118,28 +120,36 @@ export default function MedicationsScreen() {
   const handleTaken = async (med: Medication) => {
     const time = findNearestPendingTime(med);
     if (!time) {
-      Alert.alert(t('medications.allTaken'), t('medications.allTaken', { name: med.name }));
+      Alert.alert(t('medications.allDone'), t('medications.allTaken', { name: med.name }));
       return;
     }
+    if (busyId) return;
+    setBusyId(med.id);
     try {
       await medicationService.markTaken(med.id, time);
       queryClient.invalidateQueries({ queryKey: ['medications'] });
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('medications.errorSave'));
+    } finally {
+      setBusyId(null);
     }
   };
 
   const handleSkip = async (med: Medication) => {
     const time = findNearestPendingTime(med);
     if (!time) {
-      Alert.alert(t('medications.allDone'), t('medications.allDone', { name: med.name }));
+      Alert.alert(t('medications.allDone'));
       return;
     }
+    if (busyId) return;
+    setBusyId(med.id);
     try {
       await medicationService.markSkip(med.id, time);
       queryClient.invalidateQueries({ queryKey: ['medications'] });
     } catch (err: any) {
       Alert.alert(t('common.error'), err.response?.data?.detail || t('medications.errorSave'));
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -188,12 +198,16 @@ export default function MedicationsScreen() {
                   <Text style={{ fontSize: 15, fontWeight: '700', color: colors.t1 }}>{med.name} {med.dose}</Text>
                   <Text style={{ fontSize: 12, color: colors.t3, marginTop: 2 }}>{t(`medications.${freqLabels[med.frequency]}`)} · {med.times}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', gap: 6 }}>
-                  <TouchableOpacity onPress={() => handleTaken(med)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, backgroundColor: med.taken_today ? colors.greenLight : colors.bg2 }}>
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: med.taken_today ? colors.green : colors.t3 }}>{med.taken_today ? t('medications.taken') : t('medications.take')}</Text>
+                <View style={{ flexDirection: 'row', gap: 6, opacity: busyId && busyId !== med.id ? 0.6 : 1 }}>
+                  <TouchableOpacity onPress={() => handleTaken(med)} disabled={busyId !== null} style={{ minWidth: 64, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, alignItems: 'center', backgroundColor: med.taken_today ? colors.greenLight : colors.bg2 }}>
+                    {busyId === med.id ? (
+                      <Spinner size={16} color={colors.green} />
+                    ) : (
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: med.taken_today ? colors.green : colors.t3 }}>{med.taken_today ? t('medications.taken') : t('medications.take')}</Text>
+                    )}
                   </TouchableOpacity>
                   {!med.taken_today && (
-                    <TouchableOpacity onPress={() => handleSkip(med)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, backgroundColor: colors.bg2 }}>
+                    <TouchableOpacity onPress={() => handleSkip(med)} disabled={busyId !== null} style={{ minWidth: 56, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 50, alignItems: 'center', backgroundColor: colors.bg2 }}>
                       <Text style={{ fontSize: 11, fontWeight: '700', color: colors.t3 }}>{t('medications.skip')}</Text>
                     </TouchableOpacity>
                   )}

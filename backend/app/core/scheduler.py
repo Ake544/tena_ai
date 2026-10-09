@@ -20,16 +20,33 @@ def _get_offset(tz_name: str) -> int:
     return int(now.utcoffset().total_seconds() / 3600)
 
 
-def _parse_time_to_utc(time_str: str, tz_name: str = "Africa/Addis_Ababa") -> tuple[int, int]:
-    parts = time_str.replace("\u202f", " ").split()
-    h_str, m_str = parts[0].split(":")
-    h, m = int(h_str), int(m_str)
-    is_pm = len(parts) > 1 and "PM" in parts[1].upper()
-    is_am = len(parts) > 1 and "AM" in parts[1].upper()
-    if is_pm and h != 12:
-        h += 12
-    if is_am and h == 12:
-        h = 0
+def _parse_local_time(time_str: str) -> tuple[int, int] | None:
+    try:
+        s = time_str.replace("\u202f", " ").strip()
+        s = re.sub(r"\.(\d{2})", r":\1", s)
+        match = re.match(r"^(\d{1,2})(?::(\d{1,2}))?\s*([AaPp][Mm])?$", s)
+        if not match:
+            raise ValueError(s)
+        h = int(match.group(1))
+        m = int(match.group(2) or 0)
+        mer = (match.group(3) or "").upper()
+        if mer == "PM" and h != 12:
+            h += 12
+        if mer == "AM" and h == 12:
+            h = 0
+        if 0 <= h < 24 and 0 <= m < 60:
+            return (h, m)
+    except (ValueError, IndexError):
+        pass
+    logger.warning(f"Unparseable medication time: {time_str!r}")
+    return None
+
+
+def _parse_time_to_utc(time_str: str, tz_name: str = "Africa/Addis_Ababa") -> tuple[int, int] | None:
+    parsed = _parse_local_time(time_str)
+    if parsed is None:
+        return None
+    h, m = parsed
     offset = _get_offset(tz_name)
     utc_h = (h - offset) % 24
     return (utc_h, m)
@@ -65,7 +82,11 @@ def schedule_medication(med):
     tz_name = _get_patient_tz(med.patient_id)
     times = _split_times(med.times)
     for t in times:
-        h, m = _parse_time_to_utc(t, tz_name)
+        parsed = _parse_time_to_utc(t, tz_name)
+        if parsed is None:
+            logger.warning(f"Skipping med {med_id} — unparseable time {t!r}")
+            continue
+        h, m = parsed
         job_id = f"med_{med_id}_{h:02d}{m:02d}"
         scheduler.add_job(
             send_medication_reminder,
@@ -98,7 +119,7 @@ def reschedule_all_medications():
 def reset_taken_today():
     db = SessionLocal()
     try:
-        count = db.query(Medication).filter(Medication.taken_today == True).update(
+        count = db.query(Medication).update(
             {"taken_today": False, "taken_times": None, "skipped_times": None},
             synchronize_session=False,
         )

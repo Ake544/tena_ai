@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import type { DimensionValue } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -432,7 +432,7 @@ export default function HomeScreen() {
                   <Feather name="message-circle" size={14} color={colors.green} />
                 </View>
                 <View style={{ backgroundColor: colors.surface, borderRadius: 16, borderBottomLeftRadius: 4, padding: 14, ...shadows.sm }}>
-                  <ActivityIndicator size="small" color={colors.green} />
+                  <Spinner size={16} color={colors.green} />
                 </View>
               </View>
             )}

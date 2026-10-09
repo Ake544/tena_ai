@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 import { colors } from '../constants/theme';
 
-export default function Spinner({ color }: { color?: string }) {
+export default function Spinner({ color, size = 28 }: { color?: string; size?: number }) {
   const c = color || colors.green;
   const spinValue = useRef(new Animated.Value(0)).current;
 
@@ -26,10 +26,10 @@ export default function Spinner({ color }: { color?: string }) {
   return (
     <Animated.View
       style={{
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        borderWidth: 3,
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        borderWidth: Math.max(2, Math.round(size / 9)),
         borderColor: 'rgba(11,77,59,0.25)',
         borderTopColor: c,
         transform: [{ rotate }],

@@ -22,7 +22,7 @@ export default function Button({ title, onPress, variant = 'primary', size = 'md
       activeOpacity={0.8}
     >
       {loading ? (
-        <Spinner color={variant === 'gold' || variant === 'outline' || variant === 'ghost' ? colors.green : colors.white} />
+        <Spinner size={18} color={variant === 'gold' || variant === 'outline' || variant === 'ghost' ? colors.green : colors.white} />
       ) : (
         <Text style={[styles.text, styles[`text_${variant}`], styles[`textSize_${size}`]]}>{title}</Text>
       )}

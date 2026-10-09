@@ -7,7 +7,10 @@ from app.models.patient import Patient
 from app.models.medication import Medication
 from app.schemas.medication import MedicationCreate, MedicationUpdate, MedicationResponse
 from app.routers.patient import get_current_patient
+import logging
 import re
+
+logger = logging.getLogger(__name__)
 
 
 def _split_times(t: str | None) -> list[str]:
@@ -16,25 +19,49 @@ def _split_times(t: str | None) -> list[str]:
     return [x.strip() for x in t.split(",") if x.strip()]
 
 
+def _parse_time(t: str) -> list | None:
+    try:
+        s = t.replace("\u202f", " ").strip()
+        s = re.sub(r"\.(\d{2})", r":\1", s)
+        match = re.match(r"^(\d{1,2})(?::(\d{1,2}))?\s*([AaPp][Mm])?$", s)
+        if not match:
+            raise ValueError(s)
+        h = int(match.group(1))
+        m = int(match.group(2) or 0)
+        mer = (match.group(3) or "").upper()
+        if mer == "PM" and h != 12:
+            h += 12
+        if mer == "AM" and h == 12:
+            h = 0
+        if 0 <= h < 24 and 0 <= m < 60:
+            return [h, m]
+    except (ValueError, IndexError):
+        pass
+    logger.warning(f"Unparseable medication time: {t!r}")
+    return None
+
+
 def _time_sort_key(t: str) -> list:
-    t = t.strip()
-    is_pm = "PM" in t.upper()
-    is_am = "AM" in t.upper()
-    clean = re.sub(r"\s*[APap][Mm]\s*", "", t).strip()
-    h_str, m_str = clean.split(":")
-    h = int(h_str)
-    m = int(m_str)
-    if is_pm and h != 12:
-        h += 12
-    if is_am and h == 12:
-        h = 0
-    return [h, m]
+    return _parse_time(t) or [0, 0]
+
+
+def _validate_times(raw: str) -> None:
+    times = _split_times(raw)
+    if not times:
+        raise HTTPException(status_code=400, detail="At least one time is required")
+    for t in times:
+        if _parse_time(t) is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid time '{t}' — use a format like 8:00 AM or 20:00",
+            )
 
 router = APIRouter(prefix="/medications", tags=["medications"])
 
 
 @router.post("", response_model=MedicationResponse, status_code=status.HTTP_201_CREATED)
 def create_medication(payload: MedicationCreate, current_patient: Patient = Depends(get_current_patient), db: Session = Depends(get_db)):
+    _validate_times(payload.times)
     med = Medication(
         patient_id=current_patient.id,
         name=payload.name,
@@ -61,6 +88,8 @@ def update_medication(med_id: str, payload: MedicationUpdate, current_patient: P
     if not med:
         raise HTTPException(status_code=404, detail="Medication not found")
     update_data = payload.model_dump(exclude_unset=True)
+    if update_data.get("times") is not None:
+        _validate_times(update_data["times"])
     for field, value in update_data.items():
         setattr(med, field, value)
     db.commit()

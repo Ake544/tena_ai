@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors, shadows, borderRadius } from '../constants/theme';
 import { patientService } from '../services/patient';
 import { medicationService } from '../services/medication';
+import Spinner from '../components/Spinner';
 
 export default function PdfPreviewScreen() {
   const { t } = useTranslation();
@@ -143,7 +144,7 @@ try {
           style={{ backgroundColor: colors.green, borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12, ...shadows.green, opacity: downloading || !url ? 0.6 : 1 }}
         >
           {downloading ? (
-            <ActivityIndicator size="small" color={colors.white} />
+            <Spinner size={16} color={colors.white} />
           ) : (
             <Feather name="download" size={18} color={colors.white} />
           )}
