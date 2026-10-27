@@ -16,6 +16,13 @@
     "submit": "Submit",
     "ok": "OK"
   },
+  "tabs": {
+    "home": "Home",
+    "log": "Log",
+    "tips": "Tips",
+    "history": "History",
+    "profile": "Profile"
+  },
   "onboarding": {
     "slide1Title": "Track Your Blood Sugar",
     "slide1Description": "Easily log and monitor your blood glucose levels throughout the day with smart reminders.",
@@ -300,7 +307,7 @@
     "appSettings": "App Settings",
     "language": "Language",
     "english": "English",
-    "amharic": "\u12a0\u121b\u122d\u1295",
+    "amharic": "\u12a0\u121b\u122d\u129b",
     "notifications": "Notifications",
     "darkMode": "Dark Mode",
     "about": "About",

@@ -77,10 +77,23 @@ export default function ProfileScreen() {
     ? new Date(profile.created_at).getFullYear()
     : null;
 
-  const handleLogout = async () => {
-    await authService.logout();
-    queryClient.clear();
-    router.replace('/(auth)/splash');
+  const handleLogout = () => {
+    Alert.alert(
+      t('profile.signOut'),
+      t('profile.signOutSub'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('profile.signOut'),
+          style: 'destructive',
+          onPress: async () => {
+            await authService.logout();
+            queryClient.clear();
+            router.replace('/(auth)/splash');
+          },
+        },
+      ]
+    );
   };
 
   const handleDeleteAccount = () => {
@@ -415,7 +428,7 @@ export default function ProfileScreen() {
               <View style={styles.settingIcon}><Feather name="globe" size={20} color={colors.t1} /></View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>{t('profile.language')}</Text>
-                <Text style={styles.settingSub}>English · Amharic (Coming soon)</Text>
+                <Text style={styles.settingSub}>{t('profile.english')} - {t('profile.amharic')}</Text>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -722,11 +735,15 @@ export default function ProfileScreen() {
                 </View>
                 <Text style={{ fontSize: 16, fontWeight: '600', color: colors.t1 }}>{t('profile.english')}</Text>
               </TouchableOpacity>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 4, opacity: 0.4 }}>
-                <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.t4, alignItems: 'center', justifyContent: 'center' }}>
+              <TouchableOpacity
+                onPress={() => handleLanguageChange('am')}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 4 }}
+              >
+                <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: (profile?.language || 'en') === 'am' ? colors.green : colors.t4, alignItems: 'center', justifyContent: 'center' }}>
+                  {(profile?.language || 'en') === 'am' && <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colors.green }} />}
                 </View>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.t3 }}>አማርኛ (Amharic) — Coming soon</Text>
-              </View>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.t1 }}>{t('profile.amharic')}</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableWithoutFeedback>

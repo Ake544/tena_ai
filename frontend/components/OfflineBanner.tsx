@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StatusBar, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import { syncService } from '../services/sync';
 import { colors } from '../constants/theme';
@@ -71,7 +72,7 @@ export default function OfflineBanner() {
 
   return (
     <>
-      <StatusBar backgroundColor="#F07A30" barStyle="light-content" />
+      <StatusBar style="light" />
 
       {expanded && (
         <Animated.View

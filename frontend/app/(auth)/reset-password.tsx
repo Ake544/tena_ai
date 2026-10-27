@@ -15,7 +15,7 @@ export default function ResetPasswordScreen() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const inputRefs = useRef<any[]>([]);
 
   const handleOtpChange = (text: string, index: number) => {
     const digit = text.replace(/[^0-9]/g, '');

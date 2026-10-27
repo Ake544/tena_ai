@@ -1,22 +1,12 @@
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
+import type { BottomTabBarProps } from 'expo-router/tabs';
+import { useTranslation } from 'react-i18next';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { colors } from '../constants/theme';
 
 type Tab = 'home' | 'log' | 'tips' | 'history' | 'profile';
 
-interface TabConfig {
-  key: Tab;
-  label: string;
-}
-
-const tabs: TabConfig[] = [
-  { key: 'home', label: 'Home' },
-  { key: 'log', label: 'Log' },
-  { key: 'tips', label: 'Tips' },
-  { key: 'history', label: 'History' },
-  { key: 'profile', label: 'Profile' },
-];
+const tabKeys: Tab[] = ['home', 'log', 'tips', 'history', 'profile'];
 
 const iconSize = 24;
 const strokeWidth = 1.8;
@@ -79,7 +69,8 @@ const iconComponents: Record<Tab, typeof HomeIcon> = {
   profile: ProfileIcon,
 };
 
-export default function BottomNav({ state, descriptors, navigation }: BottomTabBarProps) {
+export default function BottomNav({ state, descriptors, emitter, navigateToTab }: BottomTabBarProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
@@ -87,17 +78,16 @@ export default function BottomNav({ state, descriptors, navigation }: BottomTabB
         const key = route.name as Tab;
         const isActive = state.index === index;
         const Icon = iconComponents[key];
-        const tabConfig = tabs.find((t) => t.key === key);
-        const label = tabConfig?.label ?? '';
+        const label = tabKeys.includes(key) ? t(`tabs.${key}`) : '';
 
         const onPress = () => {
-          const event = navigation.emit({
+          const event = emitter.emit({
             type: 'tabPress',
             target: route.key,
             canPreventDefault: true,
           });
           if (!isActive && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+            navigateToTab(route.key);
           }
         };
 

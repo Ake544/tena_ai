@@ -16,7 +16,7 @@ export default function VerifyEmailScreen() {
   const [email] = useState(paramEmail || '');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
-  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const inputRefs = useRef<any[]>([]);
 
   useEffect(() => {
     if (email) {

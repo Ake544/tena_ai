@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,8 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { colors, borderRadius } from '../../constants/theme';
 import { authService } from '../../services/auth';
+import { storageService } from '../../services/storage';
+import i18n from '../../locales/i18n';
 
 const gradientSets = [
   ['#0B4D3B', '#071F18'] as const,
@@ -21,6 +23,10 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    storageService.getLanguage().then((saved) => setLang(saved));
+  }, []);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -136,14 +142,14 @@ export default function OnboardingScreen() {
       <View style={styles.toggleWrap}>
         <TouchableOpacity
           style={[styles.toggleOpt, lang === 'am' && styles.toggleOptOn]}
-          onPress={() => Alert.alert('Coming soon', t('onboarding.amharicComingSoon'))}
+          onPress={async () => { await storageService.setLanguage('am'); await i18n.changeLanguage('am'); setLang('am'); }}
         >
           <Text style={[lang === 'am' ? styles.toggleTextOn : styles.toggleTextOff]}>{t('onboarding.amharic')}</Text>
           <Text style={[styles.toggleSub, lang === 'am' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.amharic')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.toggleOpt, lang === 'en' && styles.toggleOptOn]}
-          onPress={() => setLang('en')}
+          onPress={async () => { await storageService.setLanguage('en'); await i18n.changeLanguage('en'); setLang('en'); }}
         >
           <Text style={[lang === 'en' ? styles.toggleTextOn : styles.toggleTextOff]}>{t('onboarding.english')}</Text>
           <Text style={[styles.toggleSub, lang === 'en' ? styles.toggleSubOn : styles.toggleSubOff]}>{t('onboarding.english')}</Text>

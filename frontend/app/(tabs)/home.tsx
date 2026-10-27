@@ -33,7 +33,7 @@ export default function HomeScreen() {
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<any>(null);
 
   const cached = async <T,>(fetch: () => Promise<T>, select: (c: HomeCache) => T | null): Promise<T> => {
     try {
