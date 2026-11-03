@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0B4D3B"
       },
-      "package": "com.tenachinai.app"
+      "package": "com.tenachinai.app",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/icon.png"
@@ -30,7 +31,8 @@
       "expo-router",
       "expo-secure-store",
       "expo-sqlite",
-      "expo-font"
+      "expo-font",
+      "expo-notifications"
     ],
     "extra": {
       "router": {},

@@ -22,7 +22,7 @@ def chat_message(
 ):
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-    response_text = generate_chat_response(current_patient, db, payload.message)
+    response_text = generate_chat_response(current_patient, db, payload.message, payload.language)
     return {"response": response_text}
 
 

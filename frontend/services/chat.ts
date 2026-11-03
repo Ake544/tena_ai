@@ -8,8 +8,8 @@ export interface ChatMessage {
 }
 
 export const chatService = {
-  async sendMessage(message: string): Promise<string> {
-    const res = await api.post('/chat/message', { message });
+  async sendMessage(message: string, language?: string): Promise<string> {
+    const res = await api.post('/chat/message', { message, language });
     return res.data.response;
   },
 

@@ -27,7 +27,7 @@ type HomeCache = {
 };
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const [chatVisible, setChatVisible] = useState(false);
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
@@ -155,7 +155,7 @@ export default function HomeScreen() {
     setChatMessages(prev => [...prev, { role: 'user', content: text }]);
     setChatLoading(true);
     try {
-      const resp = await chatService.sendMessage(text);
+      const resp = await chatService.sendMessage(text, i18n.language);
       setChatMessages(prev => [...prev, { role: 'assistant', content: resp }]);
     } catch {
       setChatMessages(prev => [...prev, { role: 'assistant', content: t('home.chatError') }]);

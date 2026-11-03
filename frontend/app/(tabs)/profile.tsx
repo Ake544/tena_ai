@@ -140,6 +140,14 @@ export default function ProfileScreen() {
       const result = await pushService.register();
       if (result) {
         await pushService.sendTokenToBackend(result.token, result.deviceId);
+      } else {
+        // Registration failed — revert toggle
+        setNotificationsEnabled(false);
+        await storageService.setNotificationsEnabled(false);
+        Alert.alert(
+          t('common.error'),
+          'Could not enable notifications. Please check your device settings and try again.',
+        );
       }
     }
   };

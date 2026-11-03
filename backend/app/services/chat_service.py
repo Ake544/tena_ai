@@ -25,12 +25,15 @@ def clean_response(text: str) -> str:
     return text.strip()
 
 GREETING_KEYWORDS = {"hi", "hello", "hey", "你好", "ሰላም", "helo", "good morning", "good evening"}
-CACHED_GREETING = "Hi there! I'm Tenachin AI, your diabetes care assistant. How can I help you today? You can ask me about your glucose readings, medications, diet tips, or anything diabetes-related."
+CACHED_GREETING_EN = "Hi there! I'm Tenachin AI, your diabetes care assistant. How can I help you today? You can ask me about your glucose readings, medications, diet tips, or anything diabetes-related."
+CACHED_GREETING_AM = "ሰላም! እኔ ጤናችን AI ነኝ፣ የስኳር በሽታ እንክብካቤ ረዳትዎ። ዛሬ እንዴት ልረዳዎት እችላለሁ? ስለ የስኳር መጠንዎ፣ መድኃኒቶችዎ፣ የምግብ ምክሮች ወይም ስለ ስኳር በሽታ ማንኛውንም ጥያቄ መጠየቅ ይችላሉ።"
+ERROR_FALLBACK_EN = "I'm sorry, I'm having trouble connecting right now. Please try again in a moment."
+ERROR_FALLBACK_AM = "ይቅርታ፣ በአሁኑ ጊዜ መገናኘት አልቻልኩም። እባክዎን ትንሽ ቆይተው ድጋሚ ይሞክሩ።"
 
 
-def _cache_key(patient_id, text: str) -> str:
+def _cache_key(patient_id, text: str, lang: str = "en") -> str:
     h = hashlib.sha256(text.lower().strip().encode()).hexdigest()[:16]
-    return f"chat:{patient_id}:{h}"
+    return f"chat:{patient_id}:{lang}:{h}"
 
 
 def _build_context(patient: Patient, db) -> str:
@@ -85,22 +88,26 @@ def _get_history(patient_id, db, limit=4):
 
 
 def _is_greeting(text: str) -> bool:
-    t = text.lower().strip().rstrip("?!.")
+    t = text.lower().strip().rstrip("?!.,?!።፣፤፥፦፧")
     return t in GREETING_KEYWORDS or any(t.startswith(g) for g in GREETING_KEYWORDS)
 
 
-def generate_chat_response(patient: Patient, db, user_message: str) -> str:
+def generate_chat_response(patient: Patient, db, user_message: str, language: str = None) -> str:
     r = get_redis()
+    lang = language or getattr(patient, "language", None) or "en"
+    is_am = lang == "am"
+    cached_greeting = CACHED_GREETING_AM if is_am else CACHED_GREETING_EN
+    error_fallback = ERROR_FALLBACK_AM if is_am else ERROR_FALLBACK_EN
 
     if _is_greeting(user_message):
         user_msg = ChatMessage(patient_id=patient.id, role="user", content=user_message)
         db.add(user_msg)
-        assistant_msg = ChatMessage(patient_id=patient.id, role="assistant", content=CACHED_GREETING)
+        assistant_msg = ChatMessage(patient_id=patient.id, role="assistant", content=cached_greeting)
         db.add(assistant_msg)
         db.commit()
-        return CACHED_GREETING
+        return cached_greeting
 
-    cache_key = _cache_key(patient.id, user_message)
+    cache_key = _cache_key(patient.id, user_message, lang)
     cached = r.get(cache_key)
     if cached:
         try:
@@ -119,7 +126,10 @@ def generate_chat_response(patient: Patient, db, user_message: str) -> str:
     context = _build_context(patient, db)
     history = _get_history(patient.id, db)
 
-    system = f"You are Tenachin AI, a diabetes assistant. Be warm, concise (2-4 sentences). Do not diagnose. Current: {context}"
+    if is_am:
+        system = f"Respond in Amharic (አማርኛ). You are Tenachin AI, a diabetes assistant. Be warm, concise (2-4 sentences). Do not diagnose. Current: {context}"
+    else:
+        system = f"You are Tenachin AI, a diabetes assistant. Be warm, concise (2-4 sentences). Do not diagnose. Current: {context}"
 
     messages = [{"role": "system", "content": system}]
     for msg in history:
@@ -147,4 +157,4 @@ def generate_chat_response(patient: Patient, db, user_message: str) -> str:
     except Exception as e:
         logger.error(f"Groq chat failed: {e}")
         db.rollback()
-        return "I'm sorry, I'm having trouble connecting right now. Please try again in a moment."
+        return error_fallback

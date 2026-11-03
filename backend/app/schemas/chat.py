@@ -6,6 +6,7 @@ import uuid
 
 class ChatRequest(BaseModel):
     message: str = Field(max_length=2000)
+    language: Optional[str] = None
 
 
 class ChatMessageResponse(BaseModel):

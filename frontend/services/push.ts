@@ -1,4 +1,4 @@
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, Linking } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import api from './api';
@@ -52,17 +52,32 @@ export const pushService = {
 
       const { status: existing } = await Notifications.getPermissionsAsync();
       let finalStatus = existing;
+      if (existing === 'denied') {
+        // Permission was previously denied — guide user to settings
+        Alert.alert(
+          'Notifications disabled',
+          'Please enable notifications in your device settings to receive medication and appointment reminders.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ],
+        );
+        return null;
+      }
       if (existing !== 'granted') {
-        await new Promise<void>((resolve) => {
+        const wantsEnable = await new Promise<boolean>((resolve) => {
           Alert.alert(
             'Stay on track with Tenachin AI',
             'We\'ll send you gentle reminders for medications, glucose checks, and appointments. You can change this anytime in Settings.',
             [
-              { text: 'Not now', style: 'cancel', onPress: () => resolve() },
-              { text: 'Enable', onPress: () => resolve() },
+              { text: 'Not now', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Enable', onPress: () => resolve(true) },
             ],
           );
         });
+        if (!wantsEnable) {
+          return null;
+        }
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
